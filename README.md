@@ -10,6 +10,7 @@ Die Software verfügt über eine Export-Funktion, so dass die Daten am PC dann w
 ### Drahtlos über PhyPhox
 
 Es ist geplant, dass alle Modelle mit dem ESP32 Modul ausgestattet werden. Über diese Plattform können die Messwerte dann direkt über Bluetooth und PhyPhox mit dem Smartphone ausgelesen werden. Die Boxen müssen dann lediglich mit Strom versorgt werden. (Netzkabel oder Powerbank)
+https://phyphox.org/de/home-de/
 
 
 ## Boxen
