@@ -17,7 +17,7 @@ https://phyphox.org/de/home-de/
 ### Voltmeter
 Gleichspannungsmessung über ein Zeitintervall
 
-### Entfernungsmessung
+### Entfernungsmesser
 
 Ultraschallsensor - Entfernungsmessung in Abhängigkeit von der Zeit
 
