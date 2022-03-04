@@ -6,8 +6,9 @@ x_lc = 13;
 z_lc = 13;
 y_lc = 80.5;
     d_d = 10.7;
-
     $fn = 40;
+
+
 module load_cell(){
     x = x_lc+0.2;
     z = z_lc+0.2;
@@ -65,13 +66,13 @@ module cover_load(){
     translate([x/2,a1+wall,-10]){
         cylinder(d = d_h, h = z+20);
        translate([0,0,2.5]) cylinder(d = 9, h = 4.5, $fn = 6);
-                #translate([0,0,1.35*z]) cylinder(d = 10.2, h = 4.5);
+                translate([0,0,1.35*z]) cylinder(d = 10.2, h = 4.5);
 
     }
     translate([x/2,a2+wall,-10]){
         cylinder(d = d_h, h = z+20);
         translate([0,0,2.5]) cylinder(d = 9, h = 4.5, $fn = 6);
-        #translate([0,0,1.35*z]) cylinder(d = 10.2, h = 4.5);
+        translate([0,0,1.35*z]) cylinder(d = 10.2, h = 4.5);
 
     }
 
@@ -89,35 +90,43 @@ module cover_load(){
 module deckel(){
     z_1 = 53;
     wall = 1.5;
-    y_1 = wall;
+    y_1 = wall+10;
     x_1 = 38+ 2*wall+2;
     x = 38.5;
     z = x;
     y = 9;
     deckel = 10;
-    translate([0,-30,0]){
+   x_e = 31+1;
+   y_e = 10;
+   z_e = 39+1;
+     b = 3;
+    translate([0,0,0]){
         difference(){
-        translate([0,-y/2,0])cube([x_1,y_1,z_1], center = true);
-        translate([x/3,0,z/3])rotate([90,0,0])cylinder(h = 20, r = 3);
-        }
-        difference(){
+           union(){
+        translate([0,-y/2-5,0])cube([x_1,y_1,z_1], center = true);
         cube([x+0.6,y,z+0.6], center = true);
-        translate([0,0.5,0])cube([x-2*wall,y+1,z-2*wall], center = true);
+        translate([0,-y,0])cube([x_e+b,y_e,z_e+b], center = true);
+
+           }
+        translate([0,-y/2,0])color("red")cube([x_e,y_e+y+wall,z_e], center = true);
+        translate([0,-11,z_e/2])cube([12,7,b+25],center = true);
+        //translate([0,-1,0])cube([x-2*wall,y+5,z-2*wall], center = true);
         }
 
     }
 }
-!deckel();
-difference(){
-color("green")cover_load();
-    *cube(100);
-}
+
+*color("green")cover_load();
+
 *difference(){
     cover_mount();
     load_cell();
     translate([-1.5*x_lc,0,-z_lc/2])difference(){
     cube([x_lc,50,z_lc]);}
 }
-    load_cell();
+
+
+*translate([137.3,-50,-43.5])import("esp32.stl");
+deckel();
 
     
