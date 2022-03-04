@@ -96,20 +96,20 @@ module deckel(){
     z = x;
     y = 9;
     deckel = 10;
-   x_e = 31+1;
+   x_e = 31;
    y_e = 10;
-   z_e = 39+1;
+   z_e = 39;
      b = 3;
     translate([0,0,0]){
         difference(){
            union(){
         translate([0,-y/2-5,0])cube([x_1,y_1,z_1], center = true);
-        cube([x+0.6,y,z+0.6], center = true);
+        cube([x+0.6,y,z], center = true);
         translate([0,-y,0])cube([x_e+b,y_e,z_e+b], center = true);
 
            }
-        translate([0,-y/2,0])color("red")cube([x_e,y_e+y+wall,z_e], center = true);
-        translate([0,-11,z_e/2])cube([12,7,b+25],center = true);
+        translate([0,-y/2+1,0])color("red")cube([x_e,y_e+y+wall,z_e], center = true);
+        translate([0,-7.5,z_e/2])cube([10,12,b+25],center = true);
         //translate([0,-1,0])cube([x-2*wall,y+5,z-2*wall], center = true);
         }
 

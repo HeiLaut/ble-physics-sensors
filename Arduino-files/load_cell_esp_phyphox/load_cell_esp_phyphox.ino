@@ -1,11 +1,11 @@
 #include <HX711_ADC.h>
 #include <phyphoxBle.h>
-HX711_ADC LoadCell(4, 5); //LoadCell(DT,SCK)
+HX711_ADC LoadCell(16, 5); //LoadCell(DT,SCK)
 float mw = 0;
 int n = 0;
 
 void setup() {
-  PhyphoxBLE::start("ESP32 - Kraft");
+  PhyphoxBLE::start("Kraft");
     
   PhyphoxBleExperiment kraft; 
   //
