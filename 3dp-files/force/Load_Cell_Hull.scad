@@ -109,7 +109,7 @@ module deckel(){
 
            }
         translate([0,-y/2+1,0])color("red")cube([x_e,y_e+y+wall,z_e], center = true);
-        translate([0,-7.5,z_e/2])cube([10,12,b+25],center = true);
+        translate([0,-7.5,z_e/2])cube([12,11,b+25],center = true);
         //translate([0,-1,0])cube([x-2*wall,y+5,z-2*wall], center = true);
         }
 
