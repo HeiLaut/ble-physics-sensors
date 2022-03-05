@@ -213,8 +213,12 @@ def gui():
                 ax.grid(True)
                 ax.plot(x,y)
                 fig_agg.draw()
+                if n>=2:
+                    time.sleep(0.05)
+                   
+           
 
-            #takes the x and y values of the array and pushes them to the list-output # zeigt immer letztes Element der Liste an
+            #takes the x and y values of the array and pushes them to the list-output
             window.FindElement('-LISTOUT-').Update(values=output(x,y),scroll_to_index=len(x))
 
         #Actions when plotting is paused
