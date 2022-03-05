@@ -108,7 +108,9 @@ module deckel(){
         translate([0,-y,0])cube([x_e+b,y_e,z_e+b], center = true);
 
            }
-        translate([0,-y/2+1,0])color("red")cube([x_e,y_e+y+wall,z_e], center = true);
+        translate([0,-y/2+1,5.5])color("red")cube([x_e,y_e+y+wall,z_e], center = true);
+        translate([0,-y/2+1,-20])color("red")cube([x_e,y_e+y+wall,9.5], center = true);
+
         translate([0,-7.5,z_e/2])cube([12,11,b+25],center = true);
         //translate([0,-1,0])cube([x-2*wall,y+5,z-2*wall], center = true);
         }
