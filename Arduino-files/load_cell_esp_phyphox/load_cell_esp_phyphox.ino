@@ -1,8 +1,14 @@
 #include <HX711_ADC.h>
 #include <phyphoxBle.h>
+#include <Button.h>
 HX711_ADC LoadCell(16, 5); //LoadCell(DT,SCK)
 float mw = 0;
 int n = 0;
+#define BUTTON_PIN 21 
+//Button offset_button(35);
+int lastState = LOW;  // the previous state from the input pin
+int currentState;     // the current reading from the input pin
+
 
 void setup() {
   PhyphoxBLE::start("Kraft");
@@ -33,10 +39,21 @@ void setup() {
   LoadCell.setCalFactor(717.188); 
   Serial.println("F in mN");
   Serial.begin(9600); 
+  pinMode(BUTTON_PIN, INPUT_PULLUP);
 
 }
 
 void loop() {
+    currentState = digitalRead(BUTTON_PIN);
+
+  if (lastState == HIGH && currentState == LOW)
+    LoadCell.tareNoDelay();
+  else if (lastState == LOW && currentState == HIGH)
+    //Serial.println("The button is released");
+
+  // save the the last state
+  lastState = currentState;
+
   float t = 0.001 * (float)millis();
   LoadCell.update();
   float m = LoadCell.getData();
@@ -49,19 +66,4 @@ void loop() {
   //sum(f, t);
   delay(50);
 
-}
-
-float sum(float value, float zeit){
-  int x = 10;
-  n+=1;
-  mw+=value;
-  if(n == x){
-    //Serial.println(mw/x);
-    float val = mw/x/1000;
-    //Serial.println(val);
-    PhyphoxBLE::write(val);
-    mw = 0;
-    n = 0;
-    val = 0;
-  }
 }
