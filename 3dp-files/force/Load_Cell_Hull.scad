@@ -1,14 +1,13 @@
-a1 = 5;
+module ver1(){
+ a1 = 5;
 a2 = 20;
 d_h = 5.5;  
 d_h_load = 4+2;
 x_lc = 13;
 z_lc = 13;
 y_lc = 80.5;
-    d_d = 10.7;
-    $fn = 40;
-
-
+d_d = 10.7;
+$fn = 40;  
 module load_cell(){
     x = x_lc+0.2;
     z = z_lc+0.2;
@@ -31,10 +30,10 @@ module cover_mount(){
     wall = 0;
     translate([-x/2,-wall,-z/2])
     difference(){
-    cube([x,y+ wall,z]);
-    translate([x/2,a1+wall,-0.5])cylinder(d = d_h, h = z+1);
-    translate([x/2,a2+wall,-0.5])cylinder(d = d_h, h = z+1);
-    translate([-0.5,y/2+wall-1/2,z/2-z_lc+1])rotate([0,90,0])cylinder(d = d_d, h = x+1);
+      cube([x,y+ wall,z]);
+      translate([x/2,a1+wall,-0.5])cylinder(d = d_h, h = z+1);
+      translate([x/2,a2+wall,-0.5])cylinder(d = d_h, h = z+1);
+      translate([-0.5,y/2+wall-1/2,z/2-z_lc+1])rotate([0,90,0])cylinder(d = d_d, h = x+1);
         translate([x/2,y/2+wall-1/2,]){
             cylinder( h = 5, d = d_h_load);
         }
@@ -118,17 +117,112 @@ module deckel(){
     }
 }
 
-*color("green")cover_load();
+   color("green")cover_load();
 
-*difference(){
-    cover_mount();
-    load_cell();
-    translate([-1.5*x_lc,0,-z_lc/2])difference(){
-    cube([x_lc,50,z_lc]);}
+   difference(){
+       cover_mount();
+       load_cell();
+       translate([-1.5*x_lc,0,-z_lc/2])difference(){
+       cube([x_lc,50,z_lc]);}
+   }
+
+
+   translate([0,-20,0])deckel();
+
 }
 
 
-*translate([137.3,-50,-43.5])import("esp32.stl");
-deckel();
 
-    
+module esp(){;
+translate([122,63,-41])rotate([90,0,0])import("esp32.stl");
+}
+
+module ver2(){
+   
+   dMount = 5;
+   dLoad = 4;
+   distHoles = 15;
+   distFirstHole = 20;
+   xLoad = 80;
+   yLoad = 12.7;
+   zLoad = yLoad;
+   xEsp = 31;
+   yEsp = 39;
+   dRod = 10.5;
+   $fn = 40;
+   module holes(){
+      for(i=[[20,0,-50],[35,0,-50]]){
+         translate(i)cylinder(h = 60, d = dMount);
+      }
+      
+      translate([-35,0,-20])cylinder(h = 60, d = dLoad);
+      
+   }
+   module loadcell(){
+      cube([xLoad,yLoad,zLoad],center = true);
+   }
+   module cell_holder(){
+      z = 35;
+      x = 26;
+      y = yEsp+1;
+      translate([xLoad/2-x/2,0,6])
+         difference(){
+         cube([x,y,z], center = true);
+         *translate([-x/2+1,0,z/2-dRod/2-2])rotate([0,90,0])cylinder(d = dRod, h = x+1);
+         translate([0,8,-6])cube([x+1,yLoad+1+16,zLoad+1],center=true);
+         translate([0,0,10])cylinder(d = dMount, h = 10);
+      }
+      translate([-4,0,z/2])difference(){
+         h = 12;
+         cube([xEsp+6,yEsp+1,h],center = true);
+         ver = 10;
+         translate([0,0,h/2-ver/2]){
+            cube([xEsp-1,yEsp+2,ver+0.1],center = true);
+            cube([xEsp,yEsp+2,1.2],center = true);
+         }
+         
+      }
+     
+   }
+   module case(){
+      wall = 2;
+      wall2 = 5;
+      x = xLoad + 10;
+      y = yEsp + 5;
+      z = 35+1;
+      module body(){
+         difference(){
+            cube([x+2*wall,y+2*wall,z+wall2], center = true);
+            translate([0,0,wall2/2])cube([x,y,z+0.1], center = true);
+            for(i=[[20,0,-z/2-wall2/2-0.1],[35,0,-z/2-wall2/2-0.1]]){
+               translate(i)cylinder(d = 10,h=4);
+               }
+            }
+         }
+      module lid(){
+         difference(){
+         cube([x+2*wall,y+2*wall,2*wall],center = true);
+         translate([xLoad/2-26/2,0,-5]){
+            cylinder(d = dMount, h = 10);
+            translate([0,0,3])cylinder(d=7.5,h=3,$fn=6);
+         }
+         }
+      }
+      body();
+      translate([0,0,z/2+3*wall])lid();
+      }
+ 
+   *loadcell();
+   difference(){
+      union(){
+         cell_holder();
+         translate([0,0,4])case();
+      }
+      holes();
+     translate([15,0,16])rotate([0,90,0])cylinder(d = dRod, h = 50);
+   }
+}
+difference(){   
+   ver2();
+   *translate([0,-60,0])cube(120, center = true);
+}
