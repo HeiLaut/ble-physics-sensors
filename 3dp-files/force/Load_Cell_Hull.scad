@@ -1,3 +1,7 @@
+include <BOSL/constants.scad>
+use <BOSL/transforms.scad>
+use <BOSL/shapes.scad>
+
 module ver1(){
  a1 = 5;
 a2 = 20;
@@ -139,7 +143,7 @@ translate([122,63,-41])rotate([90,0,0])import("esp32.stl");
 
 module ver2(){
    
-   dMount = 6;
+   dMount = 5;
    dLoad = 5;
    distHoles = 15;
    distFirstHole = 20;
@@ -151,15 +155,28 @@ module ver2(){
    dRod = 10.5;
    $fn = 40;
    versatz = -4.5;
+   
    module holes(){
+      //holes that fit into load cell
       translate([versatz,0,0]){
       for(i=[[20,0,-50],[35,0,-50]]){
          translate(i)cylinder(h = 60, d = dMount);
       }
       
       translate([-35,0,-20])cylinder(h = 60, d = dLoad);
+      //stand mount
+      translate([15,0,16])rotate([0,90,0])cylinder(d = dRod, h = 50);
+      //screw to secure load cell on stand
+      translate([xLoad/2+versatz-8,-yEsp/2+yEsp/2,16])rotate([-90,0,0])
+      {
+         cylinder(h = yEsp, d = dMount);
+         translate([0,0,yEsp/2-5.5])rotate([0,0,90])cylinder(h = 6, d=8, $fn = 6);
+         cube();
    }
    }
+      
+}
+   
    module loadcell(){
       difference(){
          translate([versatz,0,0])cube([xLoad,yLoad,zLoad],center = true);
@@ -172,10 +189,14 @@ module ver2(){
       translate([xLoad/2-x/2+versatz,0,6])
          difference(){
          cube([x,y,z], center = true);
-         *translate([-x/2+1,0,z/2-dRod/2-2])rotate([0,90,0])cylinder(d = dRod, h = x+1);
          translate([0,8,-6])cube([x+1,yLoad+1+16,zLoad],center=true);
-         translate([0,0,10])cylinder(d = dMount, h = 10);
       }
+      difference(){
+         translate([x+x/2+versatz,0,z/2-1.5])cuboid([20,y,15], center = true, chamfer = 8, edges=EDGES_Z_RT);
+         *translate([x+9/2+1+x/2+versatz+4.5-1,yEsp/2+1,-30])cylinder(d = 10, h = 60,$fn=4);
+         *translate([x+9/2+1+x/2+versatz+4.5-1,-yEsp/2-1,-30])cylinder(d = 10, h = 60);
+      }
+      //esp mount part
       translate([-4+versatz,0,z/2-1.5]){
          difference(){
          h = 15;
@@ -187,6 +208,13 @@ module ver2(){
             translate([0,0,3])cube([xEsp,yEsp+2,1.2],center = true);
          }
          
+      }
+      //end stop for esp
+      translate([xEsp/2,yEsp/2-0.8,5]){
+         hull(){
+         cube([5,2.5,5], center = true);
+         translate([0.5,-2.5,-2.5])rotate([0,0,180])cylinder(h = 5, d = 6, $fn = 3);
+         }
       }
       *color("blue")rotate([0,180,0])translate([xEsp/2,-yEsp/2,-5])esp();
       }
@@ -200,39 +228,56 @@ module ver2(){
       z = 35+1;
       module body(){
          difference(){
-            cube([x+2*wall,y+2*wall,z+wall2], center = true);
-            translate([0,0,wall2/2])cube([x,y,z+0.1], center = true);
+            cuboid([x+2*wall,y+2*wall,z+wall2], center = true,fillet = 2, edges=EDGES_Z_ALL);
+            translate([0,0,wall2/2])cuboid([x,y,z+0.1], center = true, fillet = 2, edges=EDGES_Z_ALL);
+            //bottom holes for screws
             for(i=[[20+versatz,0,-z/2-wall2/2-0.1],[35+versatz,0,-z/2-wall2/2-0.1]]){
                translate(i)cylinder(d = 10,h=4);
                }
                //USB- hole:
-            translate([-8.5,-y/2-wall/2,14.5])cube([11,wall+1,7],center=true);
+            translate([-8.5,-y/2-wall/2,14.5])cube([11,wall+1,5],center=true);
                //switch-hole:
-            translate([-8.5,+y/2+wall/2,14.5])cube([6,wall+1,6],center=true);
+            translate([-8.5,+y/2+wall/2,14.5])cube([6.5,wall+1,6.5],center=true);
 
             }
+            for(i=[[x/2-2,y/2-2,-z/2+wall],
+                   [x/2-2,-y/2+2,-z/2+wall],
+                   [-x/2+2,y/2-2,-z/2+wall],
+                   [-x/2+2,-y/2+2,-z/2+wall]]){
+            translate(i)difference(){
+               cylinder(d = 7, h = z+0.5);
+               translate([0,0,z/2])cylinder(d = 4, h = z+0.6);
+            }
+         }
          }
       module lid(){
          difference(){
-         cube([x+2*wall,y+2*wall,2*wall],center = true);
-         translate([xLoad/2-26/2+versatz,0,-5]){
-            cylinder(d = dMount, h = 10);
-            translate([0,0,3])cylinder(d=7.5,h=3,$fn=6);
-         }
+         cuboid([x+2*wall,y+2*wall,2*wall],center = true,fillet = 2, edges=EDGES_Z_ALL);
+            for(i=[[x/2-2,y/2-2,-z/2+wall],
+                   [x/2-2,-y/2+2,-z/2+wall],
+                   [-x/2+2,y/2-2,-z/2+wall],
+                   [-x/2+2,-y/2+2,-z/2+wall]]){
+            translate(i){
+               cylinder(d = 4, h = z+0.6);
+               translate([0,0,16])cylinder(d = 7, h = 2.1);
+            }
+                      
+                   }
+           
          }
       }
       body();
-      translate([0,0,z/2+3*wall])lid();
+      *translate([0,0,23])lid();
       }
  
    *loadcell();
    difference(){
       union(){
-         color("blue")cell_holder();
-         translate([0,0,4])case();
+          cell_holder();
+          translate([0,0,4])case();
       }
       holes();
-     translate([15+versatz,0,16])rotate([0,90,0])cylinder(d = dRod, h = 50);
+     
    }
 }
 difference(){   
