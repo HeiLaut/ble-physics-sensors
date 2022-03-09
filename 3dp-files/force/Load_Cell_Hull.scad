@@ -167,10 +167,13 @@ module ver2(){
       //stand mount
       translate([15,0,16])rotate([0,90,0])cylinder(d = dRod, h = 50);
       //screw to secure load cell on stand
-      translate([xLoad/2+versatz-8,-yEsp/2+yEsp/2,16])rotate([-90,0,0])
+      translate([xLoad/2+versatz-8,-yEsp/2+yEsp/2,16])rotate([90,0,0])
       {
          cylinder(h = yEsp, d = dMount);
-         translate([0,0,yEsp/2-5.5])rotate([0,0,90])cylinder(h = 6, d=8, $fn = 6);
+         translate([0,0,yEsp/2-5.5]){
+            rotate([0,0,90])cylinder(h = 3.5, d=8, $fn = 6);
+            translate([0,3,1.7])cube([7,9,3.5],center = true);
+      }
          cube();
    }
    }
@@ -245,21 +248,21 @@ module ver2(){
                    [-x/2+2,y/2-2,-z/2+wall],
                    [-x/2+2,-y/2+2,-z/2+wall]]){
             translate(i)difference(){
-               cylinder(d = 7, h = z+0.5);
-               translate([0,0,z/2])cylinder(d = 4, h = z+0.6);
+               cylinder(d = 5, h = z+0.5);
+               translate([0,0,z/2])cylinder(d = 2, h = z+0.6);
             }
          }
          }
       module lid(){
          difference(){
-         cuboid([x+2*wall,y+2*wall,2*wall],center = true,fillet = 2, edges=EDGES_Z_ALL);
+         cuboid([x+2*wall,y+2*wall,1.5*wall],center = true,fillet = 2, edges=EDGES_Z_ALL);
             for(i=[[x/2-2,y/2-2,-z/2+wall],
                    [x/2-2,-y/2+2,-z/2+wall],
                    [-x/2+2,y/2-2,-z/2+wall],
                    [-x/2+2,-y/2+2,-z/2+wall]]){
             translate(i){
-               cylinder(d = 4, h = z+0.6);
-               translate([0,0,16])cylinder(d = 7, h = 2.1);
+               cylinder(d = 3, h = z+0.6);
+               translate([0,0,16])cylinder(d = 4.5, h = 2.1);
             }
                       
                    }
@@ -267,13 +270,13 @@ module ver2(){
          }
       }
       body();
-      *translate([0,0,23])lid();
+      translate([0,0,23])lid();
       }
  
    *loadcell();
    difference(){
       union(){
-          cell_holder();
+          *cell_holder();
           translate([0,0,4])case();
       }
       holes();
