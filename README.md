@@ -14,13 +14,22 @@ https://phyphox.org/de/home-de/
 
 
 ## Boxen
-### Voltmeter
+### Kraftsensor
+
+Alle Dateien vorhanden. (1. Version)
+
+Wägezelle zur Messung der Kraft in Abhängigkeit von der Zeit
+
+### Voltmeter 
+
+(bisher noch mit Ardino nano realisiert)
+
 Gleichspannungsmessung über ein Zeitintervall
 
 ### Entfernungsmesser
 
+(Dateien kommen zeitnah)
+
 Ultraschallsensor - Entfernungsmessung in Abhängigkeit von der Zeit
 
-### Kraftsensor
 
-Wagezelle zur Messung der Kraft in Abhängigkeit von der Zeit
