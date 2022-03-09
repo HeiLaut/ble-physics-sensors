@@ -136,7 +136,7 @@ module ver2(){
          }
       }
       body();
-      translate([0,0,40])lid();
+      translate([0,0,30])lid();
       }
  
    *loadcell();
