@@ -22,7 +22,7 @@ def get_data(port):
     split the data in a array with the first data to be x and
     the seccond to be y. saves the data in the global variable data'''
     global run, data, ser_error
-    ser = serial.Serial(port, baudrate = 9600)
+    ser = serial.Serial(port, baudrate = 115200)
         
 #     except:
 #         print("Serial Error")
