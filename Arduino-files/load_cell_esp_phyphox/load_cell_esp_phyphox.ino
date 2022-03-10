@@ -3,7 +3,6 @@
 #include <Button.h>
 HX711_ADC LoadCell(16, 5); //LoadCell(DT,SCK)
 #define BUTTON_PIN 21 
-//Button offset_button(35);
 int lastState = LOW;  // the previous state from the input pin
 int currentState;     // the current reading from the input pin
 
