@@ -1,3 +1,6 @@
+include <BOSL/constants.scad>
+use <BOSL/transforms.scad>
+use <BOSL/shapes.scad>
 
 us_hole_dia = 16.5; //Lochdurchmesser Ultraschallmodul
 us_hole_dis = 25;
@@ -18,40 +21,12 @@ us_d_x = 15.5; //Abstand in der Ultrashallsensorlöcher von oben
 
 $fn = 40;
 
-    
-
-module stativ(){
-    width = 15;
-    height = 28;
-    thick = 5;
-    module base(){
-        linear_extrude(thick){
-            intersection(){
-            circle(r = 14);
-            square([width, height], center = true);
-            }
-            translate([0,3,0])square([width, height], center = true);
-        }
-    }
-    difference(){
-        union(){
-            base();
-            translate([0,0,11])base();
-        }
-        translate([0,-6,0])cylinder(d  = 4, h = 20);
-    }
-    module chamfer(){
-        linear_extrude(width){
-            difference(){
-            square(5);
-            circle(d = 10);
-            }
-        }
-    }
-    translate([width/2,12,-5])rotate([0,-90,0])chamfer();
-    translate([-width/2,12,21])rotate([0,90,0])chamfer();
+module us_s(){
+   translate([5.5,2,11])
+   rotate([180,0,90])
+   import("HC-SR04.stl");
 }
-    
+*color("blue")us_s();
     
     
     
@@ -88,7 +63,7 @@ module case(){
             p3 = [b,a];
             polygon(points = [p1,p2,p3]);
         }
-        u_z = 10;
+        u_z = 8;
         u_y = 1.5;
         u_x = 15;
         
@@ -97,14 +72,23 @@ module case(){
         e_x = 1.5;
         
         e_s_y = 36.6; //Abstand
-        translate([us_d_x-u_x/2,0,0])cube([u_x,u_y,u_z]);
-        translate([us_d_x-u_x/2,inner_y-u_y,0])cube([u_x,u_y,u_z]);
+        
+        
+           for(i=[[3.5,0,0],[3.5+u_x+3,0,0],[3.5,43,0],[3.5+u_x+3,43,0]]){
+              translate(i)difference(){
+               cube([3,3,u_z]);
+               translate([1.5,1.5,3.5])cylinder(d=1,h=6);
+           }
+        }
+        translate([us_d_x-u_x/2-1.5,0,0])cube([u_x,u_y,u_z]);
+        translate([us_d_x-u_x/2-1.5,inner_y-u_y,0])cube([u_x,u_y,u_z]);
         cube([e_x,e_y,e_z]);
         translate([inner_x-e_x,0,0])cube([e_x,e_y,e_z]);
         linear_extrude(inner_z-3*wall)translate([0,e_s_y,0]){
             tria(a=2,b=2);
             translate([0,2])square([2,4]);
         }
+        
 
     }
     translate([wall,wall,wall])puffer();
@@ -125,13 +109,29 @@ module case(){
 
         
     }
-    translate([0,0,outer_z+wall])deckel();
+    module mount(){
+       dRod = 10.5;
+       x=20;
+       y=30;
+       z=20;
+       l = 11;
+       translate([-outer_x/2+x/2-1.5*wall,outer_y/2,x/2])difference(){
+         cuboid([x,y,z],fillet=3,edges = EDGES_Z_LF);
+          translate([2.5,y/2+0.5,0])rotate([90,0,0])cylinder(d = dRod, h = y+1);
+          translate([-x/2+2,0,0])rotate([90,0,90]){
+            rotate([0,0,90])cylinder(h = 3.5, d=8, $fn = 6);
+            translate([0,l/2,1.7])cube([7,l,3.5],center = true);
+           translate([0,0,-2.5])cylinder(d = 5, h =10);
+          }
+       }
+    }
+    mount();
+    *translate([0,0,outer_z+wall])deckel();
 
 }
 difference(){
     union(){
     case();
-    translate([outer_x+17,outer_y/2-16/2,7.5])rotate([0,90,90])stativ();
     }
-*cube([outer_x,outer_y/2,outer_z+10]);
+   *cube([outer_x,outer_y/2,outer_z+10]);
 }
