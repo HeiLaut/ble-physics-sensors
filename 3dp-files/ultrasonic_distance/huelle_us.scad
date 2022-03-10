@@ -117,7 +117,7 @@ module case(){
        l = 11;
        translate([-outer_x/2+x/2-1.5*wall,outer_y/2,x/2])difference(){
          cuboid([x,y,z],fillet=3,edges = EDGES_Z_LF);
-          translate([2.5,y/2+0.5,0])rotate([90,0,0])cylinder(d = dRod, h = y+1);
+          scale([1,1,1.05])translate([2.5,y/2+0.5,0])rotate([90,0,0])cylinder(d = dRod, h = y+1);
           translate([-x/2+2,0,0])rotate([90,0,90]){
             rotate([0,0,90])cylinder(h = 3.5, d=8, $fn = 6);
             translate([0,l/2,1.7])cube([7,l,3.5],center = true);
