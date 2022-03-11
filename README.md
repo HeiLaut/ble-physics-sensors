@@ -1,6 +1,9 @@
 # Sensors for physics lessons
 
 Sensor boxes for digital data acquisition in physics lessons.
+
+A detailed description how to build the sensors and use the software can be found in the wiki: https://github.com/HeiLaut/Physics-Arduino-Sensors/wiki
+
 ## Software
 
 ### Python Serial Plotter
