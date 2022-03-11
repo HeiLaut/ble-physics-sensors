@@ -1,4 +1,4 @@
-# Physics-Arduino-Sensors
+# Sensoren für den Physikunterricht
 
 Sensorboxen zur digitalen Messwerterfassung im Physikunterricht.
 ## Software
