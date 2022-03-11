@@ -67,7 +67,7 @@ void setup()
    firstView.addElement(secondGraph);            //attach second graph to view
 
    PhyphoxBLE::addExperiment(entfernung);      //Attach experiment to server
-   Serial.begin(9600);
+   Serial.begin(115200);
    
    d_old = 0;
    timer = 0;
