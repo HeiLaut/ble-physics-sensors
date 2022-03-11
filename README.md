@@ -1,3 +1,35 @@
+# Sensors for physics lessons
+
+Sensor boxes for digital data acquisition in physics lessons.
+## Software
+
+### PyPlot via PC
+
+The sensor boxes can all be read out via a computer. For this purpose a Pyhton program is developed, which plots the respective measured value over time. The software has an export function so that the data can then be further processed on the PC.
+
+### Wireless via PhyPhox
+
+It is planned that all models will be equipped with the ESP32 module. Using this platform, the measured values can then be read out directly via Bluetooth and PhyPhox with the smartphone. The boxes then only need to be supplied with power. (power cable or power bank) https://phyphox.org/de/home-de/
+Boxes
+
+### Force sensor
+
+All files available. (1st version)
+
+Load cell to measure the force as a function of time
+
+### Voltmeter
+
+(so far still realized with Ardino nano)
+
+DC voltage measurement over a time interval
+### Distance meter
+
+(files coming soon)
+
+ultrasonic sensor - distance measurement as a function of time
+
+
 # Sensoren für den Physikunterricht
 
 Sensorboxen zur digitalen Messwerterfassung im Physikunterricht.
