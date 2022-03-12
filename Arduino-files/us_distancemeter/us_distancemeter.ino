@@ -35,9 +35,9 @@ void setup()
    PhyphoxBleExperiment::View firstView;
    firstView.setLabel("Graph"); 
    PhyphoxBleExperiment::View secondView;
-   firstView.setLabel("Einfach");//Create a "view"
+   secondView.setLabel("Einfach");//Create a "view"
    PhyphoxBleExperiment::View thirdView;
-   firstView.setLabel("Geschwindigkeit");//Create a "view"
+   thirdView.setLabel("Geschwindigkeit");//Create a "view"
    
 
    //Graph
@@ -57,7 +57,7 @@ void setup()
    secondGraph.setUnitY("cm/s");
    secondGraph.setLabelX("Zeit");
    secondGraph.setLabelY("Geschwindigkeit");
-   secondGraph.setStyle("dots");
+   //secondGraph.setStyle("dots");
 
  
    secondGraph.setChannel(1,3);
