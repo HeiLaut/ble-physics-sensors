@@ -1,10 +1,12 @@
 # Sensors for physics lessons
 
 Sensor boxes for digital data acquisition in physics lessons.
+
+A detailed description how to build the sensors and use the software can be found in the wiki: https://github.com/HeiLaut/Physics-Arduino-Sensors/wiki
+
 ## Software
 
-### PyPlot via PC
-
+### Python Serial Plotter
 The sensor boxes can all be read out via a computer. For this purpose a Pyhton program is developed, which plots the respective measured value over time. The software has an export function so that the data can then be further processed on the PC.
 
 ### Wireless via PhyPhox
@@ -34,7 +36,7 @@ ultrasonic sensor - distance measurement as a function of time
 
 Sensorboxen zur digitalen Messwerterfassung im Physikunterricht.
 ## Software
-### PyPlot über den PC
+### Python Serial Plotter
 
 Die Sensorboxen können alle über einen Computer ausgelesen werden. Dazu wird ein Pyhton-Program entwickelt, welche den jeweiligen Messwert über die Zeit darstellt.
 Die Software verfügt über eine Export-Funktion, so dass die Daten am PC dann weiter verarbeitet werden können.
