@@ -1,11 +1,14 @@
 #include <phyphoxBle.h> 
 #include <NewPing.h>
 #include <Button.h>
-
+#include <QuickStats.h>
 #define TRIGGER_PIN 17
 #define ECHO_PIN 16
 #define MAX_DISTANCE 200
-
+float readings[]={0,0,0,0,0};
+float times[]={0,0,0,0,0};
+int numreadings = 5;
+QuickStats stats; //initialize an instance of this class
 float duration, distance, d_old, velocity, offset,t_offset;
 int timer;
 Button offset_button(2);
@@ -19,28 +22,53 @@ void setup()
 
   //phyphox setup
    
-   PhyphoxBLE::start("ESP32 - Distanz");
+   PhyphoxBLE::start("Distanz");
 
    //Experiment
    PhyphoxBleExperiment entfernung;   //generate experiment on Arduino which plot random values
 
-  entfernung.setTitle("Entfernungsmesser");
-  entfernung.setCategory("Arduino Experiments");
-  entfernung.setDescription("Die Entfernung eines Objekts zum Sensor wird in Zeitabhängigkeit gemessen");
+   entfernung.setTitle("Entfernungsmesser");
+   entfernung.setCategory("Arduino Experiments");
+   entfernung.setDescription("Die Entfernung eines Objekts zum Sensor wird in Zeitabhängigkeit gemessen");
 
    //View
    PhyphoxBleExperiment::View firstView;
-   firstView.setLabel("FirstView"); //Create a "view"
+   firstView.setLabel("Graph"); 
+   PhyphoxBleExperiment::View secondView;
+   firstView.setLabel("Einfach");//Create a "view"
+   PhyphoxBleExperiment::View thirdView;
+   firstView.setLabel("Geschwindigkeit");//Create a "view"
+   
 
    //Graph
-   PhyphoxBleExperiment::Graph firstGraph;      //Create graph which will p lot random numbers over time     
+   PhyphoxBleExperiment::Graph firstGraph;    
    firstGraph.setLabel("s(t)");
    firstGraph.setUnitX("s");
    firstGraph.setUnitY("cm");
    firstGraph.setLabelX("Zeit");
    firstGraph.setLabelY("Entfernung");
+
+
+   firstGraph.setChannel(1,2);
    
+   PhyphoxBleExperiment::Graph secondGraph;      //Create graph which will plot random numbers over time     
+   secondGraph.setLabel("v(t)");
+   secondGraph.setUnitX("s");
+   secondGraph.setUnitY("cm/s");
+   secondGraph.setLabelX("Zeit");
+   secondGraph.setLabelY("Geschwindigkeit");
+   secondGraph.setStyle("dots");
+
+ 
+   secondGraph.setChannel(1,3);
    
+   PhyphoxBleExperiment::Value dist;         //Creates a value-box.
+   dist.setLabel("s");                  //Sets the label
+   dist.setPrecision(2);                     //The amount of digits shown after the decimal point.
+   dist.setUnit("cm");                        //The physical unit associated with the displayed value.
+   dist.setColor("FFFFFF");                  //Sets font color. Uses a 6 digit hexadecimal value in "quotation marks".
+   dist.setChannel(2);
+   dist.setXMLAttribute("size=\"2\"");
 
    /* Assign Channels, so which data is plotted on x or y axis 
    *  first parameter represents x-axis, second y-axis
@@ -48,29 +76,23 @@ void setup()
    *  Channel 1 to N corresponding to the N-parameter which is written in server.write()
    */
 
-   firstGraph.setChannel(1,2);
-   
-  PhyphoxBleExperiment::Graph secondGraph;      //Create graph which will plot random numbers over time     
-   secondGraph.setLabel("v(t)");
-   secondGraph.setUnitX("s");
-   secondGraph.setUnitY("cm/s");
-   secondGraph.setLabelX("Zeit");
-   secondGraph.setLabelY("Geschwindigkeit");
-   secondGraph.setStyle("dots");
- 
-
-   secondGraph.setChannel(1,3);
 
 
+   firstView.addElement(dist);
    firstView.addElement(firstGraph);            //attach graph to view
-  entfernung.addView(firstView);         //Attach view to experiment
-   firstView.addElement(secondGraph);            //attach second graph to view
+   secondView.addElement(dist);
+
+   thirdView.addElement(secondGraph);           //attach second graph to view
+
+   entfernung.addView(firstView);               //Attach view to experiment
+   entfernung.addView(secondView);               //Attach view to experiment
+   entfernung.addView(thirdView);               //Attach view to experiment
 
    PhyphoxBLE::addExperiment(entfernung);      //Attach experiment to server
    Serial.begin(115200);
    
    d_old = 0;
-   timer = 0;
+   timer = 1;
    offset = 0;
    t_offset = 0;
    //Serial.print("Entfernung in cm");
@@ -92,21 +114,25 @@ void loop()
     offset = distance;
   }
     
-  timer += 1;
-  if(timer == 100){
-    timer =0;
-  }
   
   duration = sonar.ping();
   distance = (duration / 2) * 0.0343-offset;
   
+  readings[timer-1]=distance;
+  
+  times[timer-1]=t;
+  
   if(timer%5 ==0){
-      velocity = (distance-d_old)/0.05;
-      d_old = distance;
-  }
+    velocity = stats.slope(times,readings,numreadings);
+      //velocity = (distance-d_old)/0.04;
+      //d_old = distance;
+     timer = 0;
+ }
+  timer += 1;
   // unsigned int distance = sonar.ping_cm();
-  Serial.print(t);
-  Serial.print(",     ");
+  //Serial.print(t);
+  Serial.print(velocity);
+  Serial.print(",");
   Serial.println(distance);
   
    PhyphoxBLE::write(t, distance, velocity);   
