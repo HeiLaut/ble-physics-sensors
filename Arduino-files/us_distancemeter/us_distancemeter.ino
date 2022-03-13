@@ -95,9 +95,7 @@ void setup()
    timer = 1;
    offset = 0;
    t_offset = 0;
-   //Serial.print("Entfernung in cm");
-   //Serial.print(",     ");
-   //Serial.println("Geschwindigkeit in cm/s");
+
 
 }
 
@@ -107,8 +105,7 @@ void loop()
    float t = 0.001 * (float)millis()-t_offset; 
    
   if (offset_button.pressed()){
-    //Serial.println("pressed");
-    distance = (duration / 2) * 0.0343;
+    distance = round((duration / 2) * 0.0343*10)/10;
     t = 0.001 * (float)millis();
     t_offset = t;
     offset = distance;
@@ -116,7 +113,7 @@ void loop()
     
   
   duration = sonar.ping();
-  distance = (duration / 2) * 0.0343-offset;
+  distance = round(((duration / 2) * 0.0343-offset)*10)/10;
   
   readings[timer-1]=distance;
   
@@ -124,14 +121,10 @@ void loop()
   
   if(timer%5 ==0){
     velocity = stats.slope(times,readings,numreadings);
-      //velocity = (distance-d_old)/0.04;
-      //d_old = distance;
      timer = 0;
  }
   timer += 1;
-  // unsigned int distance = sonar.ping_cm();
-  //Serial.print(t);
-  Serial.print(velocity);
+  Serial.print(t);
   Serial.print(",");
   Serial.println(distance);
   
