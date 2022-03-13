@@ -1,4 +1,4 @@
-# Sensors for physics lessons
+# Sensors for physic lessons
 
 Sensor boxes for digital data acquisition in physics lessons.
 
