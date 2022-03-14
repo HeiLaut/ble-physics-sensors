@@ -43,7 +43,7 @@ Load cell to measure the force as a function of time
 
 DC voltage measurement over a time interval
 
-### Distance meter
+### Rangefinder
 All files available. (1st version)
 
 ultrasonic sensor - distance measurement as a function of time
