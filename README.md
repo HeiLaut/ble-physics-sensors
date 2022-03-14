@@ -8,7 +8,7 @@ https://github.com/HeiLaut/Physics-Arduino-Sensors/wiki
 ## Software
 
 ### Wireless via PhyPhox
-<img src="https://github.com/HeiLaut/Physics-Arduino-Sensors/blob/main/images/us_example.jpg" width=50% height=50%>
+<img src="https://github.com/HeiLaut/Physics-Arduino-Sensors/blob/main/images/us_example.jpg" width=25%>
 
 
 It is planned that all models will be equipped with the ESP32 module. Using this platform, the measured values can then be read out directly via Bluetooth and PhyPhox with the smartphone. The boxes then only need to be supplied with power. (power cable or power bank) https://phyphox.org/de/home-de/
