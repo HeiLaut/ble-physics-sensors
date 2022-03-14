@@ -67,7 +67,7 @@ Gleichspannungsmessung über ein Zeitintervall
 
 ### Entfernungsmesser
 
-(Dateien kommen zeitnah)
+Alle Dateien vorhanden. (1. Version)
 
 Ultraschallsensor - Entfernungsmessung in Abhängigkeit von der Zeit
 
