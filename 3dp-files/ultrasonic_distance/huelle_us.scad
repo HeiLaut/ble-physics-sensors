@@ -126,7 +126,7 @@ module case(){
        }
     }
     mount();
-    *translate([0,0,outer_z+wall])deckel();
+    translate([0,0,outer_z+wall+20])deckel();
 
 }
 difference(){
