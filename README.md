@@ -2,7 +2,9 @@
 
 ## Goal
 
-Provide **easy to use** and cheap sensorboxes for digital data acquisition that can be used in physic lessons by students or by the teacher as demonstration.
+**Easy to use** and cheap sensorboxes for digital data acquisition that can be used in physic lessons by students or by the teacher as demonstration.
+
+Each Box can be build for under 20 €.
 
 All boxes are equiped with an esp32, so that they can communicate via BLE or serial connection. 
 
@@ -52,6 +54,8 @@ ultrasonic sensor - distance measurement as a function of time
 ## Ziel
 
 **Konstengünstige** und einfach zu nutzende Sensor-Boxen für den Physikunterricht zur verfügung zu stellen, die im Physikunterricht von Schülern oder vom Lehrer zur Demonstration eingesetzt werden können.
+
+Alle Boxen können für unter 20 € gebaut werden.
 
 Alle Boxen sind mit einem esp32 ausgestattet, so dass sie über BLE oder eine serielle Verbindung kommunizieren können. 
 
