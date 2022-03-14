@@ -11,12 +11,13 @@ https://github.com/HeiLaut/Physics-Arduino-Sensors/wiki
 <img src="https://github.com/HeiLaut/Physics-Arduino-Sensors/blob/main/images/us_example.jpg" width=25%>
 
 
-It is planned that all models will be equipped with the ESP32 module. Using this platform, the measured values can then be read out directly via Bluetooth and PhyPhox with the smartphone. The boxes then only need to be supplied with power. (power cable or power bank) https://phyphox.org/de/home-de/
-Boxes
+It is planned that all models will be equipped with the ESP32 module. Using this platform, the measured values can then be read out directly via Bluetooth and PhyPhox (https://phyphox.org/de/home-de/) with the smartphone. The boxes then only need to be supplied with power. (power cable or power bank) 
+
 
 ### Python Serial Plotter
 The sensor boxes can all be read out via a computer. For this purpose a Pyhton program is developed, which plots the respective measured value over time. The software has an export function so that the data can then be further processed on the PC.
 
+## Boxes
 
 ### Force sensor
 
