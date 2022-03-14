@@ -1,6 +1,16 @@
-# Sensors for physic lessons
+# Sensor boxes for physic lessons
 
-Sensor boxes for digital data acquisition in physics lessons. 
+## Goal
+
+Provide **easy to use** and cheap sensorboxes for digital data acquisition that can be used in physic lessons by students or by the teacher as demonstration.
+
+All boxes are equiped with an esp32, so that they can communicate via BLE or serial connection. 
+
+Just power up the sensor-box and take a smartphone with pyhphox installed, and you can start. Nothing more is needed.
+
+If you want more, you can export the data from phyphox or read the data via serial connection on any pc and process them in the software you want.
+
+## how to build
 
 A detailed description how to build the sensors and use the software can be found in the wiki at this repository: 
 https://github.com/HeiLaut/Physics-Arduino-Sensors/wiki
@@ -39,7 +49,17 @@ ultrasonic sensor - distance measurement as a function of time
 
 # Sensoren für den Physikunterricht
 
-Sensorboxen zur digitalen Messwerterfassung im Physikunterricht.
+## Ziel
+
+**Konstengünstige** und einfach zu nutzende Sensor-Boxen für den Physikunterricht zur verfügung zu stellen, die im Physikunterricht von Schülern oder vom Lehrer zur Demonstration eingesetzt werden können.
+
+Alle Boxen sind mit einem esp32 ausgestattet, so dass sie über BLE oder eine serielle Verbindung kommunizieren können. 
+
+Einfach die Sensor-Box einschalten und ein Smartphone mit installiertem pyhphox nehmen, und schon kann es losgehen. Mehr ist nicht nötig.
+
+Wenn Sie mehr wollen, können Sie die Daten aus phyphox exportieren oder die Daten über eine serielle Verbindung auf einem beliebigen PC auslesen und in der gewünschten Software verarbeiten.
+
+
 ## Software
 
 
@@ -54,6 +74,7 @@ Die Sensorboxen können alle über einen Computer ausgelesen werden. Dazu wird e
 Die Software verfügt über eine Export-Funktion, so dass die Daten am PC dann weiter verarbeitet werden können.
 
 ## Boxen
+
 ### Kraftsensor
 
 Alle Dateien vorhanden. (1. Version)
