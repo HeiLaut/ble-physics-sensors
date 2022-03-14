@@ -1,6 +1,6 @@
 # Sensors for physic lessons
 
-Sensor boxes for digital data acquisition in physics lessons.
+Sensor boxes for digital data acquisition in physics lessons. 
 
 A detailed description how to build the sensors and use the software can be found in the wiki: https://github.com/HeiLaut/Physics-Arduino-Sensors/wiki
 
@@ -26,9 +26,9 @@ Load cell to measure the force as a function of time
 (so far still realized with Ardino nano)
 
 DC voltage measurement over a time interval
-### Distance meter
 
-(files coming soon)
+### Distance meter
+All files available. (1st version)
 
 ultrasonic sensor - distance measurement as a function of time
 
