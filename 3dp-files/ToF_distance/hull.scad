@@ -23,13 +23,19 @@ module ToF(){
 
 module hull(){
     up(z/2+wall/2)difference(){
-       cuboid([espX+2*wall,espY+2*wall,z+wall], fillet = 2, edges=EDGES_Z_ALL);
+       down(0.5)cuboid([espX+2*wall,espY+2*wall,z+wall+1], fillet = 2, edges=EDGES_Z_ALL);
         up(wall/2)cuboid([espX,espY,z+0.1], fillet = 1, edges=EDGES_Z_ALL);
-        translate([0,0,-z/2])cuboid([4,6,wall+1],fillet  =1, edges=EDGES_Z_ALL);
+        translate([0,0,-z/2-2])cuboid([4,6,wall+5],fillet  =1, edges=EDGES_Z_ALL);
         translate([0,-espY/2,8])cuboid([usbX,5,usbZ],fillet = 1, edges=EDGES_Y_ALL);
+       translate([-3.5-2,0,-z/2])cuboid([4,16,2]);
+        //tof screw hole
+        for(i=[[-2,9.7,-4-z/2],[-2,-9.7,-4-z/2]]){
+        color("red")translate(i)
+            cylinder(d = 3, h = dist+1);}
         
         //switch hole
-        translate([0,+espY/2+wall/2,8])cube([6.5,wall+1,6.5],center=true);
+        //translate([0,+espY/2+wall/2,8])cube([6.5,wall+1,6.5],center=true);
+            translate([0,espY/2+2,0])rotate([90,0,0])cylinder(d = 6.8, h = 5);
 
         
         //lid holder
@@ -49,27 +55,20 @@ module hull(){
     translate([i*(espX/2-1),0,z_1/2+wall-0.1])cuboid([2,20,z_1]);
     }
     difference(){
-        translate([-espX/2+0.5,espY/2-5.5,15])rotate([0,0,15])cylinder(d = 5,h=11,$fn = 3);
+        translate([-espX/2+0.5,espY/2-5,15])rotate([0,0,15])cylinder(d = 5,h=11,$fn = 3);
          translate([-espX/2,espY/2-10.5,15])rotate([0,30,0])cube([10,10,10]);
     }
     
-        difference(){
-              translate([0,0,wall+dist/2-0.5])cuboid([4+2*wall,6+2*wall,dist],fillet  =1, edges=EDGES_Z_ALL);
-            translate([0,0,wall+dist/2-0.5])cuboid([4,6,dist+1],fillet  =1, edges=EDGES_Z_ALL);
+       
         
             
-    }
     
-    for(i=[[-2,9.7,wall-0.1],[-2,-9.7,wall-0.1]]){
-        color("red")translate(i)difference(){
-            cylinder(d = 5,h=dist);
-            up(wall)cylinder(d = 2, h = dist+1);
-        }
-    }
+    
+    
     
     //lid
-    
-     up(z+2.2+8){
+    module lid(){
+     up(z+2.2+10){
          difference(){
        cuboid([espX+2*wall,espY+2*wall,wall], fillet = 2, edges=EDGES_Z_ALL);for(i=[-1,1]){
     translate([i*(espX/2-1.5),espY/2-2,-2])cylinder(d=2.5,h=5);
@@ -78,7 +77,9 @@ module hull(){
      poslid=0.1;
      translate([0,-espY/2+wall+poslid,-2.5-wall/2])cuboid([espX-3,wall*2,5]);
      translate([-espX/2+1.5,-(espY)/2+0.3+poslid,-3.5])rotate([0,90,0])cylinder(h=espX-3,d=2);
-}   
+   }
+}
+   lid();
     
 }
 
@@ -101,8 +102,8 @@ module mount(x_d){
     
 difference(){
     hull();
-    *translate([0,-25,-1])cube(50);
+    *down(2)translate([-25 ,0,-1])cube(50);
 }
     mount(espX-0.5);
-    //ToF();
+    *down(5)ToF();
     //color("green")translate([espX/2,-espY/2,z-espZ-7])esp();
