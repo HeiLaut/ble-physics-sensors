@@ -43,10 +43,15 @@ Load cell to measure the force as a function of time
 
 DC voltage measurement over a time interval
 
-### Rangefinder
+### Ultrasonic-Rangefinder
+
 All files available. (1st version)
 
 ultrasonic sensor - distance measurement as a function of time
+
+### Laser-ToF-Rangefinder
+
+
 
 
 # Sensoren für den Physikunterricht
@@ -91,10 +96,10 @@ Wägezelle zur Messung der Kraft in Abhängigkeit von der Zeit
 
 Gleichspannungsmessung über ein Zeitintervall
 
-### Entfernungsmesser
+### Ultraschall-Entfernungsmesser
 
 Alle Dateien vorhanden. (1. Version)
 
 Ultraschallsensor - Entfernungsmessung in Abhängigkeit von der Zeit
 
-
+### Laser-Entfernungsmesser
