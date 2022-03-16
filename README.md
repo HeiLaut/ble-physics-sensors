@@ -33,31 +33,32 @@ The sensor boxes can all be read out via a computer. For this purpose a Pyhton p
 
 ### Force sensor
 
-![building instructions](https://github.com/HeiLaut/Physics-Arduino-Sensors/wiki/Building-Instructions#1-force-gauge)
+![Building instructions in the wiki](https://github.com/HeiLaut/Physics-Arduino-Sensors/wiki/Building-Instructions#1-force-gauge)
 
 All files available.
 
-Load cell to measure the force as a function of time
+Load cell to measure the force as a function of time.
 
 
 ### Ultrasonic-Rangefinder
-![uidling instructions](https://github.com/HeiLaut/Physics-Arduino-Sensors/wiki/Building-Instructions#2-ultrasonic-rangefinder)
+![Building instructions in the wiki](https://github.com/HeiLaut/Physics-Arduino-Sensors/wiki/Building-Instructions#2-ultrasonic-rangefinder)
 
 All files available. 
 
 ultrasonic sensor - distance measurement as a function of time
 
 ### Laser-ToF-Rangefinder
-
+Building instructions commnig soon
 All files available.
 
-ultrasonic sensor - distance measurement as a function of time
+Laser TimeOfFlight-Senosr - distance measurement as a function of time.
 
 ### Voltmeter
+Building instructions commnig soon
 
 (so far still realized with Ardino nano)
 
-DC voltage measurement over a time interval
+DC voltage measurement over a time interval.
 
 # Sensoren für den Physikunterricht
 
