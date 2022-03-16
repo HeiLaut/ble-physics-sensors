@@ -12,7 +12,7 @@ Just power up the sensor-box and take a smartphone with pyhphox installed, and y
 
 If you want more, you can export the data from phyphox or read the data via serial connection on any pc and process them in the software you want.
 
-## how to build
+## How to build
 
 A detailed description how to build the sensors and use the software can be found in the wiki at this repository: 
 https://github.com/HeiLaut/Physics-Arduino-Sensors/wiki
