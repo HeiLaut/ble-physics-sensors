@@ -35,7 +35,7 @@ module hull(){
         
         //switch hole
         //translate([0,+espY/2+wall/2,8])cube([6.5,wall+1,6.5],center=true);
-            translate([0,espY/2+2,0])rotate([90,0,0])cylinder(d = 6.8, h = 5);
+            #translate([0,espY/2+2,-5])rotate([90,0,0])cylinder(d = 7, h = 5);
 
         
         //lid holder
@@ -89,7 +89,7 @@ module mount(x_d){
        y=30;
        z=20;
        l = 11;
-       translate([-x_d+4.2,0,x/2])difference(){
+       translate([-x_d+4.2,0,x/2-1])difference(){
          cuboid([x,y,z],fillet=3,edges = EDGES_Z_LF);
           scale([1,1,1.05])translate([2.5,y/2+0.5,0])rotate([90,0,0])cylinder(d = dRod, h = y+1);
           translate([-x/2+2,0,0])rotate([90,0,90]){
