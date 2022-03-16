@@ -33,7 +33,7 @@ The sensor boxes can all be read out via a computer. For this purpose a Pyhton p
 
 ### Force sensor
 
-![Building instructions in the wiki](https://github.com/HeiLaut/Physics-Arduino-Sensors/wiki/Building-Instructions#1-force-gauge)
+![Building instructions --> wiki](https://github.com/HeiLaut/Physics-Arduino-Sensors/wiki/Building-Instructions#1-force-gauge)
 
 All files available.
 
@@ -41,7 +41,7 @@ Load cell to measure the force as a function of time.
 
 
 ### Ultrasonic-Rangefinder
-![Building instructions in the wiki](https://github.com/HeiLaut/Physics-Arduino-Sensors/wiki/Building-Instructions#2-ultrasonic-rangefinder)
+![Building instructions --> wiki](https://github.com/HeiLaut/Physics-Arduino-Sensors/wiki/Building-Instructions#2-ultrasonic-rangefinder)
 
 All files available. 
 
