@@ -10,18 +10,20 @@ int numreadings = 5;
 QuickStats stats; //initialize an instance of this class                                                            
 float duration, distance, d_old, velocity, offset,t_offset;
 int timer;
+float intervall = 20;
 
 
 void setup() {
   Serial.begin(115200);
    //phyphox setup
    
-   PhyphoxBLE::start("Laser-Distanz");     
+   PhyphoxBLE::start("Laser-Distanz");  
+   PhyphoxBLE::configHandler = &receivedData;     
 
    //Experiment
    PhyphoxBleExperiment entfernung;   //generate experiment on Arduino which plot random values
 
-   entfernung.setTitle("Entfernungsmesser");
+   entfernung.setTitle("Laser-Entfernungsmesser");
    entfernung.setCategory("Arduino Experiments");
    entfernung.setDescription("Die Entfernung eines Objekts zum Sensor wird in Zeitabhängigkeit gemessen");
 
@@ -32,6 +34,7 @@ void setup() {
    secondView.setLabel("Einfach");//Create a "view"
    PhyphoxBleExperiment::View thirdView;
    thirdView.setLabel("Geschwindigkeit");//Create a "view"
+
    
 
    //Graph
@@ -58,11 +61,28 @@ void setup() {
    
    PhyphoxBleExperiment::Value dist;         //Creates a value-box.
    dist.setLabel("s");                  //Sets the label
-   dist.setPrecision(1);                     //The amount of digits shown after the decimal point.
+   dist.setPrecision(2);                     //The amount of digits shown after the decimal point.
    dist.setUnit("cm");                        //The physical unit associated with the displayed value.
    dist.setColor("FFFFFF");                  //Sets font color. Uses a 6 digit hexadecimal value in "quotation marks".
    dist.setChannel(2);
    dist.setXMLAttribute("size=\"2\"");
+
+   PhyphoxBleExperiment::Value vel;         //Creates a value-box.
+   vel.setLabel("v");                  //Sets the label
+   vel.setPrecision(0);                     //The amount of digits shown after the decimal point.
+   vel.setUnit("cm/s");                        //The physical unit associated with the displayed value.
+   vel.setColor("FFFFFF");                  //Sets font color. Uses a 6 digit hexadecimal value in "quotation marks".
+   vel.setChannel(3);
+   vel.setXMLAttribute("size=\"2\"");
+
+       //Edit
+  PhyphoxBleExperiment::Edit myEdit;
+  myEdit.setLabel("Abtastrate");
+  myEdit.setUnit("ms");
+  myEdit.setSigned(false);
+  myEdit.setDecimal(false);
+  myEdit.setChannel(1);
+  myEdit.setXMLAttribute("min=\"20\"");
 
    /* Assign Channels, so which data is plotted on x or y axis 
    *  first parameter represents x-axis, second y-axis
@@ -74,9 +94,12 @@ void setup() {
 
    firstView.addElement(dist);
    firstView.addElement(firstGraph);            //attach graph to view
+   firstView.addElement(myEdit);
+   
    secondView.addElement(dist);
    
    thirdView.addElement(firstGraph); 
+   thirdView.addElement(vel);
    thirdView.addElement(secondGraph);           //attach second graph to view
 
    entfernung.addView(firstView);               //Attach view to experiment
@@ -122,7 +145,7 @@ void loop() {
   
   times[timer-1]=t;
   
-  if(timer%5 ==0){
+  if(timer%numreadings ==0){
     velocity = stats.slope(times,readings,numreadings);
      timer = 0;
  }
@@ -140,5 +163,11 @@ void loop() {
   Serial.println(distance);
   PhyphoxBLE::write(t, distance, velocity);   
  
-  delay(10);
+  delay(intervall);
+}
+
+void receivedData() {           // get data from PhyPhox app
+  float readInput;
+  PhyphoxBLE::read(readInput);
+  intervall = readInput;
 }
