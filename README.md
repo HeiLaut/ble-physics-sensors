@@ -1,4 +1,4 @@
-# Sensor boxes for physic lessons
+# Sensor Boxes for physics lessons
 
 ## Goal
 
