@@ -15,7 +15,7 @@ If you want more, you can export the data from phyphox or read the data via a se
 ## How to build
 
 A detailed description of how to build the sensors and use the software can be found in the wiki at this repository: 
-https://github.com/HeiLaut/Physics-Arduino-Sensors/wiki
+https://github.com/HeiLaut/Physics-Arduino-Sensors/wiki (work in progress)
 
 ## Software
 
