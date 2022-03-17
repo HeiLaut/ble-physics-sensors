@@ -32,8 +32,9 @@ The sensors can also be read out via the serial interface of the computer. For t
 ## Boxes
 
 ### Force sensor
+<img src="https://github.com/HeiLaut/Physics-Arduino-Sensors/blob/main/images/Photo.jpg" width = 50%>
 
-![Building instructions --> wiki](https://github.com/HeiLaut/Physics-Arduino-Sensors/wiki/Building-Instructions#1-force-gauge)
+[Building instructions --> wiki](https://github.com/HeiLaut/Physics-Arduino-Sensors/wiki/Building-Instructions#1-force-gauge)
 
 All files available.
 
@@ -41,14 +42,16 @@ Load cell to measure the force as a function of time.
 
 
 ### Ultrasonic-Rangefinder
-![Building instructions --> wiki](https://github.com/HeiLaut/Physics-Arduino-Sensors/wiki/Building-Instructions#2-ultrasonic-rangefinder)
+<img src="https://github.com/HeiLaut/Physics-Arduino-Sensors/blob/main/images/distance_1.JPG" width = 50%>
+
+[Building instructions --> wiki](https://github.com/HeiLaut/Physics-Arduino-Sensors/wiki/Building-Instructions#2-ultrasonic-rangefinder)
 
 All files available. 
 
 ultrasonic sensor - distance measurement as a function of time
 
 ### Laser-ToF-Rangefinder
-
+<img src="https://github.com/HeiLaut/Physics-Arduino-Sensors/blob/main/images/ToF-Rangefinder.jpg" width = 50%>
 Building instructions commnig soon
 
 All files available.
