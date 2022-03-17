@@ -58,7 +58,7 @@ void setup() {
    
    PhyphoxBleExperiment::Value dist;         //Creates a value-box.
    dist.setLabel("s");                  //Sets the label
-   dist.setPrecision(2);                     //The amount of digits shown after the decimal point.
+   dist.setPrecision(1);                     //The amount of digits shown after the decimal point.
    dist.setUnit("cm");                        //The physical unit associated with the displayed value.
    dist.setColor("FFFFFF");                  //Sets font color. Uses a 6 digit hexadecimal value in "quotation marks".
    dist.setChannel(2);
@@ -140,5 +140,5 @@ void loop() {
   Serial.println(distance);
   PhyphoxBLE::write(t, distance, velocity);   
  
-  delay(20);
+  delay(10);
 }
