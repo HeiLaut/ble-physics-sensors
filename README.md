@@ -27,7 +27,7 @@ It is planned that all models will be equipped with the ESP32 module. Using this
 
 
 ### Python Serial Plotter
-The sensor boxes can all be read out via a computer. For this purpose a Pyhton program is developed, which plots the respective measured value over time. The software has an export function so that the data can then be further processed on the PC.
+The sensors can also be read out via the serial interface of the computer. For this purpose a Pyhton program is developed, which plots the respective measured value over time. The software has an export function so that the data can then be further processed on the PC. The program already works, but is missing a few features.
 
 ## Boxes
 
