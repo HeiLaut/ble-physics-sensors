@@ -1,21 +1,21 @@
-# Sensor boxes for physic lessons
+# Sensor Boxes for physics lessons
 
 ## Goal
 
-**Easy to use** and cheap sensorboxes for digital data acquisition that can be used in physic lessons by students or by the teacher as demonstration.
+**Easy to use** and cheap sensor boxes for digital data acquisition that can be used in physic lessons by students or by the teacher as a demonstration.
 
-Each Box can be build for under 20 €.
+Each Box can be built for under 20 €.
 
-All boxes are equiped with an esp32, so that they can communicate via BLE or serial connection. 
+All boxes are equipped with an esp32, so that they can communicate via BLE or serial connection. 
 
 Just power up the sensor-box and take a smartphone with pyhphox installed, and you can start. Nothing more is needed.
 
-If you want more, you can export the data from phyphox or read the data via serial connection on any pc and process them in the software you want.
+If you want more, you can export the data from phyphox or read the data via a serial connection on any pc and process them in the software you want.
 
 ## How to build
 
-A detailed description how to build the sensors and use the software can be found in the wiki at this repository: 
-https://github.com/HeiLaut/Physics-Arduino-Sensors/wiki
+A detailed description of how to build the sensors and use the software can be found in the wiki at this repository: 
+https://github.com/HeiLaut/Physics-Arduino-Sensors/wiki (work in progress)
 
 ## Software
 
@@ -27,38 +27,41 @@ It is planned that all models will be equipped with the ESP32 module. Using this
 
 
 ### Python Serial Plotter
-The sensor boxes can all be read out via a computer. For this purpose a Pyhton program is developed, which plots the respective measured value over time. The software has an export function so that the data can then be further processed on the PC.
+The sensors can also be read out via the serial interface of the computer. For this purpose, a Pyhton program is developed, which plots the respective measured value over time. The software has an export function so that the data can then be further processed on the PC. The program already works but is missing a few features.
 
 ## Boxes
 
 ### Force sensor
+<img src="https://github.com/HeiLaut/Physics-Arduino-Sensors/blob/main/images/Photo.jpg" width = 50%>
 
-![Building instructions --> wiki](https://github.com/HeiLaut/Physics-Arduino-Sensors/wiki/Building-Instructions#1-force-gauge)
+[Building instructions --> wiki](https://github.com/HeiLaut/Physics-Arduino-Sensors/wiki/Building-Instructions#1-force-gauge)
 
-All files available.
+All files are available.
 
 Load cell to measure the force as a function of time.
 
 
 ### Ultrasonic-Rangefinder
-![Building instructions --> wiki](https://github.com/HeiLaut/Physics-Arduino-Sensors/wiki/Building-Instructions#2-ultrasonic-rangefinder)
+<img src="https://github.com/HeiLaut/Physics-Arduino-Sensors/blob/main/images/distance_1.JPG" width = 50%>
 
-All files available. 
+[Building instructions --> wiki](https://github.com/HeiLaut/Physics-Arduino-Sensors/wiki/Building-Instructions#2-ultrasonic-rangefinder)
+
+All files are available. 
 
 ultrasonic sensor - distance measurement as a function of time
 
 ### Laser-ToF-Rangefinder
-
+<img src="https://github.com/HeiLaut/Physics-Arduino-Sensors/blob/main/images/ToF-Rangefinder.jpg" width = 50%>
 Building instructions commnig soon
 
 All files available.
 
-Laser TimeOfFlight-Senosr - distance measurement as a function of time.
+Laser TimeOfFlight-Sensor - distance measurement as a function of time.
 
 ### Voltmeter
-Building instructions commnig soon
+Building instructions coming soon
 
-(so far still realized with Ardino nano)
+(so far still realized with Arduino nano)
 
 DC voltage measurement over a time interval.
 
