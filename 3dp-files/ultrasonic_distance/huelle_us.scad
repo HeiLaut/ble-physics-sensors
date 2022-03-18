@@ -98,7 +98,7 @@ module case(){
         translate([outer_x/2,-2,21+wall+3])cube([8,10,4], center = true);//hole for usb
         translate([outer_x/2,outer_y-4,21+wall+2])cube([button_x,20,button_x], center = true);
         
-        #translate([3.4,1.5,inner_z-0.3])rotate([0,90,0])cylinder(h=esp_x-3,d=2);
+        translate([3.4,1.5,inner_z-0.3])rotate([0,90,0])cylinder(h=esp_x-3,d=2);
         
     }
     //screw holes
@@ -150,9 +150,9 @@ module lid(){
     translate([i*(esp_x/2-1.3),outer_y/2-3,-2])cylinder(d=2.5,h=5);
        }
      }
-     poslid=-3.4;
+     poslid=-3;
      translate([0,-esp_y/2+wall+poslid,-2.5-wall/2])cuboid([esp_x-3,wall*2,5]);
-     translate([-esp_y/2+5.25,-(esp_y)/2+0.3+poslid,-3.5])rotate([0,90,0])cylinder(h=esp_x-3,d=2);
+     translate([-esp_y/2+5.25,-(esp_y)/2+0.3+poslid,-3.8])rotate([0,90,0])cylinder(h=esp_x-3,d=2);
    }
 }
     translate([outer_x/2,outer_y/2,2])lid();
