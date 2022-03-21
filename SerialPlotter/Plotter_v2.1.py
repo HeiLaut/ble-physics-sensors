@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import serial
 import time
 import threading
-from multiprocessing import Process, Value, Array
+#from multiprocessing import Process, Value, Array
 from random import randint
 import csv
 import serial.tools.list_ports
