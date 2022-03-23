@@ -214,7 +214,7 @@ def gui():
                 ax.plot(x,y)
                 fig_agg.draw()
                 if n>=2:
-                    time.sleep(0.05)
+                   time.sleep(0.05)
                    
            
 
