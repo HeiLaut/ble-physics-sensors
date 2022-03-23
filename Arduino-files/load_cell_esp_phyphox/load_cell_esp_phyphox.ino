@@ -13,38 +13,52 @@ void setup() {
   PhyphoxBleExperiment kraft; 
   //
   kraft.setTitle("Kraftsensor");
-  kraft.setCategory("Arduino Experiments");
+  kraft.setCategory("Sensor-Boxen");
   
  //View
   PhyphoxBleExperiment::View firstView;
   firstView.setLabel("Graph"); //Create a "view"
   PhyphoxBleExperiment::View secondView;
   secondView.setLabel("Einfach"); //Create a "view"
+  PhyphoxBleExperiment::View waage;
+  waage.setLabel("Waage");
+  
+
   //
   PhyphoxBleExperiment::Graph firstGraph;      //Create graph which will p lot random numbers over time     
   firstGraph.setLabel("Kraft");
   firstGraph.setUnitX("s");
   firstGraph.setUnitY("N");
-  firstGraph.setLabelX("Zeit");
-  firstGraph.setLabelY("F");
+  firstGraph.setLabelX("Zeit t");
+  firstGraph.setLabelY("Kraft F");
 
   firstGraph.setChannel(1,2);
 
   //Value
   PhyphoxBleExperiment::Value force;         //Creates a value-box.
   force.setLabel("F");                  //Sets the label
-  force.setPrecision(2);                     //The amount of digits shown after the decimal point.
+  force.setPrecision(4);                     //The amount of digits shown after the decimal point.
   force.setUnit("N");                        //The physical unit associated with the displayed value.
   force.setColor("FFFFFF");                  //Sets font color. Uses a 6 digit hexadecimal value in "quotation marks".
   force.setChannel(2);
   force.setXMLAttribute("size=\"2\"");
 
+  PhyphoxBleExperiment::Value mass;         //Creates a value-box.
+  mass.setLabel("m");                  //Sets the label
+  mass.setPrecision(1);                     //The amount of digits shown after the decimal point.
+  mass.setUnit("g");                        //The physical unit associated with the displayed value.
+  mass.setColor("FFFFFF");                  //Sets font color. Uses a 6 digit hexadecimal value in "quotation marks".
+  mass.setChannel(3);
+  mass.setXMLAttribute("size=\"2\"");
+
 
   firstView.addElement(force);
   firstView.addElement(firstGraph); 
   secondView.addElement(force);
+  waage.addElement(mass);
   kraft.addView(firstView);
   kraft.addView(secondView);
+  kraft.addView(waage);
   PhyphoxBLE::addExperiment(kraft);
    
   LoadCell.begin(); // start connection to HX711
@@ -71,7 +85,7 @@ void loop() {
   Serial.print(t);
   Serial.print(",");
   Serial.println(f);
-  PhyphoxBLE::write(t,f);
+  PhyphoxBLE::write(t,f,m);
 
   //sum(f, t);
   delay(50);
