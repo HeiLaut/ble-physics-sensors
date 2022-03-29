@@ -6,7 +6,7 @@ import serial
 import time
 import threading
 #from multiprocessing import Process, Value, Array
-from random import randint
+#from random import randint
 import csv
 import serial.tools.list_ports
 QT_LOGGING_RULES="qt5ct.debug=false"
@@ -17,24 +17,24 @@ sg.theme("DarkTeal2")
 run = True
 ser_error = False
 data = ["0.0","0.0"]
+alldata = [[],[]]
 def get_data(port):
     '''test the Serial connection and getting data from it
     split the data in a array with the first data to be x and
     the seccond to be y. saves the data in the global variable data'''
     global run, data, ser_error
     ser = serial.Serial(port, baudrate = 115200)
-        
-#     except:
-#         print("Serial Error")
-#         ser_error = True
-#         exit() #Stops Thread, when a Serial Error accures
-    #i = 0
+
     while run  == True:
-        #time.sleep(0.05)
-        #i+=1
-        #data = [i, random.randint(0,10)]
         dat = str(ser.readline())[2:-5]
         data = dat.split(',')
+        
+        # versuche die daten immer zu lesen und insgesamt abzurufen, unabhängig vom fenster!
+        # alldata speichert 2 Listen. besser liste von tupeln nutzen, bzw. zwei arrays damit
+        # die daten direkt im Diagramm abgetragen werden können
+        #alldata[0].append(data[0])
+        #alldata[1].append(data[1])
+        
     ser.close()
 
 def draw_figure(canvas, figure):
@@ -150,9 +150,9 @@ def gui():
 
         if ser_error:
             window['-OUTPUT-'].update("Keine serielle Verbindung. Prüfen Sie die Verbindung mit dem Computer und starten Sie danach das Programm neu.")
-            window.FindElement('Start/Stop').update(disabled = True)
-            window.FindElement('Löschen').update(disabled = True)
-            #window.FindElement('Serielle Verbindung starten').update(disabled = False)
+            window.find_element('Start/Stop').update(disabled = True)
+            window.find_element('Löschen').update(disabled = True)
+            #window.find_element('Serielle Verbindung starten').update(disabled = False)
 
         else:
             window['-OUTPUT-'].update(f"t = {datx}\n y = {daty }")
@@ -172,13 +172,13 @@ def gui():
         y = y[-crop:]
 
         if event == "-FOLDER-":
-            window.FindElement('-FOLDERTEXT-').update(values["-FOLDER-"])
+            window.find_element('-FOLDERTEXT-').update(values["-FOLDER-"])
 
         folder = values["-FOLDER-"]
         #if there is no folder chosem, the export Button will be disabled
 
         if folder != '':
-            window.FindElement('Export csv').update(disabled = False)
+            window.find_element('Export csv').update(disabled = False)
 
         # when clicking the export button a csv-file with the list of values will be createt in the chosen folder
         if event == 'Export csv':
@@ -187,10 +187,10 @@ def gui():
         if event == 'Start/Stop':
             if pause  == False:
                 pause  = True
-                window.FindElement('Löschen').update(disabled = False)
+                window.find_element('Löschen').update(disabled = False)
             else:
                 pause  = False
-                window.FindElement('Löschen').update(disabled = True)
+                window.find_element('Löschen').update(disabled = True)
 
         if event == 'Löschen':
             datx = float(data[0])
@@ -214,12 +214,12 @@ def gui():
                 ax.plot(x,y)
                 fig_agg.draw()
                 if n>=2:
-                   time.sleep(0.05)
+                    time.sleep(0.05)
                    
            
 
             #takes the x and y values of the array and pushes them to the list-output
-            window.FindElement('-LISTOUT-').Update(values=output(x,y),scroll_to_index=len(x))
+            window.find_element('-LISTOUT-').Update(values=output(x,y),scroll_to_index=len(x))
 
         #Actions when plotting is paused
         elif pause == True:
