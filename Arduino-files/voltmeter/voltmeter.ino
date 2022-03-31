@@ -6,8 +6,8 @@ float Vout1 = 0.00;
 float Vin1 = 0.00;
 float Vout2 = 0.00;
 float Vin2 = 0.00;
-float R1 = 100000.00; // resistance of R1 (100K) 
-float R2 = 10000.00; // resistance of R2 (10K) 
+float R1 = 1000000.00; // resistance of R1 (1M) 
+float R2 = 218000.00; // resistance of R2 (220K) 
 int val1 = 0;
 int val2 = 0;
 
@@ -86,13 +86,13 @@ void loop(){
    val1 = analogRead(analogInput1);//reads the analog input
    val2 = analogRead(analogInput2);//reads the analog input
 
-   Vout1 = (val1 *3.3/4095)+0.1356; //according to a problem with the analog input on the esp i have to add an correction of 0.1356 
-   Vout2 = (val2 *3.3/4095)+0.1356;
+   Vout1 = (val1 *0.0007549)+0.19;           // 3.3/4095);//+0.1356; //according to a problem with the analog input on the esp i have to add an correction of 0.1356 
+   Vout2 = (val2 *0.0007549)+0.19;                //3.3/4095);//+0.1356;
 
    
   
    Vin1 = Vout1 / (R2/(R1+R2)); // formula for calculating voltage in i.e. GND
-   Vin2 = Vout2 / (R2/(R1+R2)); // formula for calculating voltage in i.e. GND
+   Vin2 = Vout2 / (R2/(2*R1+R2)); // formula for calculating voltage in i.e. GND
 
    if(val1==0){
     Vin1=0;
@@ -105,9 +105,11 @@ void loop(){
 
 Serial.print(t);
 Serial.print(",");
-Serial.println(val2);
+Serial.print(Vin1);
+Serial.print(",");
+Serial.println(Vin2);
   PhyphoxBLE::write(t,Vin1,Vin2);
 
 //Serial.print("ARead: "); Serial.println(val1);
-delay(50); //for maintaining the speed of the output in serial moniter
+delay(20); //for maintaining the speed of the output in serial moniter
 }
