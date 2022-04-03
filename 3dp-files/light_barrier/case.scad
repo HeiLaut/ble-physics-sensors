@@ -100,7 +100,7 @@ difference(){
    for(i=[-20,20,0]){
       translate([i,-tiefe/2+1,-abstand/2])hole_y(dSock);
    }
-   translate([-(abstand+2*breite-2*rand)/2,tiefe/2-3,-abstand/2-breite/2+rand])rotate([0,90,0])cylinder(d=2, h = abstand+2*breite-2*rand);
+   translate([-(abstand+2*breite-2*rand)/2+1.5,tiefe/2-3,-abstand/2-breite/2+rand+0.4])rotate([0,90,0])cylinder(d=2.3, h = abstand+2*breite-2*rand-3);
 }
 
 translate([0,tiefe+5,0])lid();
