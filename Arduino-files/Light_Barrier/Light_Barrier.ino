@@ -22,11 +22,80 @@ float dtABF = 0; //time between A and B falling points
 
 void setup() {
     PhyphoxBLE::start("Lichtschranke");
+     PhyphoxBLE::setMTU(48); //6 float values 6*4 = 24 bytes
+
+  // An extra task takes care of the experiment creation
+  xTaskCreate(
+    generateExperiment,    // Function that should be called
+    "experimentTask",   // Name of the task (for debugging)
+    16000,            // Stack size (bytes)
+    NULL,            // Parameter to pass
+    1,               // Task priority
+    NULL             // Task handle
+  );
+ 
+
+    pinMode(analogInput1, INPUT); //assigning the input port
+    pinMode(analogInput2, INPUT); //assigning the input port
+
+    Serial.begin(115200); //BaudRate
     
+}
+
+void loop() {
+    float t = 0.001 * (float)millis();
+
+    valA = analogRead(analogInput1);//reads the analog input
+    valB = analogRead(analogInput2);//reads the analog input
+
+    if(valA > 1000 and !trigA){
+      tAR = t;
+      trigA = true;
+  
+           
+    }
+
+    if(valA < 1000 and trigA){
+      tAF = t;
+      dtA = t - tAR;
+      trigA = false;
+    }
+
+    if(valB > 1000 and !trigB){
+      tBR = t;
+      trigB = true;
+      
+      
+    }
+
+    if(valB < 1000 and trigB){
+      tBF = t;
+      dtB = t - tBR;
+      trigB = false;
+    }
+    
+    dtABR = abs(tAR-tBR);
+    dtABF = abs(tAF-tBF);
+    
+
+  float values[6] = {t,valA,valB,dtABR,dtA,dtB};
+
+  PhyphoxBLE::write(&values[0],6);   // Serial.print(dtABR);
+   // Serial.print(",");
+   // Serial.println(dtABF);
+    //delay(5);
+
+
+}
+
+void generateExperiment(void * parameter){
     PhyphoxBleExperiment lightBarrier;
+
     
     lightBarrier.setTitle("Lichtschranke");
     lightBarrier.setCategory("Sensor-Boxen");
+    lightBarrier.numberOfChannels = 6;
+    
     PhyphoxBleExperiment::View graph;
     graph.setLabel("Graph");
 
@@ -70,35 +139,35 @@ void setup() {
     deltaTR.setChannel(4);
     deltaTR.setXMLAttribute("size=\"2\"");
 
-    PhyphoxBleExperiment::Value deltaTF;
-    deltaTF.setLabel("Signallaufzeit L1 L2 F t = ");
-    deltaTF.setPrecision(3);
-    deltaTF.setUnit("s");
-    deltaTF.setColor("FFCC5C"); 
-    deltaTF.setChannel(5);
-    deltaTF.setXMLAttribute("size=\"2\"");
+//    PhyphoxBleExperiment::Value deltaTF;
+//    deltaTF.setLabel("Signallaufzeit L1 L2 F t = ");
+//    deltaTF.setPrecision(3);
+//    deltaTF.setUnit("s");
+//    deltaTF.setColor("FFCC5C"); 
+//    deltaTF.setChannel(5);
+//    deltaTF.setXMLAttribute("size=\"2\"");
 
-//    PhyphoxBleExperiment::Value deltaA;
-//    deltaA.setLabel("Verdunklungszeit A t =");
-//    deltaA.setPrecision(3);
-//    deltaA.setUnit("s");
-//    deltaA.setColor("FFCC5C"); 
-//    deltaA.setChannel(6);
-//    deltaA.setXMLAttribute("size=\"2\"");
-//
-//    PhyphoxBleExperiment::Value deltaB;
-//    deltaB.setLabel("Verdunklungszeit B t = ");
-//    deltaB.setPrecision(3);
-//    deltaB.setUnit("s");
-//    deltaB.setColor("FFCC5C"); 
-//    deltaB.setChannel(7);
-//    deltaB.setXMLAttribute("size=\"2\"");
+    PhyphoxBleExperiment::Value deltaA;
+    deltaA.setLabel("Verdunklungszeit A t =");
+    deltaA.setPrecision(3);
+    deltaA.setUnit("s");
+    deltaA.setColor("FFCC5C"); 
+    deltaA.setChannel(5);
+    deltaA.setXMLAttribute("size=\"2\"");
+
+    PhyphoxBleExperiment::Value deltaB;
+    deltaB.setLabel("Verdunklungszeit B t = ");
+    deltaB.setPrecision(3);
+    deltaB.setUnit("s");
+    deltaB.setColor("FFCC5C"); 
+    deltaB.setChannel(6);
+    deltaB.setXMLAttribute("size=\"2\"");
 
 
     simple.addElement(deltaTR);
-    simple.addElement(deltaTF);
-    //simple.addElement(deltaA);
-   // simple.addElement(deltaB);
+    //simple.addElement(deltaTF);
+    simple.addElement(deltaA);
+    simple.addElement(deltaB);
     graph.addElement(sigGraph);
     graph.addElement(sigGraph2);
     //graph.addElement(timGraph);
@@ -106,54 +175,7 @@ void setup() {
     lightBarrier.addView(simple);
     PhyphoxBLE::addExperiment(lightBarrier);
 
-    
-    pinMode(analogInput1, INPUT); //assigning the input port
-    pinMode(analogInput2, INPUT); //assigning the input port
-
-    Serial.begin(115200); //BaudRate
-
-}
-
-void loop() {
-    float t = 0.001 * (float)millis();
-
-    valA = analogRead(analogInput1);//reads the analog input
-    valB = analogRead(analogInput2);//reads the analog input
-
-    if(valA > 1000 and !trigA){
-      tAR = t;
-      trigA = true;
-           
-    }
-
-    if(valA < 1000 and trigA){
-      tAF = t;
-      dtA = t - tAR;
-      trigA = false;
-    }
-
-    if(valB > 1000 and !trigB){
-      tBR = t;
-      trigB = true;
-    }
-
-    if(valB < 1000 and trigB){
-      tBF = t;
-      dtB = t - tBR;
-      trigB = false;
-    }
-    
-    dtABR = abs(tAR-tBR);
-    dtABF = abs(tAF-tBF);
-    
-
-
-
-    PhyphoxBLE::write(t,valA,valB,dtABR,dtABF);//,dtA,dtB);
-   // Serial.print(dtABR);
-   // Serial.print(",");
-   // Serial.println(dtABF);
-    //delay(5);
+      vTaskDelete(NULL);
 
 
 }
