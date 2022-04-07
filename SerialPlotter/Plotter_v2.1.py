@@ -1,9 +1,11 @@
+# TODO: Übergabe des Messintervalls über serielle Verbinung und damit Steuerung
+
 #!/usr/bin/env python
 import PySimpleGUI as sg
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import matplotlib.pyplot as plt
 import serial
-import time
+#import time
 import threading
 #from multiprocessing import Process, Value, Array
 #from random import randint
@@ -17,7 +19,8 @@ sg.theme("DarkTeal2")
 run = True
 ser_error = False
 data = ["0.0","0.0"]
-alldata = [[],[]]
+serialData = [[],[]]
+
 def get_data(port):
     '''test the Serial connection and getting data from it
     split the data in a array with the first data to be x and
@@ -25,16 +28,16 @@ def get_data(port):
     global run, data, ser_error
     ser = serial.Serial(port, baudrate = 115200)
 
-    while run  == True:
+    while run:
         dat = str(ser.readline())[2:-5]
         data = dat.split(',')
-        
         # versuche die daten immer zu lesen und insgesamt abzurufen, unabhängig vom fenster!
         # alldata speichert 2 Listen. besser liste von tupeln nutzen, bzw. zwei arrays damit
         # die daten direkt im Diagramm abgetragen werden können
-        #alldata[0].append(data[0])
-        #alldata[1].append(data[1])
-        
+        serialData[0].append(float(data[0]))
+        serialData[1].append(float(data[1]))
+        #print(len(serialData[0]))
+    
     ser.close()
 
 def draw_figure(canvas, figure):
@@ -62,6 +65,7 @@ def csv_out(x,y,folder):
         csv_o = list(zip(x,y))
         for row in csv_o:
             writer.writerow(row)
+            
 def list_serial():
     comlist = serial.tools.list_ports.comports()
     connected = []
@@ -77,7 +81,7 @@ def gui():
     # starts a thread, wich is continuesly updating the data comming from the serial port
     # important because so no delay will accure while running the gui
     
-    global run, data, ser_error
+    global run, data, ser_error, n
 
     # starts the serial port selector window
     select_layout = [
@@ -103,7 +107,7 @@ def gui():
     t1 = threading.Thread(target = get_data, args = (port,))
     t1.start()
     
-
+    pause = False
 
 
     # define the form layout
@@ -126,11 +130,11 @@ def gui():
     fig, ax = plt.subplots()
     ax.grid(True)
     fig_agg = draw_figure(canvas, fig)
-    x = []
-    y = []
+    
+    x = serialData[0]
+    y = serialData[1]
     i = 0
     #n = 5
-    pause = True
     x_offset = 0
     while True:
 
@@ -141,12 +145,12 @@ def gui():
         #    t1 = threading.Thread(target = get_data, args = ())
         #    t1.start()
 
-        try:
-            datx = round(float(data[0])-x_offset,2)
-            daty = float(data[1])
-        except:
-            datx = 0.0
-            daty = 0.0
+        #try:
+        #    datx = round(float(data[0])-x_offset,2)
+        #    daty = float(data[1])
+        #except:
+        #    datx = 0.0
+        #    daty = 0.0
 
         if ser_error:
             window['-OUTPUT-'].update("Keine serielle Verbindung. Prüfen Sie die Verbindung mit dem Computer und starten Sie danach das Programm neu.")
@@ -155,7 +159,9 @@ def gui():
             #window.find_element('Serielle Verbindung starten').update(disabled = False)
 
         else:
-            window['-OUTPUT-'].update(f"t = {datx}\n y = {daty }")
+            # output data on screen every update
+            if len(serialData[0])>1:
+                window['-OUTPUT-'].update(f"t = {serialData[0][-1]}\n y = {serialData[1][-1] }")
 
 
 
@@ -166,10 +172,10 @@ def gui():
             break
 
 
-
+        #crop data 
         crop = int(values['SLIDER_CROP'])
-        x = x[-crop:]
-        y = y[-crop:]
+        serialData[0] = serialData[0][-crop:]
+        serialData[1] = serialData[1][-crop:]
 
         if event == "-FOLDER-":
             window.find_element('-FOLDERTEXT-').update(values["-FOLDER-"])
@@ -182,7 +188,7 @@ def gui():
 
         # when clicking the export button a csv-file with the list of values will be createt in the chosen folder
         if event == 'Export csv':
-            csv_out(x,y,folder)
+            csv_out(tempx,tempy,folder)
 
         if event == 'Start/Stop':
             if pause  == False:
@@ -193,33 +199,41 @@ def gui():
                 window.find_element('Löschen').update(disabled = True)
 
         if event == 'Löschen':
-            datx = float(data[0])
-            x_offset = datx
-            x = []
-            y = []
+           #datx = float(data[0])
+            #x_offset = serialData[0][-1]
+            serialData[0] = []
+            serialData[1] = []
+            tempx = []
+            tempy = []
             ax.cla()
             ax.grid(True)
-            ax.plot(x,y)
+            ax.plot(serialData[0],serialData[1])
             fig_agg.draw()
 
          #updating values of x and y and plotting graph
         if pause  == False:
-            n = values['SLIDER']
-            i = int(datx*10)
-            if i % n==0:
-                y.append(float(daty))
-                x.append(float(datx))
-                ax.cla()
-                ax.grid(True)
-                ax.plot(x,y)
-                fig_agg.draw()
-                if n>=2:
-                    time.sleep(0.05)
-                   
+            ax.cla()
+            ax.grid(True)
+            ax.plot(serialData[0],serialData[1])
+            
+            #store data for processing them while pause (mark points)
+            tempx = serialData[0]
+            tempy = serialData[1]
+            
+            fig_agg.draw()
+#             n = values['SLIDER']
+#             i = int(datx*10)
+#             if i % n==0:
+#                 #y.append(float(daty))
+#                 #x.append(float(datx))
+#                
+#                 if n>=2:
+#                     time.sleep(0.05)
+#                    
            
 
             #takes the x and y values of the array and pushes them to the list-output
-            window.find_element('-LISTOUT-').Update(values=output(x,y),scroll_to_index=len(x))
+            window.find_element('-LISTOUT-').Update(values=output(serialData[0],serialData[1]),scroll_to_index=len(serialData[0]))
 
         #Actions when plotting is paused
         elif pause == True:
@@ -230,7 +244,7 @@ def gui():
                 markxy = mark.split(',')
                 ax.cla()
                 ax.grid(True)
-                ax.plot(x,y)
+                ax.plot(tempx,tempy)
                 ax.plot(float(markxy[0]),float(markxy[1]),'ro')
                 fig_agg.draw()
 
