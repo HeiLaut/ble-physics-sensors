@@ -1,3 +1,5 @@
+// TODO: Bezeichnungen Lichtschranke, A, L1 etc ändern
+
 #include <phyphoxBle.h>
 
 const int signalPin1 = 22;
@@ -15,6 +17,7 @@ bool trigB = false;
 float tAR = 0; //time a raising edge
 float tAF = 0; //time a falling edge
 float dtA = 0; //darkening time
+float ddtA = 0; //time between two signals
 
 float tBR = 0;
 float tBF = 0;
@@ -54,8 +57,10 @@ void loop() {
   int signalState2 = digitalRead(signalPin2);
 
   if (signalState1 and !trigA) {
+    ddtA = t - tAR;
     tAR = t;
     trigA = true;
+    
 
 
   }
@@ -84,7 +89,7 @@ void loop() {
   //dtABF = abs(tAF - tBF);
 
 
-  float values[6] = {t, signalState1, signalState2, dtABR, dtA, dtB};
+  float values[6] = {t, signalState1, ddtA, dtABR, dtA, dtB};
 
   PhyphoxBLE::write(&values[0], 6);  // Serial.print(dtABR);
   // Serial.print(",");
@@ -116,6 +121,9 @@ void generateExperiment(void * parameter) {
   PhyphoxBleExperiment::View simple;
   simple.setLabel("Einfach");
 
+  PhyphoxBleExperiment::View dual;
+  dual.setLabel("2 Signale");
+
 
   PhyphoxBleExperiment::Graph sigGraph;
   sigGraph.setLabel("Signal");
@@ -126,14 +134,14 @@ void generateExperiment(void * parameter) {
   sigGraph.setColor("FFCC5C");
   sigGraph.setChannel(1, 2);
 
-  PhyphoxBleExperiment::Graph sigGraph2;
-  sigGraph2.setLabel("Signal2");
-  sigGraph2.setUnitY("");
-  sigGraph2.setUnitX("s");
-  sigGraph2.setLabelX("Zeit t");
-  sigGraph2.setLabelY("");
-  sigGraph2.setColor("FFCC5C");
-  sigGraph2.setChannel(1, 3);
+//  PhyphoxBleExperiment::Graph sigGraph2;
+//  sigGraph2.setLabel("Signal2");
+//  sigGraph2.setUnitY("");
+//  sigGraph2.setUnitX("s");
+//  sigGraph2.setLabelX("Zeit t");
+//  sigGraph2.setLabelY("");
+//  sigGraph2.setColor("FFCC5C");
+//  sigGraph2.setChannel(1, 3);
 
   //    PhyphoxBleExperiment::Graph timGraph;
   //    timGraph.setLabel("Zeiten");
@@ -153,13 +161,13 @@ void generateExperiment(void * parameter) {
   deltaTR.setChannel(4);
   deltaTR.setXMLAttribute("size=\"2\"");
 
-  //    PhyphoxBleExperiment::Value deltaTF;
-  //    deltaTF.setLabel("Signallaufzeit L1 L2 F t = ");
-  //    deltaTF.setPrecision(3);
-  //    deltaTF.setUnit("s");
-  //    deltaTF.setColor("FFCC5C");
-  //    deltaTF.setChannel(5);
-  //    deltaTF.setXMLAttribute("size=\"2\"");
+      PhyphoxBleExperiment::Value ddeltaA;
+      ddeltaA.setLabel("Signallaufzeit L1 L1; t = ");
+      ddeltaA.setPrecision(3);
+      ddeltaA.setUnit("s");
+      ddeltaA.setColor("FFCC5C");
+      ddeltaA.setChannel(3);
+      ddeltaA.setXMLAttribute("size=\"2\"");
 
   PhyphoxBleExperiment::Value deltaA;
   deltaA.setLabel("Verdunklungszeit A t =");
@@ -178,15 +186,20 @@ void generateExperiment(void * parameter) {
   deltaB.setXMLAttribute("size=\"2\"");
 
 
-  simple.addElement(deltaTR);
-  //simple.addElement(deltaTF);
   simple.addElement(deltaA);
-  simple.addElement(deltaB);
+  simple.addElement(ddeltaA);
   graph.addElement(sigGraph);
-  graph.addElement(sigGraph2);
+  
+  dual.addElement(deltaTR);
+  dual.addElement(deltaA);
+  dual.addElement(deltaB);
+  //simple.addElement(deltaTF);
+  
+  //graph.addElement(sigGraph2);
   //graph.addElement(timGraph);
   lightBarrier.addView(graph);
   lightBarrier.addView(simple);
+  lightBarrier.addView(dual);
   PhyphoxBLE::addExperiment(lightBarrier);
 
   vTaskDelete(NULL);
