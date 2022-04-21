@@ -58,10 +58,10 @@ All files available.
 
 Laser TimeOfFlight-Sensor - distance measurement as a function of time.
 
-### Voltmeter
+### DC Multimeter
 Building instructions coming soon
 
-(so far still realized with Arduino nano)
+DC Multimeter. Measures Voltage up to 24V and Current up to 3 A via an INA219 Module.
 
-DC voltage measurement over a time interval.
+
 
