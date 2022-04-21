@@ -58,6 +58,12 @@ All files available.
 
 Laser TimeOfFlight-Sensor - distance measurement as a function of time.
 
+### Light Gate 
+
+Can be used as a single device or in series with an second gate or a magnetic holder to have an release timer.
+Needs a little soldering effort to build it. 
+
+
 ### DC Multimeter
 Building instructions coming soon
 
