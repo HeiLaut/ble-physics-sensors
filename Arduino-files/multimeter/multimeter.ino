@@ -7,6 +7,8 @@ Adafruit_INA219 ina219;
 float interval = 20;
 
 void setup(void) {
+  //needed to select the scl and sda port for the lolin lite board Wire.begin(I2C_SDA, I2C_SCL)
+  //Wire.begin(23, 19);
   
   PhyphoxBLE::start("Multimeter");  
   PhyphoxBLE::configHandler = &receivedData;  
