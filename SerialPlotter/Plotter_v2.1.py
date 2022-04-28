@@ -19,7 +19,7 @@ sg.theme("DarkTeal2")
 run = True
 ser_error = False
 data = ["0.0","0.0"]
-serialData = [[],[]]
+serialData = [[],[],"x","y"] # datx, daty, labelx, labely
 
 def get_data(port):
     '''test the Serial connection and getting data from it
@@ -29,15 +29,22 @@ def get_data(port):
     ser = serial.Serial(port, baudrate = 115200)
 
     while run:
+        #print(ser.readline())
         dat = str(ser.readline())[2:-5]
         data = dat.split(',')
+        
         # versuche die daten immer zu lesen und insgesamt abzurufen, unabhängig vom fenster!
         # alldata speichert 2 Listen. besser liste von tupeln nutzen, bzw. zwei arrays damit
         # die daten direkt im Diagramm abgetragen werden können
-        serialData[0].append(float(data[0]))
-        serialData[1].append(float(data[1]))
+        try:
+            serialData[2] = data[0]
+            serialData[3] = data[2]
+            serialData[0].append(float(data[1]))
+            serialData[1].append(float(data[3]))
+        except:
+            pass
         #print(len(serialData[0]))
-    
+            
     ser.close()
 
 def draw_figure(canvas, figure):
@@ -50,9 +57,14 @@ def output(x,y):
     '''takes two arrays of datapoints (same length)
     and cretes a list with bothe values space by tabbing as a str
     to paste in a text-window'''
-
+    
     outp = []
-    for i in range(len(x)):
+    # safety, if the lists are not exactly the same size. sometimes a few items in one list are missing, when there is fast measurements
+    if len(x) > len(y):
+        l = len(y)
+    else:
+        l = len(x)
+    for i in range(l):
         outp.append(f"{str(x[i])}, \t \t{str(y[i])}")
     return outp
 
@@ -81,8 +93,11 @@ def gui():
     # starts a thread, wich is continuesly updating the data comming from the serial port
     # important because so no delay will accure while running the gui
     
-    global run, data, ser_error, n
+    global run, data, ser_error
 
+    valx = serialData[2]
+    valy = serialData[3]
+    
     # starts the serial port selector window
     select_layout = [
     [sg.Text('Choose Serial Port', size=(30, 1))],
@@ -116,7 +131,7 @@ def gui():
               [sg.Text(size=(40,2), key='-OUTPUT-', font = [25]), sg.Button('Export csv', disabled = True), sg.InputText(key = "-FOLDERTEXT-"),sg.FolderBrowse(key = "-FOLDER-")],
               [sg.Button('Start/Stop', disabled = False), sg.Button('Löschen', disabled = False)],
               [sg.Text('Messintervall'), sg.Slider((1, 100),1,1,orientation="h",size=(20, 15),enable_events = True, key="SLIDER",)],
-              [sg.Text('Anzahl Messungen'), sg.Slider((10, 1000),100,10,orientation="h",size=(20, 15),enable_events = True, key="SLIDER_CROP",)],
+              [sg.Text('Anzahl Messungen'), sg.Slider((10, 2000),100,10,orientation="h",size=(20, 15),enable_events = True, key="SLIDER_CROP",)],
               #[sg.Button("Serielle Verbindung starten", disabled = True)]
               #[sg.Button('Exit', size=(10, 2), pad=((280, 0), 3), font='Helvetica 14')]
                ]
@@ -131,11 +146,10 @@ def gui():
     ax.grid(True)
     fig_agg = draw_figure(canvas, fig)
     
-    x = serialData[0]
-    y = serialData[1]
-    i = 0
+#    x = serialData[0]
+ #   y = serialData[1]
+  #  i = 0
     #n = 5
-    x_offset = 0
     while True:
 
         #print(pyautogui.position())
@@ -161,7 +175,7 @@ def gui():
         else:
             # output data on screen every update
             if len(serialData[0])>1:
-                window['-OUTPUT-'].update(f"t = {serialData[0][-1]}\n y = {serialData[1][-1] }")
+                window['-OUTPUT-'].update(f"{serialData[2]}: {serialData[0][-1]}\n{serialData[3]}: {serialData[1][-1] }")
 
 
 
@@ -176,6 +190,10 @@ def gui():
         crop = int(values['SLIDER_CROP'])
         serialData[0] = serialData[0][-crop:]
         serialData[1] = serialData[1][-crop:]
+        
+        # allways keep same length of both data, in case a value is lost in translation
+        serialData[0] = serialData[0][0:len(serialData[1])]
+        serialData[1] = serialData[1][0:len(serialData[0])]
 
         if event == "-FOLDER-":
             window.find_element('-FOLDERTEXT-').update(values["-FOLDER-"])
@@ -194,9 +212,13 @@ def gui():
             if pause  == False:
                 pause  = True
                 window.find_element('Löschen').update(disabled = False)
+                #window.find_element("SLIDER_CROP").update(disabled = True)
+
             else:
                 pause  = False
                 window.find_element('Löschen').update(disabled = True)
+                #window.find_element("SLIDER_CROP").update(disabled = False)
+
 
         if event == 'Löschen':
            #datx = float(data[0])
@@ -214,6 +236,7 @@ def gui():
         if pause  == False:
             ax.cla()
             ax.grid(True)
+            #print(len(serialData[0]),len(serialData[1]))
             ax.plot(serialData[0],serialData[1])
             
             #store data for processing them while pause (mark points)
