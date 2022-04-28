@@ -1,8 +1,8 @@
 // TODO: Bezeichnungen Lichtschranke, A, L1 etc ändern
 
 #include <phyphoxBle.h>
-
-const int signalPin1 = 22;
+//22,21 bei lolin32, 36,39 bei d1 mini
+const int signalPin1 = 17;
 const int signalPin2 = 21;
 
 //const int analogInput1 = 36;
@@ -93,15 +93,14 @@ void loop() {
 
   PhyphoxBLE::write(&values[0], 6);  // Serial.print(dtABR);
   // Serial.print(",");
-  Serial.print(signalState1);
+  Serial.print("t in s");
   Serial.print(",");
-  Serial.print(signalState2);
+  Serial.print(t,3);
   Serial.print(",");
-  Serial.print(dtA);
+  Serial.print("Signal");
   Serial.print(",");
-  Serial.print(dtB);
-  Serial.print(",");
-  Serial.println(dtABR);
+  Serial.println(signalState1);
+  
   delay(1);
 
 

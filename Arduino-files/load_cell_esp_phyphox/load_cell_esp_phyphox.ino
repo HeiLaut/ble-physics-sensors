@@ -1,13 +1,19 @@
 #include <HX711_ADC.h>
 #include <phyphoxBle.h>
 #include <Button.h>
+
 HX711_ADC LoadCell(16, 5); //LoadCell(DT,SCK)
 #define BUTTON_PIN 21 
+
 int lastState = LOW;  // the previous state from the input pin
 int currentState;     // the current reading from the input pin
 
 
+
+
+
 void setup() {
+  
   PhyphoxBLE::start("Kraft");
     
   PhyphoxBleExperiment kraft; 
@@ -64,11 +70,14 @@ void setup() {
   LoadCell.begin(); // start connection to HX711
   LoadCell.start(2000); // load cells gets 2000ms of time to stabilize
   LoadCell.setCalFactor(741.896); 
+  
   Serial.println("F in ");
   Serial.begin(115200); 
   pinMode(BUTTON_PIN, INPUT_PULLUP);
 
 }
+
+
 
 void loop() {
   currentState = digitalRead(BUTTON_PIN);
@@ -80,14 +89,13 @@ void loop() {
 
   float t = 0.001 * (float)millis();
   LoadCell.update();
-  float m = LoadCell.getData();
+  float m = abs(LoadCell.getData());
   float f = -m *9.81/1000;
-  Serial.print(t);
-  Serial.print(",");
-  Serial.println(f);
+  //Serial.print(t);
+ // Serial.print(",");
+  //Serial.println(f);
   PhyphoxBLE::write(t,f,m);
 
-  //sum(f, t);
   delay(50);
 
 }
