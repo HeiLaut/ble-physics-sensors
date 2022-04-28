@@ -10,8 +10,11 @@ espZ = 1.5;
 wall = 1.5;
 usbX = 8;
 usbZ = 4;
-z = 30;
+z = 20;
 dist = 5;
+dDIN = 15.2;
+dMag = 20 + 1;
+
 
 module esp(){;
 translate([121.5,63,-41])rotate([90,0,0])import("esp32.stl");
@@ -23,31 +26,28 @@ module ToF(){
 
 module hull(){
     up(z/2+wall/2)difference(){
-       down(0.5)cuboid([espX+2*wall,espY+2*wall,z+wall+1], fillet = 2, edges=EDGES_Z_ALL);
-        up(wall/2)cuboid([espX,espY,z+0.1], fillet = 1, edges=EDGES_Z_ALL);
+       cuboid([espX+2*wall,espY+2*wall,z+wall+1], fillet = 2, edges=EDGES_Z_ALL);
+        up(wall)cuboid([espX,espY,z+0.1], fillet = 1, edges=EDGES_Z_ALL);
      
        //Socket holes
        dSoc = 6; //diameter socket
        distZ = 15;
        distY = 10;
        
-         for(i=[[espX/2-0.1,distY,distZ/2],
-               [espX/2-0.1,-distY,distZ/2],
-               [espX/2-0.1,distY,-distZ/2]])
-       {
-          #translate(i)rotate([0,90,0])cylinder(d=dSoc,h=4);
-       }
+        rotate([90,0,0])translate([espX/2,0,0]){
+             hole_x(d = dDIN, h = 5);
+             down(11)hole_x(d = 2, h = 5);
+             up(11)hole_x(d = 2, h = 5);
+          }
        //switchcable hole
-       #translate([0,+espY/2,z/2-wall/2])cuboid([3,wall*2,3]);
+       #translate([0,+espY/2,z/2-wall/2+1.5])cuboid([3,wall*2,3]);
        
        //magnet holes
-        distX = 4.5;
-       br = 15;
-       translate([-espX/2+br/2+distX,0,-z/2-wall/2])cuboid([br,br,wall*2]);
+       translate([0,0,-z/2-wall])cylinder(d = dMag, h = wall*2);
        
        
         //lid holder
-        translate([-espX/2+1.5,-(espY)/2,13])rotate([0,90,0])cylinder(h=espX-3,d=2);
+        translate([-espX/2+1.5,-(espY)/2,z/2-1.5])rotate([0,90,0])cylinder(h=espX-3,d=2);
     }
     
     //screw holes
@@ -65,6 +65,7 @@ module hull(){
        cuboid([espX+2*wall,espY+2*wall,wall], fillet = 2, edges=EDGES_Z_ALL);for(i=[-1,1]){
     translate([i*(espX/2-1.5),espY/2-2,-2])cylinder(d=2.5,h=5);
        }
+       down(wall)cylinder(d = 3, h = wall*2);
      }
      poslid=0.5;
      translate([0,-espY/2+wall+poslid,-2.5-wall/2])cuboid([espX-3,wall*2,5]);
@@ -73,6 +74,9 @@ module hull(){
 }
    lid();
     
+}
+module hole_x(d = 5, h = 10, off = wall){
+   left(off)rotate([0,90,0])cylinder(d = d, h = h);
 }
 
 module mount(x_d=espX/2){
@@ -97,7 +101,17 @@ module mount(x_d=espX/2){
 difference(){
     hull();
     *down(2)translate([-25 ,0,-1])cube(50);
+   
 }
     mount();
     *down(5)ToF();
     //color("green")translate([espX/2,-espY/2,z-espZ-7])esp();
+
+module startbutton(){
+   difference(){
+   cylinder(d=12+2*wall,h = 20);
+   up(wall)cylinder(d=12,h = 20);
+      down(0.5)cylinder(d = 7, h  = 2*wall);
+   }
+}
+translate([50,0,0])startbutton();
