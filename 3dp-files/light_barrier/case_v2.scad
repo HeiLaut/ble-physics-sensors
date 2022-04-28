@@ -12,10 +12,10 @@ gapHeight = 80;
 wall = 1.2;
 
 //position of usb and mounting holes
-usbPos = 16.5;
+usbPos = 16;
 mcDist = 12;
 //
-espMount = [[-8.2,0,-24],[-46.5,0,-3]];
+espMount = [[-8.1,0,-24.2],[-46.5,0,-3.2]];
 
 
 
@@ -24,7 +24,7 @@ screwD = 2;
 dLED = 5.2;
 dSock = 6;
 dDIN = 15.2;
-*translate([29,2.2,-3-gapHeight/2])rotate([90,0,0])import("lolin32_lite.stl");
+*translate([29,2.2,-2.9-gapHeight/2])rotate([90,0,0])import("lolin32_lite.stl");
 
 screwholes = [[-gapWidth/2-wall-screwD,0,gapHeight/2-screwD],
               [+gapWidth/2+wall+screwD,0,gapHeight/2-screwD],
@@ -68,31 +68,31 @@ module mount(){
 module case(){
     module arm(){
         difference(){
-            cuboid([armWidth+2*wall,depth+wall,gapHeight+wall]);
+            cuboid([armWidth+2*wall,depth+wall,gapHeight+wall],fillet = 2,edges = EDGES_Y_TOP);
             translate([0,wall/2+0.01,-wall/2])cuboid([armWidth,depth,gapHeight]);
 
         }
     }
     module base(){
         difference(){
-            cuboid([gapWidth+4*wall+2*armWidth,depth+wall,baseHeight+2*wall]);
-            translate([0,wall/2+0.01,0])cuboid([gapWidth+2*wall+2*armWidth,depth,baseHeight]);
-            translate([-gapWidth/2-armWidth/2-wall,wall/2+0.01,gapHeight/2-baseHeight/2])cuboid([armWidth,depth,gapHeight]);
-            translate([gapWidth/2+armWidth/2+wall,wall/2+0.01,gapHeight/2-baseHeight/2])cuboid([armWidth,depth,gapHeight]);
+            cuboid([gapWidth+4*wall+2*armWidth,depth+wall,baseHeight+2*wall],fillet = 2,edges = EDGES_Y_BOT);
+            translate([0,wall/2+0.01,0])cuboid([gapWidth+2*wall+2*armWidth,depth,baseHeight],fillet = 2,edges = EDGES_Y_BOT);
+            translate([-gapWidth/2-armWidth/2-wall,wall/2+0.01,gapHeight/2-baseHeight/2])cuboid([armWidth,depth,gapHeight],fillet = 1,edges = EDGES_Y_BOT);
+            translate([gapWidth/2+armWidth/2+wall,wall/2+0.01,gapHeight/2-baseHeight/2])cuboid([armWidth,depth,gapHeight],fillet = 1,edges = EDGES_Y_BOT);
 
             
         }
     }
     translate([-gapWidth/2-armWidth/2-wall,0,0])arm();
     translate([gapWidth/2+armWidth/2+wall,0,0])arm();
-    translate([0,0,-gapHeight/2-baseHeight/2-wall])base();  
+    translate([0,0,-gapHeight/2-baseHeight/2-wall])base();
 }
 module lid(){
     difference(){
         union(){
-            translate([-gapWidth/2-armWidth/2-wall,0,0])cuboid([armWidth+2*wall,wall,gapHeight+wall]);
-            translate([gapWidth/2+armWidth/2+wall,0,0])cuboid([armWidth+2*wall,wall,gapHeight+wall]);
-            translate([0,0,-gapHeight/2-baseHeight/2-wall])cuboid([gapWidth+4*wall+2*armWidth,wall,baseHeight+2*wall]);
+            translate([-gapWidth/2-armWidth/2-wall,0,0])cuboid([armWidth+2*wall,wall,gapHeight+wall],fillet = 2,edges = EDGES_Y_TOP);
+            translate([gapWidth/2+armWidth/2+wall,0,0])cuboid([armWidth+2*wall,wall,gapHeight+wall],fillet = 2,edges = EDGES_Y_TOP);
+            translate([0,0,-gapHeight/2-baseHeight/2-wall])cuboid([gapWidth+4*wall+2*armWidth,wall,baseHeight+2*wall],fillet = 2,edges = EDGES_Y_BOT);
         }
         for(i = screwholes){
             translate(i)rotate([90,0,0])translate([0,0,-depth/2-wall/2])
@@ -117,6 +117,7 @@ module caseassembly(){
          }
         translate(posLED)hole_y(off=depthLED);
         translate([0,0,posIRLED[2]])hole_x(h=(gapWidth+depthLED*2+2*wall), off = (gapWidth+depthLED*2+2*wall)/2);
+        //Mount for DIN
         translate([gapWidth/2+armWidth+wall,0,0]){
              hole_x(d = dDIN, h = 5);
              down(11)hole_x(d = 2, h = 5);
@@ -131,17 +132,17 @@ module caseassembly(){
             }
         
         }
-        translate([0,-depth/2-wall/2,-gapHeight/2-baseHeight-wall*2-20])mount();
+        translate([0,-depth/2-wall/2,-gapHeight/2-baseHeight-wall*2-19.5])mount();
 }
 caseassembly();
-*translate([0,20,0])lid();
+translate([0,20,0])lid();
 
 
 translate([gapWidth/2+armWidth+wall,-depth/2+mcDist,-gapHeight/2+wall/2-screwD*2.5/4]){
-for(i = espMount){
+color("green")for(i = espMount){
              translate(i)rotate([90,0,0])difference(){
              cylinder(h=mcDist,d=screwD*2.5);
-             down(0.5)cylinder(h=mcDist, d = screwD);
+             down(0.5)cylinder(h=mcDist, d = screwD-0.5);
           }
       }
   }
