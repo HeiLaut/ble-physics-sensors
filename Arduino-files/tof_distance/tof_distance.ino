@@ -158,9 +158,12 @@ void loop() {
   if (measure.RangeStatus == 4 || distance >150) {  // phase failures have incorrect data
     distance = 0;
   }
-  Serial.print(t);
-  Serial.print(",");
-  Serial.println(distance);
+  Serial.print("t(s)");Serial.print(",");
+  Serial.print(t);Serial.print(",");
+  Serial.print("s(cm)");Serial.print(",");
+  Serial.print(distance);Serial.print(",");
+  Serial.print("v(cm/2)");Serial.print(",");
+  Serial.println(velocity);
   PhyphoxBLE::write(t, distance, velocity);   
  
   delay(intervall);
