@@ -132,15 +132,24 @@ void loop(void)
   power_mW = ina219.getPower_mW();
   loadvoltage = busvoltage + (shuntvoltage / 1000);
   
-  Serial.print("Bus Voltage:   "); Serial.print(busvoltage); Serial.println(" V");
-  Serial.print("Shunt Voltage: "); Serial.print(shuntvoltage); Serial.println(" mV");
-  Serial.print("Load Voltage:  "); Serial.print(loadvoltage); Serial.println(" V");
-  Serial.print("Current:       "); Serial.print(current_mA); Serial.println(" mA");
-  Serial.print("Power:         "); Serial.print(power_mW); Serial.println(" mW");
-  Serial.println("");
+//  Serial.print("Bus Voltage:   "); Serial.print(busvoltage); Serial.println(" V");
+//  Serial.print("Shunt Voltage: "); Serial.print(shuntvoltage); Serial.println(" mV");
+//  Serial.print("Load Voltage:  "); Serial.print(loadvoltage); Serial.println(" V");
+//  Serial.print("Current:       "); Serial.print(current_mA); Serial.println(" mA");
+//  Serial.print("Power:         "); Serial.print(power_mW); Serial.println(" mW");
+//  Serial.println("");
 
   PhyphoxBLE::write(t, loadvoltage, current_mA);   
-
+  
+  Serial.print("t(s)");Serial.print(",");
+  Serial.print(t);Serial.print(",");
+  Serial.print("U(V)");Serial.print(",");
+  Serial.print(loadvoltage);Serial.print(",");
+  Serial.print("I(mA)");Serial.print(",");
+  Serial.print(current_mA);Serial.print(",");
+  Serial.print("P(mW)");Serial.print(",");
+  Serial.println(power_mW);
+  
   delay(interval);
 }
 
