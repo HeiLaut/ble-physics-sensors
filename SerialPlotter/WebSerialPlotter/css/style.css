@@ -1,0 +1,24 @@
+html, body {
+  margin: 0;
+  padding: 0;
+}
+canvas {
+  display: block;
+}
+button{
+  border:none;
+  text-align:center;
+  font-size: 16px;
+  display: inline-block;
+  color: white;
+  background-color: #008CBA;
+  margin: 4px 2px;
+  padding: 10px 15px;
+  transition-duration: 0.4s;
+
+}
+
+button:hover{
+  background-color: #4CAF50; /* Green */
+  color: white;
+}
