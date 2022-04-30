@@ -4,8 +4,8 @@ use <BOSL/shapes.scad>
 use <BOSL/masks.scad>
 
 $fn = 30;
-espX = 40;
-espY = 39+5;
+espX = 50;
+espY = 39;
 espZ = 1.5;
 wall = 1.5;
 usbX = 8;
@@ -13,7 +13,7 @@ usbZ = 4;
 z = 20;
 dist = 5;
 dDIN = 15.2;
-dMag = 20 + 1;
+dMag = 20;
 
 
 module esp(){;
@@ -27,7 +27,7 @@ module ToF(){
 module hull(){
     up(z/2+wall/2)difference(){
        cuboid([espX+2*wall,espY+2*wall,z+wall+1], fillet = 2, edges=EDGES_Z_ALL);
-        up(wall)cuboid([espX,espY,z+0.1], fillet = 1, edges=EDGES_Z_ALL);
+       up(wall/2)cuboid([espX,espY,z+wall+0.1], fillet = 1, edges=EDGES_Z_ALL);
      
        //Socket holes
        dSoc = 6; //diameter socket
@@ -43,7 +43,7 @@ module hull(){
        #translate([0,+espY/2,z/2-wall/2+1.5])cuboid([3,wall*2,3]);
        
        //magnet holes
-       translate([0,0,-z/2-wall])cylinder(d = dMag, h = wall*2);
+       translate([-5,0,-z/2-wall])cylinder(d = dMag, h = wall*2);
        
        
         //lid holder
@@ -65,7 +65,7 @@ module hull(){
        cuboid([espX+2*wall,espY+2*wall,wall], fillet = 2, edges=EDGES_Z_ALL);for(i=[-1,1]){
     translate([i*(espX/2-1.5),espY/2-2,-2])cylinder(d=2.5,h=5);
        }
-       down(wall)cylinder(d = 3, h = wall*2);
+        left(5)down(wall)cylinder(d = 3, h = wall*2);
      }
      poslid=0.5;
      translate([0,-espY/2+wall+poslid,-2.5-wall/2])cuboid([espX-3,wall*2,5]);
@@ -85,7 +85,7 @@ module mount(x_d=espX/2){
        y=30;
        z=20;
        l = 11;
-       translate([-x_d-z/2-1,0,x/2-1])difference(){
+       translate([-x_d-z/2-1,0,z/2-wall/2+0.25])difference(){
          cuboid([x,y,z],fillet=3,edges = EDGES_Z_LF);
           scale([1,1,1.05])translate([2.5,y/2+0.5,0])rotate([90,0,0])cylinder(d = dRod, h = y+1);
           translate([2.5,0,-y/2])rotate([0,0,0])cylinder(d = dRod, h = y+1);
@@ -111,7 +111,7 @@ module startbutton(){
    difference(){
    cylinder(d=12+2*wall,h = 20);
    up(wall)cylinder(d=12,h = 20);
-      down(0.5)cylinder(d = 7, h  = 2*wall);
+     down(0.5)cylinder(d = 7, h  = 2*wall);
    }
 }
 translate([50,0,0])startbutton();
