@@ -2,7 +2,8 @@
 
 #include <phyphoxBle.h>
 //22,21 bei lolin32, 36,39 bei d1 mini
-const int signalPin1 = 17;
+//lolin lite : 17/21
+const int signalPin1 = 22;
 const int signalPin2 = 21;
 
 //const int analogInput1 = 36;
@@ -91,9 +92,8 @@ void loop() {
 
   float values[6] = {t, signalState1, ddtA, dtABR, dtA, dtB};
 
-  PhyphoxBLE::write(&values[0], 6);  // Serial.print(dtABR);
-  // Serial.print(",");
-  Serial.print("t in s");
+  PhyphoxBLE::write(&values[0], 6);  
+  Serial.print("t(s)");
   Serial.print(",");
   Serial.print(t,3);
   Serial.print(",");

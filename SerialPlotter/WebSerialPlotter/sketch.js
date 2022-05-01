@@ -17,7 +17,7 @@ let y2 = []; //second y-Axis data
 let labelX, labelY, labelY2
 let dataTable;
 let receivedData = false;
-
+let data = []; //list of incoming data
 let pause = false;
 
 function setup() {
@@ -55,10 +55,16 @@ function setup() {
   csvButton.position(800,110);
   csvButton.style("width","150px")
 
-  csvButton.mousePressed(saveCsv)
+  csvButton.mousePressed(saveCsv);
   dataSlider = createSlider(100, 5000, 1000, 100);
-  dataSlider.position(10, 630);
+  dataSlider.position(10, 650);
   dataSlider.style('width', '300px');
+
+  closeButton = createButton('Close Serial Connection');
+  closeButton.position(0,720);
+  closeButton.style('font-size','10px');
+  closeButton.style('background-color','#8B0000');
+  closeButton.mousePressed(closeSerialPort);
 
   dataTable = new p5.Table();
 
@@ -68,7 +74,9 @@ function draw() {
 
   if(serial.isOpen()){
     serialButton.position(-300,0);
-  }
+  }else{
+    serialButton.position(10,10);
+  };
 
   background(220);
   let len = dataSlider.value();
@@ -78,19 +86,43 @@ function draw() {
 }
   if(!pause){
    drawDia();
-  }
-  textSize(20);
-  textAlign(CENTER);
-  text(labelX + ':',30,30)
-  text(x[x.length-1],90,30);
-  text(labelY + ':',200,30)
-  text(y[y.length-1],260,30);
+   pauseButton.style("background-color","#008CBA");
 
+  }
+
+  if(pause){
+    pauseButton.style("background-color","green");
+  }
+  drawSerialData();
   textSize(16);
-  text(dataSlider.value(),350,110);
-  text("Number of Data Points",160,80);
+  textAlign(CENTER)
+  text(dataSlider.value(),350,120);
+  text("Number of Data Points",160,100);
 }
 
+function createButtons(){
+  for(let i = 0; i < data.length-1; i  = i + 2){
+    let bx = createButton('x');
+    let by = createButton('y');
+    bx.position(20+i*100, 580);
+    by.position(50+i*100, 580);
+    bx.style("font-size","14px");
+    bx.style("padding","5px 5px");
+    by.style("font-size","14px");
+    by.style("padding","5px 5px");
+    bx.mousePressed(function(){selectData('x',i)});
+    by.mousePressed(function(){selectData('y',i)});
+  }
+}
+
+function drawSerialData(){
+  textSize(20);
+  textAlign(LEFT);
+  for(let i = 0; i < data.length-1; i = i + 2){
+    text(data[i] + ':',20+100*i,30);
+    text(data[i+1],70+110*i,30);
+  }
+}
 /**
 00px; * Callback function by serial.js when there is an error on web serial
  *
@@ -122,46 +154,22 @@ function selectData(ax,dat){
 }
 
 function onSerialDataReceived(eventSender, newData) {
-  let data = newData.split(',');
+  data = newData.split(',');
   //called first time data are received and creates buttons for each data.
+
   if(!receivedData){
-    receivedData=true;
-    dat0 = createButton('x-axis: '+ data[0]);
-    dat0.position(800, 260);
-    dat0.style("width","150px")
-    dat0.mousePressed(function(){selectData('x',0)});
-
-    dat1x = createButton('x-axis: '+ data[2]);
-    dat1x.position(800, 160);
-    dat1x.style("width","150px")
-    dat1x.mousePressed(function(){selectData('x',2)});
-
-    dat1y = createButton('y-axis: '+ data[2]);
-    dat1y.position(955, 160);
-    dat1y.style("width","150px")
-    dat1y.mousePressed(function(){selectData('y',2)});
-
-    dat2x = createButton('x-axis: '+data[4]);
-    dat2x.position(800, 210);
-    dat2x.style("width","150px")
-    dat2x.mousePressed(function(){selectData('x',4)});
-
-    dat2y = createButton('y-axis: '+ data[4]);
-    dat2y.position(955, 210);
-    dat2y.style("width","150px")
-    dat2y.mousePressed(function(){selectData('y',4)});
-
+    createButtons();
     // parameters for the axis, default 0 - time, and 2 first data
     paramX = 0;
     paramY = 2;
+    receivedData=true;
+
   }
-  //print(data)
   if(!pause){
   labelX=data[paramX];
   x.push(data[paramX+1]);
   labelY=data[paramY];
   y.push(data[paramY+1]);
-  //print(data)
   }
 }
 
@@ -171,10 +179,15 @@ function onSerialDataReceived(eventSender, newData) {
 function openSerialPort() {
   if (!serial.isOpen()) {
     serial.connectAndOpen(null, serialOptions);
+    createButtons();
   }
 
 }
 
+function closeSerialPort(){
+  serial.close();
+  resetData();
+}
 
 function keyPressed(){
   if(key=='p'){
