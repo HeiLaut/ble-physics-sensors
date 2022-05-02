@@ -93,13 +93,12 @@ void loop() {
   float values[6] = {t, signalState1, ddtA, dtABR, dtA, dtB};
 
   PhyphoxBLE::write(&values[0], 6);  
-  Serial.print("t(s)");
-  Serial.print(",");
-  Serial.print(t,3);
-  Serial.print(",");
-  Serial.print("Signal");
-  Serial.print(",");
-  Serial.println(signalState1);
+  Serial.print("t(s)"); Serial.print(","); Serial.print(t,3);Serial.print(",");
+  Serial.print("Signal L1");Serial.print(","); Serial.print(signalState1);Serial.print(",");
+  Serial.print("darkL1 t(s)");Serial.print(","); Serial.print(dtA,3);Serial.print(",");
+  Serial.print("L1-L2 dt(s)");Serial.print(","); Serial.print(dtABR,3);Serial.print(",");
+  Serial.print("darkL2 t(s)");Serial.print(","); Serial.println(dtB,3);
+  //Serial.print("Signal L2");Serial.print(","); Serial.println(signalState2);
   
   delay(1);
 
