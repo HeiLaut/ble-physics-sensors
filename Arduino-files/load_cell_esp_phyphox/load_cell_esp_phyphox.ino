@@ -71,7 +71,6 @@ void setup() {
   LoadCell.start(2000); // load cells gets 2000ms of time to stabilize
   LoadCell.setCalFactor(741.896); 
   
-  Serial.println("F in ");
   Serial.begin(115200); 
   pinMode(BUTTON_PIN, INPUT_PULLUP);
 
@@ -89,13 +88,18 @@ void loop() {
 
   float t = 0.001 * (float)millis();
   LoadCell.update();
-  float m = abs(LoadCell.getData());
-  float f = -m *9.81/1000;
+  float incDat = LoadCell.getData();
+  float m = abs(incDat);
+  float f = -incDat *9.81/1000;
   //Serial.print(t);
  // Serial.print(",");
   //Serial.println(f);
   PhyphoxBLE::write(t,f,m);
 
+  Serial.print("t(s)");Serial.print(",");Serial.print(t);Serial.print(",");
+  Serial.print("F(N)");Serial.print(",");Serial.print(f,3);Serial.print(",");
+  Serial.print("m(g)");Serial.print(",");Serial.println(m,1);
+  
   delay(50);
 
 }

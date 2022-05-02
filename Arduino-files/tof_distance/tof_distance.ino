@@ -162,7 +162,7 @@ void loop() {
   Serial.print(t);Serial.print(",");
   Serial.print("s(cm)");Serial.print(",");
   Serial.print(distance);Serial.print(",");
-  Serial.print("v(cm/2)");Serial.print(",");
+  Serial.print("v(cm/s)");Serial.print(",");
   Serial.println(velocity);
   PhyphoxBLE::write(t, distance, velocity);   
  
