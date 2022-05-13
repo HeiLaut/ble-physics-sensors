@@ -27,7 +27,8 @@ It is planned that all models will be equipped with the ESP32 module. Using this
 
 ### Serial Plotter
 #### Web Serial Plotter (Chrome-based browsers only)
-I am working on a Web Serial Plotter, than can be accessed throughChrome or Edge. It automatically reads the data from the sensor. You can specify which data to plot and also output the data to a CSV-file. For the plotting i am using Plotly.
+I am working on a Web Serial Plotter, than can be accessed throughChrome or Edge. It automatically reads the data from the sensor. You can specify which data to plot and also output the data to a CSV-file. For the plotting i am using Plotly. Still in an early Version but usable.
+You can find the serial plotter at the adress: https://heilaut.github.io/web-serial-plotter/
 
 #### Python Serial Plotter
 The sensors can also be read out via the serial interface of the computer. For this purpose, a Pyhton program is developed, which plots the respective measured value over time. The software has an export function so that the data can then be further processed on the PC. The program already works but is missing a few features.
@@ -71,6 +72,3 @@ Needs a little soldering effort to build it.
 Building instructions coming soon
 
 DC Multimeter. Measures Voltage up to 24V and Current up to 3 A via an INA219 Module.
-
-
-
