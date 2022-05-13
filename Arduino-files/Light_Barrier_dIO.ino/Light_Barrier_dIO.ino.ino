@@ -100,7 +100,7 @@ void loop() {
   Serial.print("darkL2 t(s)");Serial.print(","); Serial.println(dtB,3);
   //Serial.print("Signal L2");Serial.print(","); Serial.println(signalState2);
   
-  delay(1);
+  delay(5);
 
 
 }
