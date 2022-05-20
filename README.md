@@ -23,7 +23,7 @@ https://github.com/HeiLaut/Physics-Arduino-Sensors/wiki (work in progress)
 <img src="https://github.com/HeiLaut/Physics-Arduino-Sensors/blob/main/images/us_example.jpg" width=25%>
 
 
-It is planned that all models will be equipped with the ESP32 module. Using this platform, the measured values can then be read out directly via Bluetooth and PhyPhox (https://phyphox.org/de/home-de/) with the smartphone. The boxes then only need to be supplied with power. (power cable or power bank) 
+Using this platform, the measured values can then be read out directly via Bluetooth and PhyPhox (https://phyphox.org/de/home-de/) with the smartphone. The boxes then only need to be supplied with power. If you use the esp32 Lolin Board, you can easylie attach a cheap LiPo Battery.
 
 ### Serial Plotter
 #### Web Serial Plotter (Chrome-based browsers only)
@@ -72,6 +72,10 @@ Needs a little soldering effort to build it.
 Building instructions coming soon
 
 DC Multimeter. Measures Voltage up to 24V and current up to 3 A via an INA219 Module.
+Example Videos:
+Diode characteristic https://youtu.be/DQ5L0hsJfBA
+Resistor characteristic https://youtu.be/PSxBtcULFwU
+Charge and Discharge of a capacitor https://youtube.com/shorts/HkM0g7PQ94s?feature=share
 
 ### Barometer 
 
