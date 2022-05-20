@@ -5,7 +5,7 @@ use <BOSL/masks.scad>
 
 $fn = 30;
 espX = 27;
-espY = 50+5;
+espY = 50+15;
 espZ = 1.5;
 wall = 1.5;
 usbX = 8;
@@ -13,7 +13,7 @@ usbZ = 3.5;
 z = 30;
 dist = 5;
 //show microcontroller and sensors?
-mc = false;
+mc = false ;
 //position of usb and mounting holes
 usbPos = 7;
 mcDist = 20;
@@ -44,22 +44,23 @@ module hull(){
       //Socket holes
        dSoc = 6; //diameter socket
        distX = 15;
-       distY = 20;
-       for(i=[ [[3,distY/2+5,-z/2-wall*2],"V-"],
-               [[3,0,-z/2-wall*2],"V+"],
+       distY = 20;translate([0,-10,0]){
+       for(i=[ [[3,distY/2+5,-z/2-wall*2],"-"],
+               [[3,0,-z/2-wall*2],"+"],
                ,
                [[3,-distY/2-5,-z/2-wall*2],"GD"]])
        {
           translate(i[0]){cylinder(d=dSoc,h=4);
           mirror([0,1,0])translate([-13,0,1.2])linear_extrude(0.6)rotate([0,0,-90])text(i[1],6,halign="center");
           }
-       }
+       }}
        
        
        
          //usb hole 
        translate([usbPos,-espY/2,6.8])cuboid([usbX,5,usbZ],fillet = 1, edges=EDGES_Y_ALL);
-   
+   //battery hole
+       translate([-8.5,-espY/2,8])cuboid([9,5,6],fillet = 1, edges=EDGES_Y_ALL);
 
         
         //lid holder
@@ -87,17 +88,21 @@ module hull(){
     
     
    //holder in219
-    zINA = 10;
-    x1 = (espX/2-3.5);
-    y1 = (-espY/2+20);
-    z1 = zINA/2-wall*2-1;
-    for(i=[[x1,y1,z1],[x1-20,y1,z1],[x1,y1+17,z1],[x1-20,y1+17,z1]]){
-    translate(i)difference(){
-       cylinder(d = 5,h = zINA);
-       up(0.1)cylinder(d = 1.2, h =zINA);
-    }
- }
-      if(mc){translate([0,1,12])ina();}
+//    zINA = 10;
+//    x1 = (espX/2-3.5);
+//    y1 = (-espY/2+20);
+//    z1 = zINA/2-wall*2-1;
+//    for(i=[[x1,y1,z1],[x1-20,y1,z1],[x1,y1+17,z1],[x1-20,y1+17,z1]]){
+//    translate(i)difference(){
+//       cylinder(d = 5,h = zINA);
+//       up(0.1)cylinder(d = 1.2, h =zINA);
+//    }
+// }  
+      for(i=[[-espX/2+0.75,espY/2-4,6+wall],[espX/2-0.75,espY/2-4,6+wall],
+         [-espX/2+0.75,espY/2-8,6+wall],[espX/2-0.75,espY/2-8,6+wall]]){
+      translate(i)cuboid([2,2,12]);
+      }
+      if(mc){translate([0,25.5,13])mirror([0,0,1])rotate([-90,0,0])ina();}
         
             
     
@@ -146,5 +151,5 @@ difference(){
 }
     down(1)mount(espX+2);
     if(mc){
-       color("red")translate([-11.4,15.5,20])lolin();
+       color("red")translate([-11.4,10.5,20])lolin();
     }
