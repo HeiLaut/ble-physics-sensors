@@ -72,9 +72,13 @@ Needs a little soldering effort to build it.
 Building instructions coming soon
 
 DC Multimeter. Measures Voltage up to 24V and current up to 3 A via an INA219 Module.
+
 Example Videos:
+
 Diode characteristic https://youtu.be/DQ5L0hsJfBA
+
 Resistor characteristic https://youtu.be/PSxBtcULFwU
+
 Charge and Discharge of a capacitor https://youtube.com/shorts/HkM0g7PQ94s?feature=share
 
 ### Barometer 
