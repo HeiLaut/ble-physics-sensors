@@ -52,6 +52,13 @@ void setup(void)
    tempT.setLabelY("Temperatur");
    tempT.setChannel(1,2);
 
+//   PhyphoxBleExperiment::Graph tempT2;    
+//   tempT2.setLabel("p(T)");
+//   tempT2.setUnitX("s");
+//   tempT2.setUnitY("*C");
+//   tempT2.setLabelX("Zeit");
+//   tempT2.setLabelY("Temperatur 2");
+//   tempT2.setChannel(1,4);
    
    PhyphoxBleExperiment::Value temperature;        
    temperature.setLabel("Temperatur");            
@@ -61,7 +68,14 @@ void setup(void)
    temperature.setChannel(2);
    temperature.setXMLAttribute("size=\"2\"");
 
-   
+//   PhyphoxBleExperiment::Value temperature2;        
+//   temperature2.setLabel("Temperatur2");            
+//   temperature2.setPrecision(2);                  
+//   temperature2.setUnit("*C");                      
+//   temperature2.setColor("FFFFFF");    
+//   temperature2.setChannel(4);
+//   temperature2.setXMLAttribute("size=\"2\"");
+//   
    PhyphoxBleExperiment::Value pres;        
    pres.setLabel("Druck");            
    pres.setPrecision(2);                  
@@ -73,9 +87,12 @@ void setup(void)
    graph.addElement(presTemp);
    graph.addElement(presT);
    graph.addElement(tempT);
+//   graph.addElement(tempT2);
    
    simple.addElement(temperature);
+   //simple.addElement(temperature2);
    simple.addElement(pres);
+   
 
    druck.addView(simple);
    druck.addView(graph);
@@ -98,11 +115,12 @@ void loop(void)
   float t = 0.001 * (float)millis();
   float p = bmp.readPressure()*0.01;
   float temp = bmp.readTemperature();
-  sensors.requestTemperatures();
+ // sensors.requestTemperatures();
+  //float t2 = sensors.getTempCByIndex(0);
   Serial.print("t(s), ");Serial.print(t); Serial.print(",");
-  Serial.print("t(*C), ");Serial.print(temp); Serial.print(",");
-  Serial.print("p(hPa), "); Serial.print(p,2);Serial.print(",");
-  Serial.print("t2(*C), ");Serial.println(sensors.getTempCByIndex(0));
+  Serial.print("T(*C), ");Serial.print(temp); Serial.print(",");
+  Serial.print("p(hPa), "); Serial.println(p,2);//Serial.print(",");
+  //Serial.print("T2(*C), ");Serial.println(t2);
   PhyphoxBLE::write(t,temp,p);
     
   delay(500);
