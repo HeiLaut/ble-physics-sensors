@@ -71,4 +71,8 @@ Needs a little soldering effort to build it.
 ### DC Multimeter
 Building instructions coming soon
 
-DC Multimeter. Measures Voltage up to 24V and Current up to 3 A via an INA219 Module.
+DC Multimeter. Measures Voltage up to 24V and current up to 3 A via an INA219 Module.
+
+### Barometer 
+
+BMP180 Barometer and Thermometer module. 
