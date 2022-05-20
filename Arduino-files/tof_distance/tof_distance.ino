@@ -4,12 +4,11 @@
 
 #define BUTTON_PIN 27
 Adafruit_VL53L0X lox = Adafruit_VL53L0X();
-float readings[]={0,0,0,0,0};
-float times[]={0,0,0,0,0};
+float readings[5]={0,0,0,0,0};
+float times[5]={0,0,0,0,0};
 int numreadings = 5;
 QuickStats stats; //initialize an instance of this class                                                            
 float duration, distance, d_old, velocity, offset,t_offset;
-int timer;
 float intervall = 20;
 
 
@@ -24,8 +23,8 @@ void setup() {
    PhyphoxBleExperiment entfernung;   //generate experiment on Arduino which plot random values
 
    entfernung.setTitle("Laser-Entfernungsmesser");
-   entfernung.setCategory("Arduino Experiments");
-   entfernung.setDescription("Die Entfernung eines Objekts zum Sensor wird in Zeitabhängigkeit gemessen");
+   entfernung.setCategory("Sensor-Boxen");
+   entfernung.setDescription("IR-Laser Entfernungsmessung");
 
    //View
    PhyphoxBleExperiment::View firstView;
@@ -89,7 +88,21 @@ void setup() {
    *  Channel 0 means a timestamp is created after the BLE package arrives in phyphox
    *  Channel 1 to N corresponding to the N-parameter which is written in server.write()
    */
+      //Export
+  PhyphoxBleExperiment::ExportSet mySet;       //Provides exporting the data to excel etc.
+  mySet.setLabel("Distanz");
 
+  PhyphoxBleExperiment::ExportData exTime;
+  exTime.setLabel("t(s)");
+  exTime.setDatachannel(1);
+
+  PhyphoxBleExperiment::ExportData exDist;
+  exDist.setLabel("s(cm)");
+  exDist.setDatachannel(2);
+
+  PhyphoxBleExperiment::ExportData exVel;
+  exVel.setLabel("v(cm/s)");
+  exVel.setDatachannel(3);
 
 
    firstView.addElement(dist);
@@ -106,6 +119,11 @@ void setup() {
    entfernung.addView(secondView);               //Attach view to experiment
    entfernung.addView(thirdView);               //Attach view to experiment
 
+   mySet.addElement(exTime);
+   mySet.addElement(exDist);
+   mySet.addElement(exVel);
+   entfernung.addExportSet(mySet);  
+  
    PhyphoxBLE::addExperiment(entfernung);      //Attach experiment to server
    
   // wait until serial port opens for native USB devices
@@ -120,7 +138,6 @@ void setup() {
   }
   // power 
   //Serial.println(F("VL53L0X API Simple Ranging example\n\n")); 
-   timer = 1;
    offset = 0;
    t_offset = 0;
    pinMode(BUTTON_PIN, INPUT_PULLUP);
@@ -141,15 +158,14 @@ void loop() {
     t_offset = t;
     offset = distance;
   }
-  readings[timer-1]=distance;
-  
-  times[timer-1]=t;
-  
-  if(timer%numreadings ==0){
-    velocity = stats.slope(times,readings,numreadings);
-     timer = 0;
- }
-  timer += 1;
+  for ( int i = 1; i < 5; ++i ) {
+      readings[i-1] = readings[i];
+      times[i-1] = times[i];
+   }
+       
+  readings[4]=distance;
+  times[4]=t;
+  velocity = stats.slope(times,readings,numreadings);
 
 
     

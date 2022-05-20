@@ -5,12 +5,11 @@
 #define TRIGGER_PIN 17
 #define ECHO_PIN 16
 #define MAX_DISTANCE 200
-float readings[]={0,0,0,0,0,0,0};
-float times[]={0,0,0,0,0,0,0};
-int numreadings = 7;
+float readings[5]={0,0,0,0,0};
+float times[5]={0,0,0,0,0};
+int numreadings = 5;
 QuickStats stats; //initialize an instance of this class
 float duration, distance, d_old, velocity, offset,t_offset;
-int timer;
 Button offset_button(2);
 float intervall = 20;
 
@@ -24,15 +23,17 @@ void setup()
   //phyphox setup
    
    PhyphoxBLE::start("US-Distanz");
+
+
    PhyphoxBLE::configHandler = &receivedData;
 
    //Experiment
-   PhyphoxBleExperiment entfernung;   //generate experiment on Arduino which plot random values
+   PhyphoxBleExperiment entfernung; 
+   
 
    entfernung.setTitle("Ultraschall-Entfernungsmesser");
-   entfernung.setCategory("Arduino Experiments");
-   entfernung.setDescription("Die Entfernung und die daraus folgende Geschwindigkeit eines Objekts zum Sensor wird in Zeitabhängigkeit gemessen");
-
+   entfernung.setCategory("Sensor-Boxen");
+   entfernung.setDescription("Ultraschall Entfernungsmesser");
    //View
    PhyphoxBleExperiment::View firstView;
    firstView.setLabel("Graph"); 
@@ -95,6 +96,23 @@ void setup()
   myEdit.setXMLAttribute("min=\"20\"");
 
 
+
+    //Export
+  PhyphoxBleExperiment::ExportSet mySet;       //Provides exporting the data to excel etc.
+  mySet.setLabel("Distanz");
+
+  PhyphoxBleExperiment::ExportData exTime;
+  exTime.setLabel("t(s)");
+  exTime.setDatachannel(1);
+
+  PhyphoxBleExperiment::ExportData exDist;
+  exDist.setLabel("s(cm)");
+  exDist.setDatachannel(2);
+
+  PhyphoxBleExperiment::ExportData exVel;
+  exVel.setLabel("v(cm/s)");
+  exVel.setDatachannel(3);
+
    firstView.addElement(dist);
    firstView.addElement(firstGraph);            //attach graph to view
    firstView.addElement(myEdit);
@@ -109,10 +127,14 @@ void setup()
    entfernung.addView(secondView);               //Attach view to experiment
    entfernung.addView(thirdView);               //Attach view to experiment
 
+   mySet.addElement(exTime);
+   mySet.addElement(exDist);
+   mySet.addElement(exVel);
+   entfernung.addExportSet(mySet);  
+   
    PhyphoxBLE::addExperiment(entfernung);      //Attach experiment to server
    Serial.begin(115200);
    
-   timer = 1;
    offset = 0;
    t_offset = 0;
 
@@ -135,15 +157,15 @@ void loop()
   duration = sonar.ping();
   distance = round(((duration / 2) * 0.0343-offset)*10)/10;
   
-  readings[timer-1]=distance;
+  for ( int i = 1; i < 5; ++i ) {
+      readings[i-1] = readings[i];
+      times[i-1] = times[i];
+   }
+       
+  readings[4]=distance;
+  times[4]=t;
+  velocity = stats.slope(times,readings,numreadings);
   
-  times[timer-1]=t;
-  
-  if(timer%numreadings ==0){
-    velocity = stats.slope(times,readings,numreadings);
-     timer = 0;
- }
-  timer += 1;
   Serial.print("t(2)");Serial.print(",");Serial.print(t); Serial.print(",");
   Serial.print("s(cm)");Serial.print(",");Serial.print(distance);Serial.print(",");
   Serial.print("v(cm/s)");Serial.print(",");Serial.println(velocity);
