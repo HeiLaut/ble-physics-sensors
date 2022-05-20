@@ -7,8 +7,13 @@ Adafruit_INA219 ina219;
 float interval = 20;
 
 void setup(void) {
+  //int sda = 15;
+ // int scl = 13;
   //needed to select the scl and sda port for the lolin lite board Wire.begin(I2C_SDA, I2C_SCL)
-  //Wire.begin(23, 19);
+ // Wire.begin(sda, scl);
+
+  pinMode(LED_BUILTIN, OUTPUT);  
+  digitalWrite(LED_BUILTIN, LOW);
   
   PhyphoxBLE::start("Multimeter");  
   PhyphoxBLE::configHandler = &receivedData;  
@@ -17,7 +22,7 @@ void setup(void) {
 
   multimeter.setTitle("Multimeter");
   multimeter.setCategory("Sensor-Boxen");
-  multimeter.setDescription("Spannugns und Strommessgerät");
+  multimeter.setDescription("Spannungs und Strommessgerät");
 
   //View
    PhyphoxBleExperiment::View graph;
@@ -68,6 +73,14 @@ void setup(void) {
    current.setChannel(3);
    current.setXMLAttribute("size=\"2\"");
 
+   PhyphoxBleExperiment::Value power;        
+   power.setLabel("P");            
+   power.setPrecision(2);                  
+   power.setUnit("mW");                      
+   power.setColor("FFFFFF");    
+   power.setChannel(4);
+   power.setXMLAttribute("size=\"2\"");
+
    PhyphoxBleExperiment::Edit sampleR;
    sampleR.setLabel("Abtastrate");
    sampleR.setUnit("ms");
@@ -82,6 +95,7 @@ void setup(void) {
    
    simple.addElement(volt);
    simple.addElement(current);
+   simple.addElement(power);
 
    charac.addElement(characteristic);
 
@@ -139,7 +153,7 @@ void loop(void)
 //  Serial.print("Power:         "); Serial.print(power_mW); Serial.println(" mW");
 //  Serial.println("");
 
-  PhyphoxBLE::write(t, loadvoltage, current_mA);   
+  PhyphoxBLE::write(t, loadvoltage, current_mA, power_mW);   
   
   Serial.print("t(s)");Serial.print(",");
   Serial.print(t);Serial.print(",");
