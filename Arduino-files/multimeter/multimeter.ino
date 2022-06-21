@@ -7,10 +7,10 @@ Adafruit_INA219 ina219;
 float interval = 20;
 
 void setup(void) {
-  //int sda = 15;
- // int scl = 13;
+  int sda = 15;
+  int scl = 13;
   //needed to select the scl and sda port for the lolin lite board Wire.begin(I2C_SDA, I2C_SCL)
- // Wire.begin(sda, scl);
+  Wire.begin(sda, scl);
 
   pinMode(LED_BUILTIN, OUTPUT);  
   digitalWrite(LED_BUILTIN, LOW);
@@ -89,6 +89,28 @@ void setup(void) {
    sampleR.setChannel(1);
    sampleR.setXMLAttribute("min=\"10\"");
 
+  //Export
+//   PhyphoxBleExperiment::ExportSet mySet;       //Provides exporting the data to excel etc.
+//   mySet.setLabel("Multimeter");
+//
+//   PhyphoxBleExperiment::ExportData exTime;
+//   exTime.setLabel("t(s)");
+//   exTime.setDatachannel(1);
+//
+//   PhyphoxBleExperiment::ExportData exVoltage;
+//   exVoltage.setLabel("U(V)");
+//   exVoltage.setDatachannel(2);
+   
+//   PhyphoxBleExperiment::ExportData exCur;
+//   exCur.setLabel("I(mA)");
+//   exCur.setDatachannel(3);
+//
+ //  PhyphoxBleExperiment::ExportData exPower;
+ //  exPower.setLabel("p(mW)");
+ //  exPower.setDatachannel(4);
+
+
+  
    graph.addElement(voltG);
    graph.addElement(currentG);
    graph.addElement(sampleR);
@@ -103,6 +125,13 @@ void setup(void) {
    multimeter.addView(graph);
    multimeter.addView(charac);
 
+//   mySet.addElement(exTime);
+//   mySet.addElement(exVoltage);
+//   mySet.addElement(exCur);
+ //  mySet.addElement(exPower);
+   
+//   multimeter.addExportSet(mySet); 
+   
    PhyphoxBLE::addExperiment(multimeter);
 
 
