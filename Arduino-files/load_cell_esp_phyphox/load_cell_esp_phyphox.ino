@@ -2,8 +2,8 @@
 #include <phyphoxBle.h>
 #include <Button.h>
 
-HX711_ADC LoadCell(16, 5); //LoadCell(DT,SCK)
-#define BUTTON_PIN 21 
+HX711_ADC LoadCell(4, 5); //LoadCell(DT,SCK)
+#define BUTTON_PIN 2 
 
 int lastState = LOW;  // the previous state from the input pin
 int currentState;     // the current reading from the input pin
@@ -69,7 +69,7 @@ void setup() {
    
   LoadCell.begin(); // start connection to HX711
   LoadCell.start(2000); // load cells gets 2000ms of time to stabilize
-  LoadCell.setCalFactor(741.896); 
+  LoadCell.setCalFactor(1061.05); 
   
   Serial.begin(115200); 
   pinMode(BUTTON_PIN, INPUT_PULLUP);
