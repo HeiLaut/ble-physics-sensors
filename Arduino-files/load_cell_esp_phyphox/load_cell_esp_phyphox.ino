@@ -3,7 +3,7 @@
 #include <Button.h>
 
 HX711_ADC LoadCell(4, 5); //LoadCell(DT,SCK)
-HX711_ADC LoadCell2(33,25);
+HX711_ADC LoadCell2(33,14);
 
 #define BUTTON_PIN 2 
 
@@ -15,12 +15,15 @@ int currentState;     // the current reading from the input pin
 
 
 void setup() {
+  //Turn on the internal LED on lolin 32
+  pinMode(LED_BUILTIN, OUTPUT);  
+  digitalWrite(LED_BUILTIN, LOW);
   
-  PhyphoxBLE::start("Kraft");
+  PhyphoxBLE::start("Kraft2");
     
   PhyphoxBleExperiment kraft; 
   //
-  kraft.setTitle("Kraftsensor");
+  kraft.setTitle("Kraftsensor2");
   kraft.setCategory("Sensor-Boxen");
   
  //View
@@ -30,6 +33,8 @@ void setup() {
   secondView.setLabel("Einfach"); //Create a "view"
   PhyphoxBleExperiment::View waage;
   waage.setLabel("Waage");
+  PhyphoxBleExperiment::View dual;
+  dual.setLabel("Zwei Sensoren");
   
 
   //
@@ -41,6 +46,15 @@ void setup() {
   firstGraph.setLabelY("Kraft F");
 
   firstGraph.setChannel(1,2);
+
+  PhyphoxBleExperiment::Graph secondGraph;      //Create graph which will p lot random numbers over time     
+  secondGraph.setLabel("Kraft");
+  secondGraph.setUnitX("s");
+  secondGraph.setUnitY("N");
+  secondGraph.setLabelX("Zeit t");
+  secondGraph.setLabelY("Kraft F_2");
+
+  secondGraph.setChannel(1,4);
 
   //Value
   PhyphoxBleExperiment::Value force;         //Creates a value-box.
@@ -59,24 +73,46 @@ void setup() {
   mass.setChannel(3);
   mass.setXMLAttribute("size=\"2\"");
 
+  //Value
+  PhyphoxBleExperiment::Value force2;         //Creates a value-box.
+  force2.setLabel("F_2");                  //Sets the label
+  force2.setPrecision(4);                     //The amount of digits shown after the decimal point.
+  force2.setUnit("N");                        //The physical unit associated with the displayed value.
+  force2.setColor("FFFFFF");                  //Sets font color. Uses a 6 digit hexadecimal value in "quotation marks".
+  force2.setChannel(4);
+  force2.setXMLAttribute("size=\"2\"");
+
+  PhyphoxBleExperiment::Value mass2;         //Creates a value-box.
+  mass2.setLabel("m_2");                  //Sets the label
+  mass2.setPrecision(1);                     //The amount of digits shown after the decimal point.
+  mass2.setUnit("g");                        //The physical unit associated with the displayed value.
+  mass2.setColor("FFFFFF");                  //Sets font color. Uses a 6 digit hexadecimal value in "quotation marks".
+  mass2.setChannel(5);
+  mass2.setXMLAttribute("size=\"2\"");
+
 
   firstView.addElement(force);
   firstView.addElement(firstGraph); 
   secondView.addElement(force);
   waage.addElement(mass);
+  dual.addElement(firstGraph);
+  dual.addElement(force);
+  dual.addElement(secondGraph);
+  dual.addElement(force2);
   kraft.addView(firstView);
   kraft.addView(secondView);
   kraft.addView(waage);
+  kraft.addView(dual);
+  
   PhyphoxBLE::addExperiment(kraft);
    
   LoadCell.begin(); // start connection to HX711
-
   LoadCell.start(2000); // load cells gets 2000ms of time to stabilize
   LoadCell.setCalFactor(1061.05); 
 
   LoadCell2.begin(); // start connection to HX711
   LoadCell2.start(2000); // load cells gets 2000ms of time to stabilize
-  LoadCell2.setCalFactor(1061.05); 
+  LoadCell2.setCalFactor(1019.34); 
   
   
   Serial.begin(115200); 
@@ -107,7 +143,7 @@ void loop() {
   //Serial.print(t);
  // Serial.print(",");
   //Serial.println(f);
-  PhyphoxBLE::write(t,f,m);
+  PhyphoxBLE::write(t,f,m,f2,m2);
 
   Serial.print("t(s)");Serial.print(",");Serial.print(t);Serial.print(",");
   Serial.print("F(N)");Serial.print(",");Serial.print(f,3);Serial.print(",");
