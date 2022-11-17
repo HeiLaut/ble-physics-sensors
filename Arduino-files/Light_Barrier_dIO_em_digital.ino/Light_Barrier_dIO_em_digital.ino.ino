@@ -1,16 +1,14 @@
-// TODO: Bezeichnungen Lichtschranke, A, L1 etc ändern
+ // TODO: Bezeichnungen Lichtschranke, A, L1 etc ändern
 
 #include <phyphoxBle.h>
-#define BUTTON_PIN 25
+//#define BUTTON_PIN 25
 //22,21 bei lolin32, 36,39 bei d1 mini
-//lolin lite : 17/21
-int electromagnet = 26;
+//lolin lite : S1 17/ S2 16
 
-const int signalPin1 = 17;
-const int signalPin2 = 16;
+//int electromagnet = 26;
 
-bool sig2 = true;
-int signalState2 = LOW;
+const int signalPin1 = 36;
+const int signalPin2 = 39;
 
 float valA = 0;
 float valB = 0;
@@ -32,8 +30,6 @@ float dtABF = 0; //time between A and B falling points
 
 
 void setup() {
-  pinMode(BUTTON_PIN, INPUT_PULLUP);
-  pinMode(electromagnet, OUTPUT);
 
   PhyphoxBLE::start("Lichtschranke");
   PhyphoxBLE::setMTU(48); //6 float values 6*4 = 24 bytes
@@ -60,24 +56,9 @@ void loop() {
   float t = 0.001 * (float)millis();
    
   int signalState1 = digitalRead(signalPin1);
-  if(sig2){
-    signalState2 = digitalRead(signalPin2);
-  }
-  int buttonState = digitalRead(BUTTON_PIN);
+  int signalState2 = digitalRead(signalPin2);
   
-  if(signalState2 == LOW or sig2 == false){
-    if(buttonState == LOW) 
-      {
-        digitalWrite(electromagnet, HIGH );
-        signalState2 = HIGH;
-        sig2 = false;
-      
-      }else{
-        digitalWrite(electromagnet,LOW);
-        signalState2 = LOW;
-        
-      }
-  }
+  
     
   if (signalState1 and !trigA) {
     ddtA = t - tAR;
