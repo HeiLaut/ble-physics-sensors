@@ -17,14 +17,20 @@ mcDist = 12;
 //
 espMount = [[-8.1,0,-24.2],[-46.5,0,-3.2]];
 
-
-
+con = "rj45"; //"din" or "rj45" or "none"
+esp = true; //esp holes and mount on or off (Master: on; Slave: off)
 screwD = 2;
 
 dLED = 5.2;
 dSock = 6;
 dDIN = 15.2;
 *translate([29,2.2,-2.9-gapHeight/2])rotate([90,0,0])import("lolin32_lite.stl");
+module rj45(){
+   difference(){
+      import("parts/keystone.stl");
+   }
+}
+
 
 screwholes = [[-gapWidth/2-wall-screwD,0,gapHeight/2-screwD],
               [+gapWidth/2+wall+screwD,0,gapHeight/2-screwD],
@@ -117,13 +123,26 @@ module caseassembly(){
          }
         translate(posLED)hole_y(off=depthLED);
         translate([0,0,posIRLED[2]])hole_x(h=(gapWidth+depthLED*2+2*wall), off = (gapWidth+depthLED*2+2*wall)/2);
-        //Mount for DIN
+        //Mount for Connector
+         if(con=="din"){
         translate([gapWidth/2+armWidth+wall,0,0]){
              hole_x(d = dDIN, h = 5);
              down(11)hole_x(d = 2, h = 5);
              up(11)hole_x(d = 2, h = 5);
           }
-         translate([gapWidth/2+armWidth+wall,-depth/2+mcDist+1,-gapHeight/2-wall-8-usbPos])cube([4,3.5,8]);;
+         }else if(con == "rj45"){
+            //cut for rj45 mouting plate
+               mirror([1,0,0])translate([gapWidth/2+armWidth+wall,-0.5,-56])cuboid([3,16,20]);
+         }
+         //esp connector holes
+         if(esp){
+         translate([gapWidth/2+armWidth+wall,-depth/2+mcDist+1,-gapHeight/2-wall-8-usbPos])cube([4,3.5,8]);
+         translate([gapWidth/2+armWidth+wall,-depth/2+mcDist+1,-gapHeight/2-wall+7.5-usbPos])cube([4,7,8]);
+         }
+          }
+          
+          if (con == "rj45"){
+             rj45();
           }
           for(i = screwholes){
               translate(i)rotate([90,0,0])translate([0,0,-depth/2-wall/2])difference(){
@@ -138,6 +157,7 @@ caseassembly();
 translate([0,20,0])lid();
 
 
+if(esp)
 translate([gapWidth/2+armWidth+wall,-depth/2+mcDist,-gapHeight/2+wall/2-screwD*2.5/4]){
 color("green")for(i = espMount){
              translate(i)rotate([90,0,0])difference(){

@@ -4,8 +4,8 @@ use <BOSL/shapes.scad>
 use <BOSL/masks.scad>
 
 $fn = 30;
-espX = 50;
-espY = 39;
+espX = 70;
+espY = 45;
 espZ = 1.5;
 wall = 1.5;
 usbX = 8;
@@ -14,7 +14,7 @@ z = 20;
 dist = 5;
 dDIN = 15.2;
 dMag = 20;
-
+con="rj45";//"din" or "rj45"
 
 module esp(){;
 translate([121.5,63,-41])rotate([90,0,0])import("esp32.stl");
@@ -23,6 +23,10 @@ translate([121.5,63,-41])rotate([90,0,0])import("esp32.stl");
 module ToF(){
     color("grey")rotate([0,0,90])translate([-19.8,-13.3,wall+dist])import("VL53L0X.stl");
 }
+module rj45(){
+   import("parts/keystone.stl");
+}
+
 
 module hull(){
     up(z/2+wall/2)difference(){
@@ -33,21 +37,31 @@ module hull(){
        dSoc = 6; //diameter socket
        distZ = 15;
        distY = 10;
-       
-        rotate([90,0,0])translate([espX/2,0,0]){
+       if(con == "din"){
+        translate([-espX/5,espY/2,espZ/2])rotate([90,0,90]){
              hole_x(d = dDIN, h = 5);
              down(11)hole_x(d = 2, h = 5);
              up(11)hole_x(d = 2, h = 5);
           }
+       }
+     else if(con == "rj45"){
+            //cut for rj45 mouting plate
+               translate([-espX/4,espY/2+0.1,-1])cuboid([25,3,17]);
+       }
+       
        //switchcable hole
-       #translate([0,+espY/2,z/2-wall/2+1.5])cuboid([3,wall*2,3]);
+      translate([-espX/3,+espY/2,z/2-wall/2+1.5])cuboid([3,wall*2,3]);
        
        //magnet holes
-       translate([-5,0,-z/2-wall])cylinder(d = dMag, h = wall*2);
+       translate([espX/2-5-dMag/2,0,-z/2-wall])cylinder(d = dMag, h = wall*2);
        
        
         //lid holder
         translate([-espX/2+1.5,-(espY)/2,z/2-1.5])rotate([0,90,0])cylinder(h=espX-3,d=2);
+    }
+    if(con == "rj45"){
+       translate([36.5,-48.4,8.5])rotate([-90,0,-90])rj45();
+
     }
     
     //screw holes
@@ -62,17 +76,29 @@ module hull(){
     module lid(){
      up(z+2.2+10){
          difference(){
-       cuboid([espX+2*wall,espY+2*wall,wall], fillet = 2, edges=EDGES_Z_ALL);for(i=[-1,1]){
-    translate([i*(espX/2-1.5),espY/2-2,-2])cylinder(d=2.5,h=5);
-       }
-        left(5)down(wall)cylinder(d = 3, h = wall*2);
+            union(){
+            cuboid([espX+2*wall,espY+2*wall,wall], fillet = 2, edges=EDGES_Z_ALL);
+            //led base
+            translate([0,0,-wall])cuboid([10,10,3]);
+            }
+            //led hole
+            translate([0,0,-wall*4])cylinder(d=5,h=7);
+
+            //mounting screw holes
+            for(i=[-1,1]){
+                translate([i*(espX/2-1.5),espY/2-2,-2])cylinder(d=2.5,h=5);
+            }
+                  
+            
+       //magnet screw gole
+        right(espX/2-5-dMag/2)down(wall)cylinder(d = 3, h = wall*2);
      }
      poslid=0.5;
      translate([0,-espY/2+wall+poslid,-2.5-wall/2])cuboid([espX-3,wall*2,5]);
      translate([-espX/2+1.5,-(espY)/2+0.3+poslid,-3.5])rotate([0,90,0])cylinder(h=espX-3,d=1.5);
    }
 }
-   lid();
+   color("red")lid();
     
 }
 module hole_x(d = 5, h = 10, off = wall){
@@ -114,4 +140,4 @@ module startbutton(){
      down(0.5)cylinder(d = 7, h  = 2*wall);
    }
 }
-translate([50,0,0])startbutton();
+translate([0,40,0])startbutton();

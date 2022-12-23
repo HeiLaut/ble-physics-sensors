@@ -2,9 +2,9 @@
 
 #include <phyphoxBle.h>
 //22,21 bei lolin32, 36,39 bei d1 mini
-//lolin lite : 17/21
-const int signalPin1 = 22;
-const int signalPin2 = 21;
+//lolin lite : 17/21 oder 17/16?
+const int signalPin1 = 17;
+const int signalPin2 = 16;
 
 //const int analogInput1 = 36;
 //const int analogInput2 = 39;

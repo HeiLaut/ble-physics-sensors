@@ -668,7 +668,7 @@
     (property "Value" "BC547" (id 1) (at 110.49 59.6899 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
-    (property "Footprint" "" (id 2) (at 110.49 60.325 0)
+    (property "Footprint" "Package_TO_SOT_THT:TO-92L_HandSolder" (id 2) (at 110.49 60.325 0)
       (effects (font (size 1.27 1.27) italic) (justify left) hide)
     )
     (property "Datasheet" "https://www.onsemi.com/pub/Collateral/BC550-D.pdf" (id 3) (at 105.41 58.42 0)
@@ -685,7 +685,7 @@
     (property "Reference" "R3" (id 0) (at 102.87 50.7999 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
-    (property "Value" "10" (id 1) (at 102.87 53.3399 0)
+    (property "Value" "" (id 1) (at 102.87 53.3399 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal" (id 2) (at 98.552 52.07 90)
@@ -866,7 +866,7 @@
       (reference "J2") (unit 1) (value "Conn_01x02") (footprint "Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical")
     )
     (path "/10e50957-8ccb-462c-a1ab-2c68753f4dff"
-      (reference "Q1") (unit 1) (value "BC547") (footprint "Package_TO_SOT_THT:TO-92L_Inline_Wide")
+      (reference "Q1") (unit 1) (value "BC547") (footprint "Package_TO_SOT_THT:TO-92L_HandSolder")
     )
     (path "/e8d8bbd4-2e6c-40b0-92e3-9d9c5a98e195"
       (reference "R1") (unit 1) (value "220") (footprint "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal")
@@ -875,7 +875,7 @@
       (reference "R2") (unit 1) (value "470k") (footprint "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal")
     )
     (path "/1f796a2c-0195-444a-b957-72363cb03819"
-      (reference "R3") (unit 1) (value "10") (footprint "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal")
+      (reference "R3") (unit 1) (value "100") (footprint "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal")
     )
   )
 )
