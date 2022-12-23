@@ -17,14 +17,14 @@ mcDist = 12;
 //
 espMount = [[-8.1,0,-24.2],[-46.5,0,-3.2]];
 
-con = "rj45"; //"din" or "rj45" or "none"
+con = "none"; //"din" or "rj45" or "none"
 esp = true; //esp holes and mount on or off (Master: on; Slave: off)
 screwD = 2;
 
 dLED = 5.2;
 dSock = 6;
 dDIN = 15.2;
-*translate([29,2.2,-2.9-gapHeight/2])rotate([90,0,0])import("lolin32_lite.stl");
+*translate([29,2.2,-2.9-gapHeight/2])rotate([90,0,0])import("parts/lolin32_lite.stl");
 module rj45(){
    difference(){
       import("parts/keystone.stl");
@@ -36,10 +36,14 @@ screwholes = [[-gapWidth/2-wall-screwD,0,gapHeight/2-screwD],
               [+gapWidth/2+wall+screwD,0,gapHeight/2-screwD],
               [-gapWidth/2-wall-armWidth+screwD,0,gapHeight/2-screwD],
               [+gapWidth/2+wall+armWidth-screwD,0,gapHeight/2-screwD],
-              [-gapWidth/2-wall-screwD,0,-gapHeight/2+screwD],
-              [+gapWidth/2+wall+screwD,0,-gapHeight/2+screwD],
+              //[-gapWidth/2-wall-screwD,0,-gapHeight/2+screwD],
+              //[-gapWidth/2-wall-armWidth+2,0,-gapHeight/2+screwD],
               [-gapWidth/2-wall-armWidth+2,0,-gapHeight/2+screwD],
-              [+gapWidth/2+wall+armWidth-2,0,-gapHeight/2+screwD]];
+              [+gapWidth/2+wall+armWidth-2,0,-gapHeight/2+screwD],
+               [-15,0,-gapHeight/2-baseHeight],
+               [15,0,-gapHeight/2-baseHeight]
+
+];
 $fn = 25;
 module hole_x(d = dLED, h = 10, off = wall){
    left(off)rotate([0,90,0])cylinder(d = d, h = h);
@@ -111,7 +115,7 @@ module lid(){
 }
 module caseassembly(){
     difference(){
-        depthLED = 4;
+        depthLED = 5;
         posLED = [armWidth/2+gapWidth/2+wall,-depth/2,gapHeight/7];
         posIRLED = [gapWidth/2+depthLED/2+wall/2,wall/2,gapHeight/3];
         union(){
@@ -153,6 +157,55 @@ module caseassembly(){
         }
         translate([0,-depth/2-wall/2,-gapHeight/2-baseHeight-wall*2-19.5])mount();
 }
+
+module wheel(){
+   dRod = 10.5;
+       x=20;
+       y=30;
+       z=20;
+       l = 11;
+   difference(){
+      down(35)cuboid([30,22+4*wall,110],fillet=5,edges = EDGES_X_TOP+EDGES_Y_BOT);
+      down(70)cuboid([35,23,60]);
+      down(0)cuboid([30-8*wall,40,40]);
+      left(25)up(15)rotate([0,90,0])cylinder(d=3,h=50);
+      translate([0,30,-76])rotate([90,0,0])cylinder(d = dRod, h = 60);
+   }
+   *up(15)rotate([0,90,0])
+      difference(){
+         cylinder(d = 51.5,h = 4);
+         cylinder(d=2,h=10);
+      }
+   
+}
+
+module wheel_v2(){
+   dRod = 10.5;
+       x=20;
+       y=30;
+       z=20;
+       l = 11;
+   difference(){
+      down(35)cuboid([32+2*wall,22+4*wall,110],fillet=5,edges = EDGES_X_TOP+EDGES_Y_BOT);
+      fwd(wall)down(70)cuboid([30,27,60]);
+      down(0)cuboid([30-8*wall,40,40]);
+      left(25)up(15)rotate([0,90,0])cylinder(d=3,h=50);
+      translate([0,30,-76])rotate([90,0,0])cylinder(d = dRod, h = 60);
+      translate([-20,0,-76])rotate([0,90,0])cylinder(d = dRod, h = 60);
+      down(54.5)fwd(3)cuboid([37,30,30]);
+   }
+   *up(15)rotate([0,90,0])
+      difference(){
+         cylinder(d = 51.5,h = 4);
+         cylinder(d=2,h=10);
+      }
+   
+}
+
+
+*wheel_v2();
+
+
 caseassembly();
 translate([0,20,0])lid();
 
@@ -166,3 +219,5 @@ color("green")for(i = espMount){
           }
       }
   }
+
+

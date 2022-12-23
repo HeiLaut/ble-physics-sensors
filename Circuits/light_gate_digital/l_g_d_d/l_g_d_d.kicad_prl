@@ -2,7 +2,7 @@
   "board": {
     "active_layer": 0,
     "active_layer_preset": "",
-    "auto_track_width": true,
+    "auto_track_width": false,
     "hidden_nets": [],
     "high_contrast_mode": 0,
     "net_color_mode": 1,
@@ -62,11 +62,11 @@
       35,
       36
     ],
-    "visible_layers": "fffffff_ffffffff",
+    "visible_layers": "0003030_ffffffff",
     "zone_display_mode": 0
   },
   "meta": {
-    "filename": "l_g_d.kicad_prl",
+    "filename": "l_g_d_d.kicad_prl",
     "version": 3
   },
   "project": {
