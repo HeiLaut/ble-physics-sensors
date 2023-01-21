@@ -31,12 +31,16 @@ xCh = lcX;
 yCh = y-1;
 zCh1 = 10;
 xCh2 = 20;
-zCh2 = 15;
+zCh2 = 18;
 
 //dimensions load holder
 xLh = lcX/1.5;
 yLh = y-1;
 zLh = 5;
+
+//rod
+d_rod = 10.5;
+
 
  module screwshaft(d1=4,d2=2,h=5){
         translate([0,0,0])rotate([90,0,0])difference(){
@@ -65,8 +69,10 @@ module loadcell(){
 }
 module case(x=x,y=y,z=z,a=1){
     difference(){
-        cuboid([x+wall*2,y+wall*2,z+wall*2],fillet = 3, edges=EDGES_Y_ALL);
+       cuboid([x+wall*2,y+wall*2,z+wall*2],fillet = 3, edges=EDGES_Y_ALL);
         translate([0,-a*wall,0])cuboid([x,y+wall,z],fillet = 3, edges=EDGES_Y_ALL);
+           
+
     }
 }
 module load_cell_mount(){
@@ -78,6 +84,11 @@ module load_cell_mount(){
         translate([0,0,zCh1/2+zCh2/2])cuboid([xCh2, yCh, zCh2]);
     }
     holes();
+    //rod hole
+    translate([0,0,12]){
+       translate([-50,0,0])rotate([0,90,0])cylinder(d = d_rod, h = 100);
+       translate([0,50,0])rotate([90,0,0])cylinder(d = d_rod, h = 100);
+    }
     }
     difference(){
     left(lcX/2-xLh/2)down(lcZ/2+zLh/2+2)cuboid([xLh,yLh,zLh]);
@@ -128,6 +139,8 @@ module lolin_lid(){
          translate([x/2+1,3.5,7.2])cuboid([2*wall,6,7]);
          //USB connector
          translate([x/2+1,2.1,-8.5])cuboid([2*wall,3,7]);
+         //rod hole
+       translate([0,50,16.5])rotate([90,0,0])cylinder(d = d_rod, h = 100);
        
        for(i=[[-x/2+wall+0.5,y/2-wall,-z/2+wall+0.5],
         [x/2-wall-0.5,y/2-wall,z/2-wall-0.5],
@@ -145,16 +158,22 @@ module lolin_lid(){
     
 }
 module load_cell_case(){
-    case();
-    for(i=[[-x/2+wall+0.5,y/2-wall,-z/2+wall+0.5],
-        [x/2-wall-0.5,y/2-wall,z/2-wall-0.5],
-        [x/2-wall-0.5,y/2-wall,-z/2+wall+0.5],
-        [-x/2+wall+0.5,y/2-wall,z/2-wall-0.5] ]){
-        translate(i)screwshaft(4,2,y);
-    }
+   difference(){ 
+   union(){
+       color("green")case();
+       for(i=[[-x/2+wall+0.5,y/2-wall,-z/2+wall+0.5],
+           [x/2-wall-0.5,y/2-wall,z/2-wall-0.5],
+           [x/2-wall-0.5,y/2-wall,-z/2+wall+0.5],
+           [-x/2+wall+0.5,y/2-wall,z/2-wall-0.5] ]){
+           translate(i)screwshaft(4,2,y);
+       }}
+    translate([0,0,16.5]){
+       translate([-50,0,0])rotate([0,90,0])cylinder(d = d_rod, h = 100);
+       translate([0,50,0])rotate([90,0,0])cylinder(d = d_rod, h = 100);
+    }    }
 }
 
-back(5)load_cell_case();
-fwd(15)lolin_lid();
+up(9.)load_cell_case();
+*up(9.3)fwd(30)lolin_lid();
 //loadcell();
-//down(6)back(20)load_cell_mount();
+load_cell_mount();

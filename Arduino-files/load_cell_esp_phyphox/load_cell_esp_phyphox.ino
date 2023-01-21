@@ -10,7 +10,8 @@ HX711_ADC LoadCell2(33,14);
 int lastState = LOW;  // the previous state from the input pin
 int currentState;     // the current reading from the input pin
 
-
+int touchValue;
+int counter = 0;
 
 
 
@@ -108,7 +109,7 @@ void setup() {
    
   LoadCell.begin(); // start connection to HX711
   LoadCell.start(2000); // load cells gets 2000ms of time to stabilize
-  LoadCell.setCalFactor(1061.05); 
+  LoadCell.setCalFactor(742.73); 
 
   LoadCell2.begin(); // start connection to HX711
   LoadCell2.start(2000); // load cells gets 2000ms of time to stabilize
@@ -123,14 +124,25 @@ void setup() {
 
 
 void loop() {
+  //Serial.print(touchValue);
   currentState = digitalRead(BUTTON_PIN);
-  if (lastState == HIGH && currentState == LOW)
+   
+   //touchValue = touchRead(2);
+
+  //if(touchValue<20){
+  //  counter+=1;
+ // }else{
+ //   counter=0;
+ // }
+
+  
+  if ((lastState == HIGH && currentState == LOW)||counter>5)
     {LoadCell.tareNoDelay();
     LoadCell2.tareNoDelay();}
   else if (lastState == LOW && currentState == HIGH)
   // save the the last state
   lastState = currentState;
-
+  //Serial.print(counter);
   float t = 0.001 * (float)millis();
   LoadCell.update();
   LoadCell2.update();
@@ -149,7 +161,7 @@ void loop() {
   Serial.print("F(N)");Serial.print(",");Serial.print(f,3);Serial.print(",");
   Serial.print("m(g)");Serial.print(",");Serial.print(m,1);Serial.print(",");
   Serial.print("F2(N)");Serial.print(",");Serial.print(f2,3);Serial.print(",");
-  Serial.print("m2(g)");Serial.print(",");Serial.println(m2,1);
+  Serial.print("m2(g)");Serial.print(",");Serial.println(m2,1);//Serial.print(touchValue);
   
   delay(50);
 
