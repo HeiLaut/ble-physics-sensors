@@ -17,7 +17,7 @@ mcDist = 12;
 //
 espMount = [[-8.1,0,-24.2],[-46.5,0,-3.2]];
 
-con = "none"; //"din" or "rj45" or "none"
+con = "rj45"; //"din" or "rj45" or "none"
 esp = true; //esp holes and mount on or off (Master: on; Slave: off)
 screwD = 2;
 

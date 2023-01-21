@@ -118,7 +118,7 @@ void loop() {
 
     
   float values[6] = {t, signal1.high, s , dt_1_2*0.001, signal1.dt*0.001, signal2.dt*0.001};
-  PhyphoxBLE::write(&values[0], 6);  
+  //PhyphoxBLE::write(&values[0], 6);  
 
  // PhyphoxBLE::write(t, s, v);
   Serial.print("t,");Serial.print(t,3);
