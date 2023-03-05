@@ -6,7 +6,7 @@
 
 Each Box can be built for under 20 €.
 
-All boxes are equipped with an esp32, so that they can communicate via BLE or serial connection. 
+All boxes are equipped with an esp32, so that they can communicate via BLE or serial connection. Older models use the d1 mini, but I now switched to the lolin32 lite, because it's cheaper and has a battery connector. Unfortunately the wiki isn't up to date.
 
 Just power up the sensor-box and take a smartphone with pyhphox installed, and you can start. Nothing more is needed.
 
