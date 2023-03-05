@@ -30,9 +30,6 @@ Using this platform, the measured values can then be read out directly via Bluet
 I am working on a Web Serial Plotter, than can be accessed through Chrome or Edge. It automatically reads the data from the sensor. You can specify which data to plot and also output the data to a CSV-file. For the plotting i am using Plotly. Still in an early Version but usable.
 You can find the serial plotter at the adress: https://heilaut.github.io/web-serial-plotter/
 
-#### Python Serial Plotter
-The sensors can also be read out via the serial interface of the computer. For this purpose, a Pyhton program is developed, which plots the respective measured value over time. The software has an export function so that the data can then be further processed on the PC. The program already works but is missing a few features.
-
 ## Boxes
 
 ### Force sensor
