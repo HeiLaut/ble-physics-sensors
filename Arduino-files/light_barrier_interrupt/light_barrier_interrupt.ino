@@ -31,8 +31,8 @@ float s = 0;
 //22,21 bei lolin32, 36,39 bei d1 mini
 //lolin lite : 17/21 oder 17/16
 
-Signal signal1 = {22, 0, false, 0 ,0, 0,0};
-Signal signal2 = {21, 0, false, 0, 0, 0,0};
+Signal signal1 = {17, 0, false, 0 ,0, 0,0};
+Signal signal2 = {16, 0, false, 0, 0, 0,0};
 
 //variables to keep track of the timing of recent interrupts
 
@@ -118,7 +118,7 @@ void loop() {
 
     
   float values[6] = {t, signal1.high, s , dt_1_2*0.001, signal1.dt*0.001, signal2.dt*0.001};
-  //PhyphoxBLE::write(&values[0], 6);  
+  PhyphoxBLE::write(&values[0], 6);  
 
  // PhyphoxBLE::write(t, s, v);
   Serial.print("t,");Serial.print(t,3);
