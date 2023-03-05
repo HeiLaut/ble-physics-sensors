@@ -1,0 +1,152 @@
+SciDAVis 2.3.0 project file
+<scripting-lang>	muParser
+<windows>	3
+<table>
+3569
+<table creation_time="2023-22-02 14:49:38:787" caption_spec="%n%C{ - }%c" name="Tabelle1" columns="2" rows="30"><comment><![CDATA[]]></comment><column creation_time="2023-22-02 14:49:38:792" caption_spec="%n%C{ - }%c" name="2" type="TypeDouble" mode="Numeric" plot_designation="X"><comment><![CDATA[]]></comment><input_filter><simple_filter creation_time="2023-22-02 14:49:38:792" caption_spec="%n%C{ - }%c" name="InputFilter" filter_name="String2DoubleFilter"><comment><![CDATA[]]></comment></simple_filter></input_filter><output_filter><simple_filter creation_time="2023-22-02 14:49:38:792" caption_spec="%n%C{ - }%c" name="OutputFilter" format="g" digits="6" filter_name="Double2StringFilter"><comment><![CDATA[]]></comment></simple_filter></output_filter><row type="TypeDouble" index="0" invalid="no">1.4900000000000000e+03</row><row type="TypeDouble" index="1" invalid="no">1.2000000000000000e+03</row><row type="TypeDouble" index="2" invalid="no">1.6000000000000000e+03</row><row type="TypeDouble" index="3" invalid="no">1.6200000000000000e+03</row><row type="TypeDouble" index="4" invalid="no">1.5900000000000000e+03</row><row type="TypeDouble" index="5" invalid="no">1.5300000000000000e+03</row><row type="TypeDouble" index="6" invalid="no">1.4770000000000000e+03</row><row type="TypeDouble" index="7" invalid="no">1.4200000000000000e+03</row><row type="TypeDouble" index="8" invalid="no">1.4000000000000000e+03</row><row type="TypeDouble" index="9" invalid="no">1.3200000000000000e+03</row><row type="TypeDouble" index="10" invalid="no">1.2900000000000000e+03</row><row type="TypeDouble" index="11" invalid="no">1.7000000000000000e+03</row><row type="TypeDouble" index="12" invalid="no">1.8000000000000000e+03</row><row type="TypeDouble" index="13" invalid="no">1.9300000000000000e+03</row></column><column creation_time="2023-22-02 14:49:38:787" caption_spec="%n%C{ - }%c" name="1" type="TypeDouble" mode="Numeric" plot_designation="Y"><comment><![CDATA[]]></comment><input_filter><simple_filter creation_time="2023-22-02 14:49:38:788" caption_spec="%n%C{ - }%c" name="InputFilter" filter_name="String2DoubleFilter"><comment><![CDATA[]]></comment></simple_filter></input_filter><output_filter><simple_filter creation_time="2023-22-02 14:49:38:791" caption_spec="%n%C{ - }%c" name="OutputFilter" format="g" digits="6" filter_name="Double2StringFilter"><comment><![CDATA[]]></comment></simple_filter></output_filter><row type="TypeDouble" index="0" invalid="no">3.9100000000000001e+00</row><row type="TypeDouble" index="1" invalid="no">1.2000000000000000e+01</row><row type="TypeDouble" index="2" invalid="no">1.1499999999999999e+00</row><row type="TypeDouble" index="3" invalid="no">4.1999999999999998e-01</row><row type="TypeDouble" index="4" invalid="no">1.3200000000000001e+00</row><row type="TypeDouble" index="5" invalid="no">2.8199999999999998e+00</row><row type="TypeDouble" index="6" invalid="no">4.5000000000000000e+00</row><row type="TypeDouble" index="7" invalid="no">5.9199999999999999e+00</row><row type="TypeDouble" index="8" invalid="no">6.5400000000000000e+00</row><row type="TypeDouble" index="9" invalid="no">8.7400000000000002e+00</row><row type="TypeDouble" index="10" invalid="no">9.7500000000000000e+00</row><row type="TypeDouble" index="11" invalid="no">-1.8999999999999999e+00</row><row type="TypeDouble" index="12" invalid="no">-5.0000000000000000e+00</row><row type="TypeDouble" index="13" invalid="no">-8.3000000000000007e+00</row></column><column_width column="0">50</column_width><column_width column="1">120</column_width></table>
+geometry	0	0	676	383	
+
+</table>
+<multiLayer>
+Grafik3	1	1	22.02.2023 14:55
+geometry	0	258	500	400	
+WindowLabel		2
+Margins	5	5	5	5
+Spacing	5	5
+LayerCanvasSize	416	271
+Alignement	0	0
+<graph>
+ggeometry	5	5	473	330
+PlotTitle	Titel	#ff000000	4228
+<Antialiasing>1</Antialiasing>
+Background	#ffffffff	255
+Margin	0
+Border	0	#ff000000
+grid	0	0	0	0	#ff0000ff	0	0	#ffa0a0a4	2	0	#ff0000ff	0	0	#ffa0a0a4	2	0	0	0	2	0
+EnabledAxes	1	0	1	0	
+AxesTitles	X-Achsentitel	Y-Achsentitel			
+AxesTitleColors	#ff000000	#ff000000	#ff000000	#ff000000	
+AxesTitleAlignment	5124	4	5124	4
+TitleFont	MS Shell Dlg 2	10	75	0	0	0
+ScaleFont0	MS Shell Dlg 2	8	75	0	0	0
+ScaleFont1	MS Shell Dlg 2	8	75	0	0	0
+ScaleFont2	MS Shell Dlg 2	8	75	0	0	0
+ScaleFont3	MS Shell Dlg 2	8	75	0	0	0
+AxisFont0	MS Shell Dlg 2	8	50	0	0	0
+AxisFont1	MS Shell Dlg 2	8	50	0	0	0
+AxisFont2	MS Shell Dlg 2	8	50	0	0	0
+AxisFont3	MS Shell Dlg 2	8	50	0	0	0
+EnabledTickLabels	1	1	1	1	
+AxesColors	#ff000000	#ff000000	#ff000000	#ff000000
+AxesNumberColors	#ff000000	#ff000000	#ff000000	#ff000000
+AxesBaseline	0	0	0	0	
+CanvasBackground	#ffffffff	255
+curve	Tabelle1_1	Tabelle1_2	1	0	#ff000000	0	1	7	1	#ff000000	#ff000000	0	#ff000000	14	1	0	64		2	0	0	13	1
+scale	0	1100	2000	0	8	5	0	0
+scale	1	1100	2000	0	8	5	0	0
+scale	2	-10	15	0	8	5	0	0
+scale	3	-10	15	0	8	5	0	0
+LabelsFormat	0	4	0	4	0	4	0	4	
+AxisType	0	0	0	0	
+MajorTicks	1	1	1	1	
+MinorTicks	1	1	1	1	
+TicksLength	5	9
+DrawAxesBackbone	1
+AxesLineWidth	1
+LabelsRotation	0	0
+<legend>	-0.121951219512195	1895.11278195489	MS Shell Dlg 2	8	50	0	0	0	#ff000000	1	0	#00ffffff	0	\c{1}Tabelle1_2	</legend>
+</graph>
+</multiLayer>
+<multiLayer>
+Grafik2	1	1	22.02.2023 14:56
+geometry	44	73	500	400	active
+WindowLabel		2
+Margins	5	5	5	5
+Spacing	5	5
+LayerCanvasSize	427	271
+Alignement	0	0
+<graph>
+ggeometry	5	5	473	330
+PlotTitle	Titel	#ff000000	4228
+<Antialiasing>1</Antialiasing>
+Background	#ffffffff	255
+Margin	0
+Border	0	#ff000000
+grid	0	0	0	0	#ff0000ff	0	0	#ffa0a0a4	2	0	#ff0000ff	0	0	#ffa0a0a4	2	0	0	0	2	0
+EnabledAxes	1	0	1	0	
+AxesTitles	X-Achsentitel	Y-Achsentitel			
+AxesTitleColors	#ff000000	#ff000000	#ff000000	#ff000000	
+AxesTitleAlignment	5124	4	5124	4
+TitleFont	MS Shell Dlg 2	10	75	0	0	0
+ScaleFont0	MS Shell Dlg 2	8	75	0	0	0
+ScaleFont1	MS Shell Dlg 2	8	75	0	0	0
+ScaleFont2	MS Shell Dlg 2	8	75	0	0	0
+ScaleFont3	MS Shell Dlg 2	8	75	0	0	0
+AxisFont0	MS Shell Dlg 2	8	50	0	0	0
+AxisFont1	MS Shell Dlg 2	8	50	0	0	0
+AxisFont2	MS Shell Dlg 2	8	50	0	0	0
+AxisFont3	MS Shell Dlg 2	8	50	0	0	0
+EnabledTickLabels	1	1	1	1	
+AxesColors	#ff000000	#ff000000	#ff000000	#ff000000
+AxesNumberColors	#ff000000	#ff000000	#ff000000	#ff000000
+AxesBaseline	0	0	0	0	
+CanvasBackground	#ffffffff	255
+curve	Tabelle1_2	Tabelle1_1	1	0	#ff000000	0	1	7	1	#ff000000	#ff000000	0	#ff000000	14	1	0	64		2	0	0	29	1
+FunctionCurve	0,NichtlinearAnpassung1,x,1200,1930	100			0	1	#ffff0000	0	1	0	0	#ff000000	#ffa0a0a4	0	#ff000000	14	1	16	64		2	0	149847568	528	1
+<formula>
+a=-0.0280897307412916
+b=45.8616626245428
+
+a*x+b
+</formula>
+scale	0	-10	15	0	8	5	0	0
+scale	1	-10	15	0	8	5	0	0
+scale	2	1100	2000	0	8	5	0	0
+scale	3	1100	2000	0	8	5	0	0
+LabelsFormat	0	4	0	4	0	4	0	4	
+AxisType	0	0	0	0	
+MajorTicks	1	1	1	1	
+MinorTicks	1	1	1	1	
+TicksLength	5	9
+DrawAxesBackbone	1
+AxesLineWidth	1
+LabelsRotation	0	0
+<legend>	1539.13043478261	14.718045112782	MS Shell Dlg 2	8	50	0	0	0	#ff000000	1	0	#00ffffff	0	\c{1}Tabelle1_1	\c{2}NichtlinearAnpassung1	</legend>
+</graph>
+</multiLayer>
+<log>
+[22.02.2023 14:54	Diagramm: ''Grafik2'']
+Lineare Regression Anpassung an den Datensatz: Tabelle1_2, unter Benutzung der Funktion: A*x+B
+Y Standardfehler: Unbekannt
+Von x = 3,91 bis x = 9,75
+B (y-Achsenabschnitt) = 1.630,10084346316 +/- 4,82142190623935
+A (Steigung) = -35,1525676010915 +/- 0,699803390562543
+--------------------------------------------------------------------------------------
+Chi^2 = 52,1157281071694
+R^2 = 0,998417258276299
+---------------------------------------------------------------------------------------
+[22.02.2023 14:56	Diagramm: ''Grafik2'']
+Lineare Regression Anpassung an den Datensatz: Tabelle1_1, unter Benutzung der Funktion: A*x+B
+Y Standardfehler: Unbekannt
+Von x = 1.490 bis x = 1.930
+B (y-Achsenabschnitt) = 46,1750966988996 +/- 0,730707392102359
+A (Steigung) = -0,0282790930310103 +/- 0,000439352890233484
+--------------------------------------------------------------------------------------
+Chi^2 = 0,173669956652217
+R^2 = 0,998553831974401
+---------------------------------------------------------------------------------------
+[22.02.2023 18:21	Diagramm: ''Grafik2'']
+Nichtlinear Anpassung an den Datensatz: Tabelle1_1, unter Benutzung der Funktion: a*x+b
+Y Standardfehler: Unbekannt
+Skalierter Levenberg-Marquardt Algorithmus mit Toleranz = 0,0001
+Von x = 1.200 bis x = 1.930
+a  = -0,0280897307412916 +/- 0,000195325664443362
+b  = 45,8616626245428 +/- 0,300486474057017
+--------------------------------------------------------------------------------------
+Chi^2 = 0,239080241261115
+R^2 = 0,999420100418956
+---------------------------------------------------------------------------------------
+Iterationen = 1
+Status = success
+---------------------------------------------------------------------------------------
+</log>
