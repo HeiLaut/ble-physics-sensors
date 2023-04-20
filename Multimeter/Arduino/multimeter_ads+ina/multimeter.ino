@@ -1,16 +1,25 @@
 #include <Wire.h>
 #include <Adafruit_INA219.h>
 #include <phyphoxBle.h> 
+#include <Adafruit_ADS1X15.h>
+
+Adafruit_ADS1015 ads1015;
 
 Adafruit_INA219 ina219;
 
-float interval = 20;
+float interval = 10;
 
 void setup(void) {
   int sda = 15;
   int scl = 13;
-  //needed to select the scl and sda port for the lolin lite board Wire.begin(I2C_SDA, I2C_SCL)
   Wire.begin(sda, scl);
+  Serial.begin(115200);
+  ads1015.begin(0x4A);
+  if (! ina219.begin()) {
+    Serial.println("Failed to find INA219 chip");
+    while (1) { delay(10); }
+  }
+  
 
   pinMode(LED_BUILTIN, OUTPUT);  
   digitalWrite(LED_BUILTIN, LOW);
@@ -87,7 +96,7 @@ void setup(void) {
    sampleR.setSigned(false);
    sampleR.setDecimal(false);
    sampleR.setChannel(1);
-   sampleR.setXMLAttribute("min=\"10\"");
+   sampleR.setXMLAttribute("min=\"5\"");
 
   //Export
 //   PhyphoxBleExperiment::ExportSet mySet;       //Provides exporting the data to excel etc.
@@ -134,34 +143,12 @@ void setup(void) {
    
    PhyphoxBLE::addExperiment(multimeter);
 
-
-  Serial.begin(115200);
-  while (!Serial) {
-      // will pause Zero, Leonardo, etc until serial console opens
-      delay(1);
-  }
-  
-
-  uint32_t currentFrequency;
-    
-  Serial.println("Hello!");
-  
-  // Initialize the INA219.
-  // By default the initialization will use the largest range (32V, 2A).  However
-  // you can call a setCalibration function to change this range (see comments).
-  if (! ina219.begin()) {
-    Serial.println("Failed to find INA219 chip");
-    while (1) { delay(10); }
-  }
-  // To use a slightly lower 32V, 1A range (higher precision on amps):
-  //ina219.setCalibration_32V_1A();
-  // Or to use a lower 16V, 400mA range (higher precision on volts and amps):
-  //ina219.setCalibration_16V_400mA();
-
 }
 
 void loop(void) 
 {
+  float voltage;
+
   float t = 0.001 * (float)millis();
   float shuntvoltage = 0;
   float busvoltage = 0;
@@ -169,10 +156,11 @@ void loop(void)
   float loadvoltage = 0;
   float power_mW = 0;
 
+  voltage = ads1015.readADC_Differential_0_1()*0.032967;
   shuntvoltage = ina219.getShuntVoltage_mV();
   busvoltage = ina219.getBusVoltage_V();
   current_mA = ina219.getCurrent_mA();
-  power_mW = ina219.getPower_mW();
+  power_mW = voltage*current_mA;
   loadvoltage = busvoltage + (shuntvoltage / 1000);
   
 //  Serial.print("Bus Voltage:   "); Serial.print(busvoltage); Serial.println(" V");
@@ -182,12 +170,12 @@ void loop(void)
 //  Serial.print("Power:         "); Serial.print(power_mW); Serial.println(" mW");
 //  Serial.println("");
 
-  PhyphoxBLE::write(t, loadvoltage, current_mA, power_mW);   
+  PhyphoxBLE::write(t, voltage, current_mA, power_mW);   
   
   Serial.print("t(s)");Serial.print(",");
   Serial.print(t);Serial.print(",");
   Serial.print("U(V)");Serial.print(",");
-  Serial.print(loadvoltage);Serial.print(",");
+  Serial.print(voltage);Serial.print(",");
   Serial.print("I(mA)");Serial.print(",");
   Serial.print(current_mA);Serial.print(",");
   Serial.print("P(mW)");Serial.print(",");

@@ -37,6 +37,20 @@ module ToF(){
     color("grey")rotate([0,0,90])translate([-19.8,-13.3,wall+dist])import("VL53L0X.stl");
 }
 
+module switch(){
+         d=10;
+         gap=0.6;
+         difference(){
+            union(){
+            fwd(d/2)down(2)cylinder(d=d,h=4);
+            cuboid([d,d,4]);
+               
+         }
+            fwd(d/2)down(2)cylinder(d=d-gap*2,h=5);
+            cuboid([d-gap*2,d,5]);
+           }
+     }
+     
 module hull(){
     up(z/2+wall/2)difference(){
        down(0.5)cuboid([espX+2*wall,espY+2*wall,z+wall+1], fillet = 2, edges=EDGES_Z_ALL);
@@ -47,7 +61,7 @@ module hull(){
        distY = 20;translate([0,-10,0]){
        for(i=[ [[3,distY/2+5,-z/2-wall*2],"-"],
                [[3,0,-z/2-wall*2],"+"],
-               ,
+               
                [[3,-distY/2-5,-z/2-wall*2],"GD"]])
        {
           translate(i[0]){cylinder(d=dSoc,h=4);
@@ -115,11 +129,18 @@ module hull(){
          difference(){
        cuboid([espX+2*wall,espY+2*wall,wall], fillet = 2, edges=EDGES_Z_ALL);for(i=[-1,1]){
     translate([i*(espX/2-1.5),espY/2-2,-2])cylinder(d=2.5,h=5);
+    fwd(espY/2-10)switch();
        }
      }
      poslid=0.1;
+     difference(){
+     union(){
      translate([0,-espY/2+wall+poslid,-2.5-wall/2])cuboid([espX-3,wall*2,5]);
      translate([-espX/2+1.5,-(espY)/2+0.3+poslid,-3.5])rotate([0,90,0])cylinder(h=espX-3,d=2);
+     }translate([0,-(espY)/2+0.3+poslid,-3.5])cuboid(10);
+     }
+     h=8.7;
+     translate([-0.8,-(espY)/2+poslid+3.6,-h/2])cyl(h=h,d=3);
    }
 }
    lid();
@@ -147,7 +168,7 @@ module mount(x_d){
     
 difference(){
     hull();
-    *down(2)translate([-25 ,0,-1])cube(50);
+    *down(2)translate([-25 ,-25,-1])cube(50);
 }
     down(1)mount(espX+2);
     if(mc){
