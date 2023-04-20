@@ -2,13 +2,13 @@
 
 ## Goal
 
-**Easy to use** and cheap sensor boxes for digital data acquisition that can be used in physic lessons by students or by the teacher as a demonstration.
+**Easy to use** and cheap sensor boxes for digital data acquisition that can be used in physics lessons by students or by the teacher as a demonstration.
 
 Each Box can be built for under 20 €.
 
-All boxes are equipped with an esp32, so that they can communicate via BLE or serial connection. Older models use the d1 mini, but I now switched to the lolin32 lite, because it's cheaper and has a battery connector. Unfortunately the wiki isn't up to date.
+All boxes are equipped with an esp32, so that they can communicate via BLE or serial connection. Older models use the d1 mini, but I now switched to the lolin32 lite, because it's cheaper and has a battery connector. Unfortunately, the wiki isn't up to date.
 
-Just power up the sensor-box and take a smartphone with pyhphox installed, and you can start. Nothing more is needed.
+Just power up the sensor box and take a smartphone with pyhphox installed, and you can start. Nothing more is needed.
 
 If you want more, you can export the data from phyphox or read the data via a serial connection on any pc and process them in the software you want.
 
@@ -27,7 +27,7 @@ Using this platform, the measured values can then be read out directly via Bluet
 
 ### Serial Plotter
 #### Web Serial Plotter (Chrome-based browsers only)
-I am working on a Web Serial Plotter, than can be accessed through Chrome or Edge. It automatically reads the data from the sensor. You can specify which data to plot and also output the data to a CSV-file. For the plotting i am using Plotly. Still in an early Version but usable.
+I am working on a Web Serial Plotter, than can be accessed through Chrome or Edge. It automatically reads the data from the sensor. You can specify which data to plot and also output the data to a CSV-file. For the plotting, i am using Plotly. Still in an early version but usable.
 You can find the serial plotter at the adress: https://heilaut.github.io/web-serial-plotter/
 
 ## Boxes
@@ -53,7 +53,7 @@ ultrasonic sensor - distance measurement as a function of time
 
 ### Laser-ToF-Rangefinder
 <img src="https://github.com/HeiLaut/Physics-Arduino-Sensors/blob/main/images/ToF-Rangefinder.jpg" width = 50%>
-Building instructions commnig soon
+Building instructions are commnig soon
 
 All files available.
 
@@ -61,7 +61,7 @@ Laser TimeOfFlight-Sensor - distance measurement as a function of time.
 
 ### Light Gate 
 
-Can be used as a single device or in series with an second gate or a magnetic holder to have an release timer.
+Can be used as a single device or in series with a second gate or a magnetic holder to have a release timer.
 Needs a little soldering effort to build it. 
 
 
