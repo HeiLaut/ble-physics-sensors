@@ -1,4 +1,4 @@
-# Sensor boxes for physics lessons
+# BLE Sensors for physics lessons
 
 ## Goal
 
