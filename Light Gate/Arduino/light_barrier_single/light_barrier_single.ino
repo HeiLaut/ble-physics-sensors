@@ -1,7 +1,4 @@
 #include <phyphoxBle.h>
-#include <QuickStats.h>
-
-QuickStats stats;
 
 struct Signal {
   const uint8_t PIN;
@@ -13,7 +10,7 @@ struct Signal {
   unsigned int ddt; //time between two rising signals
 };
 
-float distance = 5;
+float spacing = 5;
 
 const int dt = 10;
 
@@ -22,6 +19,8 @@ int n = 0;
 float s = 0;
 //22,21 bei lolin32, 36,39 bei d1 mini
 //lolin lite : 17/21 oder 17/16
+
+int lastrising = 0;
 
 Signal signal1 = {22, 0, false, 0 ,0, 0,0};
 
@@ -40,7 +39,7 @@ void isr1() {
 
 
 void setup() {
-  PhyphoxBLE::start("Lichtschranke");
+  PhyphoxBLE::start("Einzel-Lichtschranke");
   PhyphoxBLE::setMTU(48); //6 float values 6*4 = 24 bytes
   // An extra task takes care of the experiment creation
   xTaskCreate(
@@ -54,53 +53,51 @@ void setup() {
 
   Serial.begin(115200);
   attachInterrupt(digitalPinToInterrupt(signal1.PIN), isr1, CHANGE);
-
-
 }
 
 void loop() {
   float t = 0.001 * (float)millis();
-
+  if(signal1.t0 != lastrising){
+  signal1.ddt = signal1.t0 - lastrising;
+  }
+  lastrising = signal1.t0;
+  
+//prevent the integer values to get negative
   if(signal1.t0>signal1.t1){
     signal1.dt = signal1.t0 - signal1.t1;
   }else{
     signal1.dt = signal1.t1 - signal1.t0;
   }
 
-
   //calculating distance 
-  s = n*distance*0.01;//5068;
+  s = n*spacing*0.01;
 
-  float v = distance*0.01/(signal1.dt*0.001);
-  if(v>100){
-    v=0;
-  }
-    
-  float values[5] = {t, signal1.high, s , v, signal1.dt*0.001};
+
+  float values[5] = {t, signal1.high, s , signal1.ddt*0.001, signal1.dt*0.001};
   PhyphoxBLE::write(&values[0], 5);  
 
   Serial.print("t,");Serial.print(t,3);
   Serial.print(",t1,");Serial.print(signal1.t0*0.001,3);
   Serial.print(",dt,"); Serial.print(signal1.dt*0.001,3);
   Serial.print(",s,");Serial.print(s,3);
-  Serial.print(",v,");Serial.print(v,3);
-  Serial.print(",distance,");Serial.println(distance);
+  Serial.print(",ddt,");Serial.println(signal1.ddt*0.001,3);
   delay(dt);
 
 }
 void receivedData() {           // get data from PhyPhox app
   float readInput;
   PhyphoxBLE::read(readInput);
-  distance = readInput;
+  spacing = readInput;
 }
 
 void generateExperiment(void * parameter) {
   PhyphoxBleExperiment lightBarrier;
 
 
-  lightBarrier.setTitle("Lichtschranke");
+  lightBarrier.setTitle("Einzel-Lichtschranke");
   lightBarrier.setCategory("Sensor-Boxen");
   lightBarrier.numberOfChannels = 5;
+  lightBarrier.setDescription("Lichtschranke zur Zeit und Wegmessung");
   PhyphoxBLE::configHandler = &receivedData;  
 
   PhyphoxBleExperiment::View graph;
@@ -130,16 +127,6 @@ void generateExperiment(void * parameter) {
   distGraph.setColor("FFCC5C");
   distGraph.setChannel(1, 3);
 
-
-  PhyphoxBleExperiment::Graph velGraph;
-  velGraph.setLabel("Geschwindigkeit");
-  velGraph.setUnitY("m");
-  velGraph.setUnitX("m/s");
-  velGraph.setLabelX("Zeit t");
-  velGraph.setLabelY("v in m/s");
-  velGraph.setColor("FFCC5C");
-  velGraph.setChannel(1, 4);
-
   PhyphoxBleExperiment::Graph darkGraph;
   darkGraph.setLabel("Laufzeit");
   darkGraph.setUnitY("s");
@@ -157,13 +144,13 @@ void generateExperiment(void * parameter) {
   dist.setChannel(3);
   dist.setXMLAttribute("size=\"2\"");
 
-  PhyphoxBleExperiment::Value vel;
-  vel.setLabel("Geschwindigkeit v =");
-  vel.setPrecision(3);
-  vel.setUnit("m/s");
-  vel.setColor("FFCC5C");
-  vel.setChannel(4);
-  vel.setXMLAttribute("size=\"2\"");
+  PhyphoxBleExperiment::Value ddt;
+  ddt.setLabel("Signallaufzeit t =");
+  ddt.setPrecision(3);
+  ddt.setUnit("s");
+  ddt.setColor("FFCC5C");
+  ddt.setChannel(4);
+  ddt.setXMLAttribute("size=\"2\"");
 
   PhyphoxBleExperiment::Edit myEdit;
   myEdit.setLabel("Gitterabstand");
@@ -176,7 +163,7 @@ void generateExperiment(void * parameter) {
 
 
   PhyphoxBleExperiment::Value deltaA;
-  deltaA.setLabel("Laufzeit t =");
+  deltaA.setLabel("Verdunklungszeit t =");
   deltaA.setPrecision(3);
   deltaA.setUnit("s");
   deltaA.setColor("FFCC5C");
@@ -185,14 +172,16 @@ void generateExperiment(void * parameter) {
 
 
   simple.addElement(deltaA);
-  simple.addElement(darkGraph);
+  simple.addElement(ddt);
+
   graph.addElement(sigGraph);
-  
+ // graph.addElement(darkGraph);
+
   
   multi.addElement(distGraph);
   multi.addElement(dist);
-  multi.addElement(velGraph);
-  multi.addElement(vel);
+ // multi.addElement(velGraph);
+//  multi.addElement(vel);
   multi.addElement(myEdit);
 
   lightBarrier.addView(graph);
