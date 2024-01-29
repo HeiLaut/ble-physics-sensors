@@ -66,6 +66,7 @@ void loop() {
     Serial.print("t(s),");Serial.print(time*0.001,3);Serial.print(",T1(s),");Serial.print(t*0.001,3);Serial.print(",T2(s),");Serial.println(dt*0.001,3);
   }
 }
+
 void isr() {
   static unsigned long last_interrupt_time = 0;
   unsigned long interrupt_time = millis();
