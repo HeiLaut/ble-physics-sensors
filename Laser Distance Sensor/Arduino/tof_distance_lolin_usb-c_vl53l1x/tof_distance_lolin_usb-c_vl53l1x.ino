@@ -173,7 +173,7 @@ void loop() {
     Serial.println("press");
     distance = vl53.distance()/10.00;
 
-    t = 0.001 * (float)millis();
+    t = 0.001 * (float)millis(); 
     t_offset = t;
     offset = distance;
   }
