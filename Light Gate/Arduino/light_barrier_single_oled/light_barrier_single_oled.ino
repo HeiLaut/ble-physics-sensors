@@ -1,3 +1,4 @@
+#include <Wire.h>
 #include <phyphoxBle.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
@@ -10,6 +11,7 @@ struct Signal {
   const uint8_t PIN;
   uint32_t n;
   bool high;
+  //bool high2;
   unsigned int t0; //rising time
   unsigned int t1; //rising time
   unsigned int dt; //darkening time
@@ -18,26 +20,29 @@ struct Signal {
 
 float spacing = 5;
 
-const int dt = 10;
+const int dt = 100;
 
 unsigned int t_temp = 0;
 int n = 0;
 float s = 0;
+int space = 2; //spacing between fork 2cm
 //22,21 bei lolin32, 36,39 bei d1 mini
 //lolin lite : 17/21 oder 17/16
 
 int lastrising = 0;
+Signal signal1 = {22, 0,false, 0,0 ,0 ,0};
 
-Signal signal1 = {22, 0, false, 0 ,0, 0,0};
 
-float lastmeasure
 //variables to keep track of the timing of recent interrupts
+
+
+
 
 void isr1() {
   n++;
   if(signal1.high){
-    signal1.t1 = (int)millis();
-    signal1.high = false;
+   signal1.t1 = (int)millis();
+   signal1.high = false;
   }else{
     signal1.t0 = (int)millis();
     signal1.high = true;
@@ -46,6 +51,8 @@ void isr1() {
 
 
 void setup() {
+  Wire.begin(16,17);
+
   PhyphoxBLE::start("Einzel-Lichtschranke");
   PhyphoxBLE::setMTU(48); //6 float values 6*4 = 24 bytes
   // An extra task takes care of the experiment creation
@@ -57,30 +64,45 @@ void setup() {
     1,               // Task priority
     NULL             // Task handle
   );
-
+  if (!oled.begin(SSD1306_SWITCHCAPVCC, 0x3C)) {
+    Serial.println(F("failed to start SSD1306 OLED"));
+    while (1)
+      ;
+  }
   Serial.begin(115200);
   attachInterrupt(digitalPinToInterrupt(signal1.PIN), isr1, CHANGE);
-  Wire.begin(16,17);
 }
 
 void loop() {
+
   float t = 0.001 * (float)millis();
   if(signal1.t0 != lastrising){
-  signal1.ddt = signal1.t0 - lastrising;
+    signal1.ddt = signal1.t0 - lastrising;
   }
   lastrising = signal1.t0;
-  
-//prevent the integer values to get negative
-  if(signal1.t0>signal1.t1){
-    signal1.dt = signal1.t0 - signal1.t1;
-  }else{
-    signal1.dt = signal1.t1 - signal1.t0;
-  }
+
+  signal1.dt = abs((float)signal1.t0-(float)signal1.t1);
 
   //calculating distance 
-  s = n*spacing*0.01;
+   s = n*spacing*0.01;
 
+    oled.clearDisplay();  // clear display
 
+    oled.setTextSize(2);                                 // set text size
+    oled.setTextColor(WHITE);                            // set text color
+    
+    oled.setCursor(0, 0);
+    oled.print(signal1.ddt*0.001,3);oled.println(" s");  // set text
+
+                              
+    oled.setCursor(0, 22);
+    oled.print(signal1.dt*0.001,3);oled.println(" s");  // set text
+
+    oled.setCursor(0, 44);
+    oled.print(s,3);oled.println(" cm");  // set text
+    oled.display();
+    
+    
   float values[5] = {t, signal1.high, s , signal1.ddt*0.001, signal1.dt*0.001};
   PhyphoxBLE::write(&values[0], 5);  
 
@@ -89,28 +111,11 @@ void loop() {
   Serial.print(",dt,"); Serial.print(signal1.dt*0.001,3);
   Serial.print(",s,");Serial.print(s,3);
   Serial.print(",ddt,");Serial.println(signal1.ddt*0.001,3);
-  delay(dt);
+  delay(dt);                                  // display on OLED
 
-  if (change) {
-    //static unsigned long last_interrupt_time = 0;
-    //unsigned long interrupt_time = millis();
-     // wait two seconds for initializing
-    oled.clearDisplay();  // clear display
-
-    oled.setTextSize(3);                                 // set text size
-    oled.setTextColor(WHITE);                            // set text color
-    
-    oled.setCursor(0, 0);
-    oled.print(signal1.t0*0.001,3);oled.println(" s");  // set text
-
-                              
-    oled.setCursor(0, 32);
-      oled.print(signal1.dt*0.001,3);oled.println(" s");  // set text
-    oled.display();                                      // display on OLED
-  }
-}
 
 }
+
 void receivedData() {           // get data from PhyPhox app
   float readInput;
   PhyphoxBLE::read(readInput);
