@@ -119,22 +119,23 @@ module Sidepanel(assemble = 0){
 }//end leftpanel
  
  
- module rightpanel(){
+ module rightpanel(jst=false,switch=true){
    difference(){
       Sidepanel();
-      translate([-0.75,70,0])rotate([90,0,-90])switchcase(true);
+      if(switch)translate([-0.75,70,0])rotate([90,0,-90])switchcase(true);
       translate([wall,15.5,-1.8])rotate([0,0,90]){
-       //translate([-7.7,-0.1,-0.4])cuboid([7,3,5.5],rounding=1,except=[FRONT,BACK],anchor=FRONT);
+       if(jst)translate([-7.7,-0.1,-0.4])cuboid([7,3,5.5],rounding=1,except=[FRONT,BACK],anchor=FRONT);
        translate([7.3,-0.1,-2.0])cuboid([10.5,3,4.5],rounding=1,except=[FRONT,BACK],anchor=FRONT);
        }
       translate([+wall+1,ya/2.5,0])rotate([0,-90,0])rodmount(false);
 
       }
       translate([+wall/2,ya/2.5,0])rotate([0,-90,0])rodmount();
-      translate([-0.75,70,0])rotate([90,0,-90])switchcase(false);
+      if(switch)translate([-0.74,70,0])rotate([90,0,-90])switchcase(false);
 
       }
- module Top(oled=1){
+      
+ module Top(oled=1,led=1){
     difference(){
         Body();
         translate([0,-0.01,cutheight])cuboid([xa+1,ya+1,z],anchor = FRONT+TOP);
@@ -142,8 +143,12 @@ module Sidepanel(assemble = 0){
          translate([0,17,z/2-wall])cuboid([26.5+2.4,27.5+2.4,wall*2],anchor=BOTTOM);
         }
         //status LED
-        //translate([xa/2-widthx/4,ya-20,0])zcyl(h=xi*3+2,d=dLED);
+        if(led)translate([xa/2-widthx/4,ya-20,0])zcyl(h=xi*3+2,d=dLED);
     }//end difference
+    if(led)translate([xa/2-widthx/4,ya-20,z/2-wall+0.1])difference(){
+    cuboid([10,10,3],anchor=TOP);
+    zcyl(h=xi*3+2,d=dLED);
+    }
     for(i=[-1,1]){
       translate([i*(xi/2+wall-d1/5),ya-(yi-clearance*2)/2-wall,cutheight+d1*0.6])ycyl(h=yi,d=d1);
       
@@ -217,7 +222,7 @@ module Sidepanel(assemble = 0){
 difference(){
     union(){
    up(10)up(0.0)Top(false);
-   *down()Bottom();
+   down(30)Bottom();
    }//end union
    *down(5)fwd(1)cube(40);
    }
