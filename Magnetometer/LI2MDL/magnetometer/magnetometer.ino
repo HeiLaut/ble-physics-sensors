@@ -154,10 +154,10 @@ void loop() {
   z = event.magnetic.z*0.001-zo;
   float g =sqrt(pow(x,2)+pow(y,2)+pow(z,2));
   Serial.print("t(s): ,");  Serial.print(t);
-  Serial.print(",Bx(mT): ,");  Serial.print(x,2);
-  Serial.print(",By(mT): ,");  Serial.print(y,2);
-  Serial.print(",Bz(mT): ,");  Serial.print(z,2);
-  Serial.print(",Bg(mT): ,");  Serial.println(g,2);
+  Serial.print(",Bx(mT): ,");  Serial.print(x,3);
+  Serial.print(",By(mT): ,");  Serial.print(y,3);
+  Serial.print(",Bz(mT): ,");  Serial.print(z,3);
+  Serial.print(",Bg(mT): ,");  Serial.println(g,3);
 
   if(buttonState==0){
     xo=x;
