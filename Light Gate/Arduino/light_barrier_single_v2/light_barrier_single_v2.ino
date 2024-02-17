@@ -76,7 +76,7 @@ PhyphoxBLE::write(&values[0], 6);
 
 Serial.print("t,");Serial.print(t,3);
 Serial.print(",Laufzeit,");Serial.print(laufT,3);
-Serial.print(",Verdungklungszeit,"); Serial.print(verdT,3);
+Serial.print(",Änderungen,"); Serial.print(verdT,3);
 Serial.print(",Schwingungsdauer,");Serial.print(pendelT,3);
 Serial.print(",Frequenz,");Serial.print(pendelF,3);
 Serial.print(",n,");Serial.println(n);
@@ -96,7 +96,7 @@ void generateExperiment(void * parameter) {
   lightBarrier.setDescription("Lichtschranke");
 
   PhyphoxBleExperiment::View graph;
-  graph.setLabel("Speichenrad");
+  graph.setLabel("Vielfachmessung");
 
   PhyphoxBleExperiment::View simple;
   simple.setLabel("Laufzeiten");
@@ -105,7 +105,7 @@ void generateExperiment(void * parameter) {
   multi.setLabel("Pendel");
 
   PhyphoxBleExperiment::Graph nGraph;
-  nGraph.setLabel("Verdunklungen");
+  nGraph.setLabel("Ereignisse");
   nGraph.setUnitY("");
   nGraph.setUnitX("s");
   nGraph.setLabelX("Zeit t");
