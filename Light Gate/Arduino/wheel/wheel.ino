@@ -1,56 +1,35 @@
 #include <phyphoxBle.h> 
 
-struct Signal {
-  const uint8_t PIN;
-  uint32_t n;
-  bool high;
-  unsigned int t0; 
-  unsigned int t1;  
-  unsigned int s0;
-  unsigned int s1;
-};
+#define SignalPIN  16
+#define SignalPIN2 17
 
-Signal signal1 = { 16, 0, false, 0, 0, 0, 0};
-//Signal signal2 = { 17, 0, false, 0, 0 };
-
-int dr = 0;
+float s2 = 0;
+//define a great value for n so it doesnt get negative, subtractet later in the loop ; n must be integer to be handled int the interrupt function
 int n = 20000;
-int dt = 20;
+int dt = 100;
 
 void isr() {
-  if(digitalRead(17)){
-    dr=1;
-  }else{
-    dr=0;
-  }
-  
-  if(dr){
+  if(digitalRead(SignalPIN2)){
     n++;
   }else{
     n--;
   }
-
-  signal1.t1 = signal1.t0;
-  signal1.t0 = (int)millis();
-  signal1.s1 = signal1.s0;
-  signal1.s0 = n;
 }
 
 void setup() {
-  pinMode(17, INPUT);           // set pin to input
+  pinMode(SignalPIN2, INPUT);           // set pin to input
+  pinMode(SignalPIN, INPUT);
   Serial.begin(115200);
-  attachInterrupt(digitalPinToInterrupt(signal1.PIN), isr, RISING);
+  attachInterrupt(digitalPinToInterrupt(SignalPIN), isr, RISING);
   phyphox_init();
 }
 
 void loop() {
   float t = 0.001 * (float)millis();
   delay(dt);
-  float v = 0;
   float s = (n*1.0-20000)*0.764;
-  if(signal1.t0 != signal1.t1){
-    v = (signal1.s1*1.0-signal1.s0*1.0)/(signal1.t1*0.001-signal1.t0*0.001);
-  }
+  float v = (s-s2)/(dt*0.001);
+  s2 = s;
 
   Serial.print("t(s),");Serial.print(t);Serial.print(", s(cm),");Serial.print(s,1);
   Serial.print(", v(cm/s),");Serial.println(v,1);

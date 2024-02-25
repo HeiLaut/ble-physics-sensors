@@ -12,6 +12,8 @@ float pendelT = 0;
 bool s1 = false;
 bool s2 = false;
 
+float radius = 0;
+
 void isr1() {
   n++;
   if(!s1 && !s2){
@@ -55,6 +57,8 @@ void loop() {
 //gets runtime
 float t = 0.001 * (float)millis();
 
+//calculating distance of rotation
+float s = 2*radius*PI/40*n;
 //gets darkening Time of the sensor
 //because of capturing multiple si
 float verdT = 0;
@@ -161,4 +165,12 @@ void generateExperiment(void * parameter) {
   PhyphoxBLE::addExperiment(lightBarrier);
 
   vTaskDelete(NULL);
+}
+
+void receivedData() {           // get data from PhyPhox app
+  float readInput;
+  PhyphoxBLE::read(readInput);
+   if(readInput>0){
+      radius = readInput;
+    }
 }
