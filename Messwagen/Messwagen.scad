@@ -7,7 +7,7 @@ module ir_holder(){
     b = 35;
     d = 39;
     h = 4;
-    diff = 1;
+    diff = 1.1;
     angle = 0*360/40;
     module sens_holder(l=true,a=10,u=0,holes=true){
         difference(){
@@ -38,8 +38,8 @@ module ir_holder(){
     *back(b/2+0.5)wall();
     }//end union
     //axis
-    down(0)ycyl(d=3.8,h=b*2);
-    right(50)ycyl(d=3.8,h=b*2);
+    down(0)ycyl(d=3.5,h=b*2);
+    right(50)ycyl(d=3.5,h=b*2);
 
     }//end difference
     module espholder(){
