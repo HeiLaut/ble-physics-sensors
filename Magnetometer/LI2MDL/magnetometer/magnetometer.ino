@@ -74,7 +74,7 @@ void setup() {
   secondGraph.setChannel(1,3);
 
   PhyphoxBleExperiment::Graph thirdGraph;    
-  thirdGraph.setLabel("y");
+  thirdGraph.setLabel("z");
   thirdGraph.setUnitX("s");
   thirdGraph.setUnitY("mT");
   thirdGraph.setLabelX("Zeit");
