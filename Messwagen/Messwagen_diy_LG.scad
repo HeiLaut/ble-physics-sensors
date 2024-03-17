@@ -1,10 +1,10 @@
 include<BOSL2/std.scad>
 $fn=40;
-
+include<doppellichtschranke.scad>
 
 module ir_holder(){
     a = 10;
-    b = 30;
+    b = 12; //b = 30 for speed sensors
     d = 39;
     h = 4;
     diff = 1.1;
@@ -26,10 +26,11 @@ module ir_holder(){
         down(diff)rotate([0,angle,0])right(d/2+h/2)cuboid([h,h,a]);
         }//end hull
     }//end wall
+    
     left(d/2+h/2)sens_holder();
     down(diff)right(d/2+h/2)sens_holder(0,10,diff);
     right(74.5)sens_holder(holes=false);
-    difference(){
+     difference(){
     union(){
     for(i=[-1,1]){
     translate([d/2+h/2+5,i*(b/2+h/2),0])cuboid([100,h,10]);
@@ -42,6 +43,8 @@ module ir_holder(){
     right(50)ycyl(d=3.7,h=b*2);
 
     }//end difference
+    
+    
     module espholder(){
     down(6)cuboid([26,47,2]);
         difference(){
@@ -56,8 +59,8 @@ module ir_holder(){
    }//end difference
     }
    translate([48,0,4])cuboid([50,b,2]);
-   translate([50,-7,18])rotate([90,0,0])rotate([0,0,90])up(10)espholder();
-
+   translate([50,2,18])rotate([90,90,0])up(10)espholder();
+   up(18.1)rotate([0,180,90])lightgate();
 }//end ir holder
 module wheel(){
     difference(){
@@ -78,5 +81,5 @@ module bat(){
  }
 }
 ir_holder();
-!wheel();
-translate([50,0,15])bat();
+//wheel();
+*translate([50,4,15])bat();
