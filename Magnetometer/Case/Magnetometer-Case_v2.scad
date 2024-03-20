@@ -1,13 +1,13 @@
 include<BOSL2/std.scad>
 include<CASE/Case2.scad>
 
-!translate([0,-40,0])sensor(true,false, "mlx90393");
+translate([0,-40,0])sensor(false,true, "li2mdl");
 left(100)frontplate();
-down(30)bottom();
+bottom();
 top();
 
-buttoncase();
-down(80)standscrew(l=9,h=30);
+
+!down(80)standscrew(l=9,h=40);
 
 
 x = 30;
