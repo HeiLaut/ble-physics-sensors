@@ -3,22 +3,25 @@ include<BOSL2/threading.scad>
 
 
 z = 28;
-xi = 60;
-xa = 100;
-yi = 80;
-widthbase = 32;
+xi = 80;//60
+xa = 135;//100
+yi = 85;//80
+widthbase = 37; //Minimum for lolin lite 32
 
 
 widthx = (xa-xi);
 widthy = widthbase*2;
 ya = yi + widthy/2;
-wall = 1.5;
+wall = 2;
 clearance = 0.2;
 cutheight = 4;
 d1 = 2;
 $fn=50;
 lolinspace = 7.4;
 dLED = 5.1;
+
+
+
 //color("green")translate([5.1,5.2,-6.3])rotate([-180,0,0])import("lolin32_lite.stl");
 
 
@@ -56,13 +59,14 @@ module oled_bezel(){
     //if(modules)down(4.6)color("green")oled();
 }
 
-module buttoncase(cap = true){
+module buttoncase(cap = true,case =true){
    x = 14;
    y = 17;
    z = 14;
    xi = 12;
    yi = 14.2;
    tol = 0.8;
+   if(case)
    difference(){
       cuboid([x,y,z],anchor=TOP);
       up(0.1)cuboid([xi,yi,10],anchor=TOP);
@@ -70,15 +74,15 @@ module buttoncase(cap = true){
       down(6)cuboid([xi,1.5,6],anchor=TOP);
    }
    // button cap
-   if(cap){
+    if(cap){
       down(0.25)difference(){
          cuboid([xi-tol,yi-tol,4],anchor = BOTTOM);
-         down(0.05)cylinder(d=7,h=3.5/2-0.1,anchor = BOTTOM);
+         down(0.05)cylinder(d=8,h=3.5/2-0.1,anchor = BOTTOM);
          }//end difference
       for(i=[1:90:279]){
          rotate([0,0,i])translate([-4/2-0.75/2,0,0])union(){
             cuboid([0.75,2.7,3.5]);
-            translate([-0.75/2,0,0.25])cuboid([1,1,3]);
+            translate([-0.75,0,0.25])cuboid([1.5,1,3]);
             translate([0.75/2,2.7/2,-3.5/2+0.7])rotate([90,90,0])linear_extrude(2.7)polygon([[0,0],[0.7,0.5],[0.7,0]]);
          }//end union
       }//end for
@@ -94,43 +98,48 @@ module SnapFemale(l =yi, angy = 0,angz = 0,m=0){
 
 
 module Body(){
+
     difference(){
         cuboid([xa,ya,z],chamfer = 2, except = [LEFT,RIGHT],anchor=FRONT);
         translate([0,widthy/2,0])cuboid([xi,yi+0.1,z+1],chamfer = 2, except = [TOP,BOTTOM,BACK],anchor=FRONT);
         for(i=[-1,1]){
             translate([i*(xa/2-(widthx/2-wall)/2),wall,0])cuboid([widthx/2-wall+0.01,ya-2*wall,z-2*wall],chamfer = 2, except = [LEFT,RIGHT],anchor=FRONT);
-            translate([i*(xa/2-wall),wall/2,0])cuboid([wall+clearance,ya-wall+clearance,z-wall+clearance],chamfer = 2, except = [LEFT,RIGHT],anchor=FRONT);
+            translate([i*(xa/2-wall),wall/2,0])cuboid([wall,ya-wall,z-wall],chamfer = 2, except = [LEFT,RIGHT],anchor=FRONT);
             }//end for
          translate([0,wall,0])cuboid([xa,widthy/2-2*wall,z-2*wall],chamfer = 2, edges = FRONT,anchor = FRONT);
         
         }//end difference
 }//end body        
 module Sidepanel(assemble = 0){
-   translate(assemble*[(xa/2-wall),wall/2,0])cuboid([wall,ya-wall,z-wall],chamfer = 2, except = [LEFT,RIGHT],anchor=FRONT);
+   translate(assemble*[(xa/2-wall),wall/2,0])cuboid([wall-clearance*2,ya-wall-clearance*2,z-wall-clearance*2],chamfer = 2, except = [LEFT,RIGHT],anchor=FRONT);
 
  }
  
- module leftpanel(button=false){
+ module leftpanel(button=false,rj45=false){
    difference(){
       Sidepanel();
       if(button)translate([-wall/3,15,0])cuboid([wall*2,17,14]);
+      if(rj45)translate([0,18.9,0])cuboid([2*wall,20,17]);
    }//end difference
-   if(button)translate([-wall/2,15,0])rotate([0,90,180])buttoncase(false);
+      if(button)translate([-wall/2+0.2,15,0])rotate([0,90,180])buttoncase(false);
+      if(rj45){
+         translate([-0.8,30.6,0])rotate([90,0,0])import("keystone1.stl");
+         }
 }//end leftpanel
  
  
- module rightpanel(jst=false,switch=true){
+ module rightpanel(jst=true,switch=false,usb=true){
    difference(){
       Sidepanel();
       if(switch)translate([-0.75,70,0])rotate([90,0,-90])switchcase(true);
       translate([wall,15.5,-1.8])rotate([0,0,90]){
        if(jst)translate([-7.7,-0.1,-0.4])cuboid([7,3,5.5],rounding=1,except=[FRONT,BACK],anchor=FRONT);
-       translate([7.3,-0.1,-2.0])cuboid([10.5,3,4.5],rounding=1,except=[FRONT,BACK],anchor=FRONT);
+       if(usb)translate([7.3,-0.1,-2.0])cuboid([10.5,3,4.5],rounding=1,except=[FRONT,BACK],anchor=FRONT);
        }
       translate([+wall+1,ya/2.5,0])rotate([0,-90,0])rodmount(false);
 
       }
-      translate([+wall/2,ya/2.5,0])rotate([0,-90,0])rodmount();
+      translate([+wall/2-0.2,ya/2.5,0])rotate([0,-90,0])rodmount();
       if(switch)translate([-0.74,70,0])rotate([90,0,-90])switchcase(false);
 
       }
@@ -167,7 +176,7 @@ module Sidepanel(assemble = 0){
    b=[5,6,2];
    c= [3.5,4.4,0.5];
    if(hole){
-   cuboid([7,3.7,2],anchor=TOP);
+   cuboid([7,3.7,wall*2]);
    }else{
    left(10.7/2)difference(){
       cuboid(b,anchor=RIGHT+BOTTOM);
@@ -209,7 +218,7 @@ module Sidepanel(assemble = 0){
     translate([0,widthy/2-wall+0.01,d1-d1/4+cutheight-1])SnapFemale(l = xi-3*wall,angy=90,angz = 90);
     
     //lolin mount
-    translate([21.8,16.5,0])rotate([0,0,90])difference(){
+    translate([xa/2-28.2-wall+1,16.5,0])rotate([0,0,90])difference(){
         union(){
           translate([0,-23,-z/2])cuboid([26,8,lolinspace],anchor = BOTTOM+FRONT);
           translate([0,24,-z/2])cuboid([26,5.5,lolinspace],anchor = BOTTOM+BACK);
@@ -219,15 +228,25 @@ module Sidepanel(assemble = 0){
     }//end difference
            
  }
+ module standscrew(l=10,d = 10, h = 50,cut = true){
+   difference(){
+      union(){
+         threaded_rod(d=d-0.1, pitch = 2, l = l,orient=LEFT,anchor=TOP);
+         xcyl(d=10,h=h,anchor=RIGHT);
+         }
+         if(cut)down(4)cuboid([2*h,10,d],anchor=TOP);
+   }
+}//end adjscrew
+
 difference(){
     union(){
-   up(10)up(0.0)Top(false);
+   up(10)Top(false);
    down(30)Bottom();
    }//end union
    *down(5)fwd(1)cube(40);
-   }
-translate([-(xa/2-1.5*wall),wall/2,0])leftpanel();
-translate([xa/2-1.5*wall,wall/2,0])rightpanel();
+  }
+translate([-(xa/2-1.5*wall),wall/2,0])leftpanel(false,false);
+translate([xa/2-1.5*wall,wall/2,0])rightpanel(jst=true, usb = true, switch=false);
 
-
+!standscrew();
 
