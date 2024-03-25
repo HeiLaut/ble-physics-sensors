@@ -2,73 +2,67 @@
 
 ## Goal
 
-**Easy to use** and cheap sensor boxes for digital data acquisition that can be used in physics lessons by students or by the teacher as a demonstration.
+**Easy to use** and affordable sensor boxes for digital data acquisition are suitable for use in physics lessons by students or for demonstrations by teachers.
 
-Each Box can be built for under 20 €.
+Each box can be assembled for less than 20 euros.
 
-All boxes are equipped with an esp32, so that they can communicate via BLE or serial connection. Older models use the d1 mini, but I now switched to the lolin32 lite, because it's cheaper and has a battery connector. Unfortunately, the wiki isn't up to date.
+## Microcontroller and Sensors
 
-Just power up the sensor box and take a smartphone with pyhphox installed, and you can start. Nothing more is needed.
+All boxes are equipped with an ESP32, enabling them to communicate via BLE (Bluetooth Low Energy) or a serial connection.
 
-If you want more, you can export the data from phyphox or read the data via a serial connection on any pc and process them in the software you want.
+I use the Wemos Lolin32Lite developement board because of its availibility, the battery connector and the low price.
 
-## How to build
+Most of the sensors are using the I2C interface to communicate with the ESP32.
 
-A detailed description of how to build the sensors and use the software can be found in the wiki at this repository: 
-https://github.com/HeiLaut/Physics-Arduino-Sensors/wiki (work in progress)
+### Force Sensor
 
-## Software
+Sensor:
 
-### Wireless via PhyPhox
-<img src="https://github.com/HeiLaut/Physics-Arduino-Sensors/blob/main/images/us_example.jpg" width=25%>
+Load Cell and HX711 amplifier
 
+### ToF Distance-Sensor
 
-Using this platform, the measured values can then be read out directly via Bluetooth and PhyPhox (https://phyphox.org/de/home-de/) with the smartphone. The boxes then only need to be supplied with power. If you use the esp32 Lolin Board, you can easily attach a cheap LiPo Battery.
+Sensor:
 
-### Serial Plotter
-#### Web Serial Plotter (Chrome-based browsers only)
-I am working on a Web Serial Plotter, than can be accessed through Chrome or Edge. It automatically reads the data from the sensor. You can specify which data to plot and also output the data to a CSV-file. For the plotting, i am using Plotly. Still in an early version but usable.
-You can find the serial plotter at the adress: https://heilaut.github.io/web-serial-plotter/
+VL53L0X
 
-## Boxes
+or
 
-### Force sensor
-<img src="https://github.com/HeiLaut/Physics-Arduino-Sensors/blob/main/images/Photo.jpg" width = 50%>
+VL53L1X
 
-[Building instructions --> wiki](https://github.com/HeiLaut/Physics-Arduino-Sensors/wiki/Building-Instructions#1-force-gauge)
+### Light Gate
 
-All files are available.
+Sensor:
 
-Load cell to measure the force as a function of time.
+Adafruit Break Beam Sensor 
 
+or (cheaper)
 
-### Ultrasonic-Rangefinder
-<img src="https://github.com/HeiLaut/Physics-Arduino-Sensors/blob/main/images/distance_1.JPG" width = 50%>
+modified lightgate/speed-sensor with lm393
 
-[Building instructions --> wiki](https://github.com/HeiLaut/Physics-Arduino-Sensors/wiki/Building-Instructions#2-ultrasonic-rangefinder)
+### Magnetometer
 
-All files are available. 
+Sensor:
 
-ultrasonic sensor - distance measurement as a function of time
+LI2MDL
 
-### Laser-ToF-Rangefinder
-<img src="https://github.com/HeiLaut/Physics-Arduino-Sensors/blob/main/images/ToF-Rangefinder.jpg" width = 50%>
-Building instructions are commnig soon
+or
 
-All files available.
+MLX90393
 
-Laser TimeOfFlight-Sensor - distance measurement as a function of time.
+or
 
-### Light Gate 
-
-Can be used as a single device or in series with a second gate or a magnetic holder to have a release timer.
-Needs a little soldering effort to build it. 
-
+(Gy-271) low range 
 
 ### DC Multimeter
-Building instructions coming soon
 
-DC Multimeter. Measures Voltage up to 24V and current up to 3 A via an INA219 Module.
+Sensor:
+
+INA219
+
+and (optional)
+
+ADS1115
 
 Example Videos:
 
@@ -77,6 +71,7 @@ Diode characteristic https://youtu.be/DQ5L0hsJfBA
 Resistor characteristic https://youtu.be/PSxBtcULFwU
 
 Charge and Discharge of a capacitor https://youtube.com/shorts/HkM0g7PQ94s?feature=share
+
 
 ### Barometer 
 
