@@ -1,8 +1,8 @@
-1 S3 out electromagnet gelb
+1 				(S3 out electromagnet gelb)
 2 V++ rot
 3 S2 in weiß
-4 Button (only magnet) lila
+4 Second Light Gate detector				(Button (only magnet) lila)
 5
-6
+6 
 7 GND scwarz
 8

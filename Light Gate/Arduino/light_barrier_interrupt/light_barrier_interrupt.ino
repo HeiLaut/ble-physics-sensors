@@ -1,10 +1,6 @@
-// todo- Für Speichenrad evtl. Verzicht auf Variabel ddt
-//ddt kann ganz aus code verschwinden!
 #include <phyphoxBle.h>
 #include <QuickStats.h>
-
 QuickStats stats;
-
 struct Signal {
   const uint8_t PIN;
   uint32_t n;
@@ -15,11 +11,9 @@ struct Signal {
   unsigned int ddt; //time between two rising signals
 };
 
-
 int numreadings = 5;
 float readings[5]={0,0,0,0,0};
 float times[5]={0,0,0,0,0};
-
 
 const int dt = 10;
 //time between signal 1 and two
@@ -38,9 +32,8 @@ Signal signal2 = {16, 0, false, 0, 0, 0,0};
 
 void isr1() {
   n++;
-  if(signal1.high){
+  if(signal1. high){
     signal1.t1 = (int)millis();
-      
     //calculating time between two rising signals of signal 1
     //signal1.ddt = signal1.t0 - t_temp;
   //  t_temp = signal1.t0;
@@ -136,7 +129,6 @@ void loop() {
 
 void generateExperiment(void * parameter) {
   PhyphoxBleExperiment lightBarrier;
-
 
   lightBarrier.setTitle("Lichtschranke");
   lightBarrier.setCategory("Sensor-Boxen");
