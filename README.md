@@ -6,69 +6,36 @@
 
 Each Box can be built for under 20 €.
 
-All boxes are equipped with an esp32, so that they can communicate via BLE or serial connection. Older models use the d1 mini, but I now switched to the lolin32 lite, because it's cheaper and has a battery connector. Unfortunately, the wiki isn't up to date.
-
-Just power up the sensor box and take a smartphone with pyhphox installed, and you can start. Nothing more is needed.
-
-If you want more, you can export the data from phyphox or read the data via a serial connection on any pc and process them in the software you want.
-
-## How to build
-
-A detailed description of how to build the sensors and use the software can be found in the wiki at this repository: 
-https://github.com/HeiLaut/Physics-Arduino-Sensors/wiki (work in progress)
-
-## Software
-
-### Wireless via PhyPhox
-<img src="https://github.com/HeiLaut/Physics-Arduino-Sensors/blob/main/images/us_example.jpg" width=25%>
-
-
-Using this platform, the measured values can then be read out directly via Bluetooth and PhyPhox (https://phyphox.org/de/home-de/) with the smartphone. The boxes then only need to be supplied with power. If you use the esp32 Lolin Board, you can easily attach a cheap LiPo Battery.
-
-### Serial Plotter
-#### Web Serial Plotter (Chrome-based browsers only)
-I am working on a Web Serial Plotter, than can be accessed through Chrome or Edge. It automatically reads the data from the sensor. You can specify which data to plot and also output the data to a CSV-file. For the plotting, i am using Plotly. Still in an early version but usable.
-You can find the serial plotter at the adress: https://heilaut.github.io/web-serial-plotter/
-
-## Boxes
-
-### Force sensor
-<img src="https://github.com/HeiLaut/Physics-Arduino-Sensors/blob/main/images/Photo.jpg" width = 50%>
-
-[Building instructions --> wiki](https://github.com/HeiLaut/Physics-Arduino-Sensors/wiki/Building-Instructions#1-force-gauge)
-
-All files are available.
-
-Load cell to measure the force as a function of time.
-
-
-### Ultrasonic-Rangefinder
-<img src="https://github.com/HeiLaut/Physics-Arduino-Sensors/blob/main/images/distance_1.JPG" width = 50%>
-
-[Building instructions --> wiki](https://github.com/HeiLaut/Physics-Arduino-Sensors/wiki/Building-Instructions#2-ultrasonic-rangefinder)
-
-All files are available. 
-
-ultrasonic sensor - distance measurement as a function of time
-
-### Laser-ToF-Rangefinder
-<img src="https://github.com/HeiLaut/Physics-Arduino-Sensors/blob/main/images/ToF-Rangefinder.jpg" width = 50%>
-Building instructions are commnig soon
-
-All files available.
-
-Laser TimeOfFlight-Sensor - distance measurement as a function of time.
-
-### Light Gate 
+All boxes are equipped with an esp32, so that they can communicate via BLE or serial connection.
 
 Can be used as a single device or in series with a second gate or a magnetic holder to have a release timer.
 Needs a little soldering effort to build it. 
 
+### ToF Distance-Sensor
+
+Sensor:
+VL53L0X
+or
+VL53L1X
+
+### Light Gate
+
+Sensor:
+Adafruit Break Beam Sensor 
+or (cheaper)
+modified lightgate/speed-sensor with lm393
+
+### Magnetometer
+
+Sensor:
+
 
 ### DC Multimeter
-Building instructions coming soon
 
-DC Multimeter. Measures Voltage up to 24V and current up to 3 A via an INA219 Module.
+Sensor:
+INA219
+and (optional)
+ADS1115
 
 Example Videos:
 
