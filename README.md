@@ -8,8 +8,11 @@ Each Box can be built for under 20 €.
 
 All boxes are equipped with an esp32, so that they can communicate via BLE or serial connection.
 
-Can be used as a single device or in series with a second gate or a magnetic holder to have a release timer.
-Needs a little soldering effort to build it. 
+
+### Forve Sensor
+
+Sensor:
+Load Cell and HX711 amplifier
 
 ### ToF Distance-Sensor
 
@@ -28,7 +31,11 @@ modified lightgate/speed-sensor with lm393
 ### Magnetometer
 
 Sensor:
-
+LI2MDL
+or
+MLX90393
+or
+(Gy-271) low range 
 
 ### DC Multimeter
 
@@ -44,6 +51,7 @@ Diode characteristic https://youtu.be/DQ5L0hsJfBA
 Resistor characteristic https://youtu.be/PSxBtcULFwU
 
 Charge and Discharge of a capacitor https://youtube.com/shorts/HkM0g7PQ94s?feature=share
+
 
 ### Barometer 
 
