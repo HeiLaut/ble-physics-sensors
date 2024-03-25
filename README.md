@@ -2,46 +2,66 @@
 
 ## Goal
 
-**Easy to use** and cheap sensor boxes for digital data acquisition that can be used in physics lessons by students or by the teacher as a demonstration.
+**Easy to use** and affordable sensor boxes for digital data acquisition are suitable for use in physics lessons by students or for demonstrations by teachers.
 
-Each Box can be built for under 20 €.
+Each box can be assembled for less than 20 euros.
 
-All boxes are equipped with an esp32, so that they can communicate via BLE or serial connection.
+## Microcontroller and Sensors
 
+All boxes are equipped with an ESP32, enabling them to communicate via BLE (Bluetooth Low Energy) or a serial connection.
 
-### Forve Sensor
+I use the Wemos Lolin32Lite developement board because of its availibility, the battery connector and the low price.
+
+Most of the sensors are using the I2C interface to communicate with the ESP32.
+
+### Force Sensor
 
 Sensor:
+
 Load Cell and HX711 amplifier
 
 ### ToF Distance-Sensor
 
 Sensor:
+
 VL53L0X
+
 or
+
 VL53L1X
 
 ### Light Gate
 
 Sensor:
+
 Adafruit Break Beam Sensor 
+
 or (cheaper)
+
 modified lightgate/speed-sensor with lm393
 
 ### Magnetometer
 
 Sensor:
+
 LI2MDL
+
 or
+
 MLX90393
+
 or
+
 (Gy-271) low range 
 
 ### DC Multimeter
 
 Sensor:
+
 INA219
+
 and (optional)
+
 ADS1115
 
 Example Videos:
