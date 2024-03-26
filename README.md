@@ -14,7 +14,7 @@
 
 **Easy to use** and affordable sensor boxes for digital data acquisition are suitable for use in physics lessons by students or for teacher demonstrations.
 
-Each box can be assembled for less than 20 euros.
+Each box can be assembled for less than 20 €.
 
 ## Microcontroller and Sensors <a name="sensors"></a>
 
