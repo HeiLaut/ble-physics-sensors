@@ -16,6 +16,8 @@
 
 Each box can be assembled for less than 20 €.
 
+Comments and requests for changes to both the 3D files and the Arduino code are welcome.
+
 ## Microcontroller and Sensors <a name="sensors"></a>
 
 All boxes are equipped with an ESP32, enabling them to communicate via BLE (Bluetooth Low Energy) or a serial connection.
