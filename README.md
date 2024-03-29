@@ -65,7 +65,7 @@ modified lightgate/speed-sensor with LM393
 
 Sensor:
 
-LI2MDL
+LIS2MDL
 
 or
 
