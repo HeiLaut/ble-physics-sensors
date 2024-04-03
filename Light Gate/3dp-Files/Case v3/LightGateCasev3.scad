@@ -128,13 +128,14 @@ module Sidepanel(assemble = 0){
 }//end leftpanel
  
  
- module rightpanel(jst=true,switch=false,usb=true){
+ module rightpanel(jst=false,switch=false,usb=false, usbC=false){
    difference(){
       Sidepanel();
       if(switch)translate([-0.75,70,0])rotate([90,0,-90])switchcase(true);
       translate([wall,15.5,-1.8])rotate([0,0,90]){
        if(jst)translate([-7.7,-0.1,-0.4])cuboid([7,3,5.5],rounding=1,except=[FRONT,BACK],anchor=FRONT);
        if(usb)translate([7.3,-0.1,-2.0])cuboid([10.5,3,4.5],rounding=1,except=[FRONT,BACK],anchor=FRONT);
+       if(usbC)translate([7.3-2.5,-0.1,-2.0])cuboid([10.5,3,4.5],rounding=1,except=[FRONT,BACK],anchor=FRONT);
        }
       translate([+wall+1,ya/2.5,0])rotate([0,-90,0])rodmount(false);
 
@@ -246,7 +247,7 @@ difference(){
    *down(5)fwd(1)cube(40);
   }
 translate([-(xa/2-1.5*wall),wall/2,0])leftpanel(false,false);
-translate([xa/2-1.5*wall,wall/2,0])rightpanel(jst=true, usb = true, switch=false);
+!translate([xa/2-1.5*wall,wall/2,0])rightpanel(jst=false,usb=false, usbC = true, switch=true);
 
-!standscrew();
+standscrew();
 
