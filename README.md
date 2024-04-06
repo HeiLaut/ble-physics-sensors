@@ -14,7 +14,9 @@
 
 **Easy to use** and affordable sensor boxes for digital data acquisition are suitable for use in physics lessons by students or for teacher demonstrations.
 
-Each box can be assembled for less than 20 euros.
+Each box can be assembled for less than 20 €.
+
+Comments and requests for changes to both the 3D files and the Arduino code are welcome.
 
 ## Microcontroller and Sensors <a name="sensors"></a>
 
@@ -63,7 +65,7 @@ modified lightgate/speed-sensor with LM393
 
 Sensor:
 
-LI2MDL
+LIS2MDL
 
 or
 
@@ -76,7 +78,7 @@ or
 ### DC Multimeter <a name="multimeter"></a>
 
 <img src="https://github.com/HeiLaut/ble-physics-sensors/blob/main/Multimeter/Pictures/Sensor.jpg" width="300">
-
+<img src="https://github.com/HeiLaut/ble-physics-sensors/blob/main/Multimeter/Pictures/phyphox.jpg" width="150">
 Sensor:
 
 INA219
@@ -95,5 +97,7 @@ Charge and Discharge of a capacitor https://youtube.com/shorts/HkM0g7PQ94s?featu
 
 
 ### Barometer <a name="barometer"></a>
+<img src="https://github.com/HeiLaut/ble-physics-sensors/blob/main/Pressure%20Sensor/Pictures/Sensor.jpg" width="300">
+<img src="https://github.com/HeiLaut/ble-physics-sensors/blob/main/Pressure%20Sensor/Pictures/phyphox.jpg" width="150">
 
 BMP180 Barometer and Thermometer module. 
