@@ -54,46 +54,80 @@ void setup() {
   firstView.setLabel("Graph"); 
   PhyphoxBleExperiment::View secondView;
   secondView.setLabel("Einfach");//Create a "view"
+  PhyphoxBleExperiment::View thirdView;
+  thirdView.setLabel("Multi");//Create a "view"
+
 
   //Graph
-  PhyphoxBleExperiment::Graph firstGraph;    
-  firstGraph.setLabel("x");
-  firstGraph.setUnitX("s");
-  firstGraph.setUnitY("mT");
-  firstGraph.setLabelX("Zeit");
-  firstGraph.setLabelY("B");
-  firstGraph.setChannel(1,2);
-
-  PhyphoxBleExperiment::Graph secondGraph;    
-  secondGraph.setLabel("y");
-  secondGraph.setUnitX("s");
-  secondGraph.setUnitY("mT");
-  secondGraph.setLabelX("Zeit");
-  secondGraph.setLabelY("B");
-  secondGraph.setChannel(1,3);
-
-  PhyphoxBleExperiment::Graph thirdGraph;    
-  thirdGraph.setLabel("z");
-  thirdGraph.setUnitX("s");
-  thirdGraph.setUnitY("mT");
-  thirdGraph.setLabelX("Zeit");
-  thirdGraph.setLabelY("B");
-  thirdGraph.setChannel(1,4);
-
-  PhyphoxBleExperiment::Graph fourthGraph;    
-  fourthGraph.setLabel("Gesamt");
-  fourthGraph.setUnitX("s");
-  fourthGraph.setUnitY("mT");
-  fourthGraph.setLabelX("Zeit");
-  fourthGraph.setLabelY("B");
-  fourthGraph.setChannel(1,5);
+  PhyphoxBleExperiment::Graph xGraph;    
+  xGraph.setLabel("x");
+  xGraph.setUnitX("s");
+  xGraph.setUnitY("mT");
+  xGraph.setLabelX("Zeit");
+  xGraph.setLabelY("B");
+  xGraph.setChannel(1,2);
+  xGraph.setColor("00ff04");
 
 
+  PhyphoxBleExperiment::Graph yGraph;    
+  yGraph.setLabel("y");
+  yGraph.setUnitX("s");
+  yGraph.setUnitY("mT");
+  yGraph.setLabelX("Zeit");
+  yGraph.setLabelY("B");
+  yGraph.setChannel(1,3);
+  yGraph.setColor("00a5ff");
+
+
+  PhyphoxBleExperiment::Graph zGraph;    
+  zGraph.setLabel("z");
+  zGraph.setUnitX("s");
+  zGraph.setUnitY("mT");
+  zGraph.setLabelX("Zeit");
+  zGraph.setLabelY("B");
+  zGraph.setChannel(1,4);
+  zGraph.setColor("ecfa00");
+
+
+  PhyphoxBleExperiment::Graph sumGraph;    
+  sumGraph.setLabel("Gesamt");
+  sumGraph.setUnitX("s");
+  sumGraph.setUnitY("mT");
+  sumGraph.setLabelX("Zeit");
+  sumGraph.setLabelY("B");
+  sumGraph.setChannel(1,5);
+
+  PhyphoxBleExperiment::Graph multiGraph;
+  multiGraph.setLabel("y");
+  multiGraph.setUnitX("s");
+  multiGraph.setUnitY("mT");
+  multiGraph.setLabelX("Zeit");
+  multiGraph.setLabelY("B");    
+  multiGraph.setChannel(1,5);
+  multiGraph.setColor("ffffff");
+
+  PhyphoxBleExperiment::Graph::Subgraph xData;
+  xData.setChannel(1,2);
+  xData.setColor("00ff04");
+
+  PhyphoxBleExperiment::Graph::Subgraph yData;
+  yData.setChannel(1,3);
+  yData.setColor("00a5ff");
+
+  PhyphoxBleExperiment::Graph::Subgraph zData;
+  zData.setChannel(1,4);
+  zData.setColor("ecfa00");
+
+  multiGraph.addSubgraph(xData);
+  multiGraph.addSubgraph(yData);
+  multiGraph.addSubgraph(zData);
+
+  
   PhyphoxBleExperiment::Value bx;         //Creates a value-box.
   bx.setLabel("B-x");                  //Sets the label
   bx.setPrecision(2);                     //The amount of digits shown after the decimal point.
   bx.setUnit("mT");                        //The physical unit associated with the displayed value.
-  bx.setColor("FFFFFF");                  //Sets font color. Uses a 6 digit hexadecimal value in "quotation marks".
+  bx.setColor("00ff04");                  //Sets font color. Uses a 6 digit hexadecimal value in "quotation marks".
   bx.setChannel(2);
   bx.setXMLAttribute("size=\"2\"");
 
@@ -101,7 +135,7 @@ void setup() {
   by.setLabel("B-y");                  //Sets the label
   by.setPrecision(2);                     //The amount of digits shown after the decimal point.
   by.setUnit("mT");                        //The physical unit associated with the displayed value.
-  by.setColor("FFFFFF");                  //Sets font color. Uses a 6 digit hexadecimal value in "quotation marks".
+  by.setColor("00a5ff");                  //Sets font color. Uses a 6 digit hexadecimal value in "quotation marks".
   by.setChannel(3);
   by.setXMLAttribute("size=\"2\"");
 
@@ -109,7 +143,7 @@ void setup() {
   bz.setLabel("B-z");                  //Sets the label
   bz.setPrecision(2);                     //The amount of digits shown after the decimal point.
   bz.setUnit("mT");                        //The physical unit associated with the displayed value.
-  bz.setColor("FFFFFF");                  //Sets font color. Uses a 6 digit hexadecimal value in "quotation marks".
+  bz.setColor("ecfa00");                  //Sets font color. Uses a 6 digit hexadecimal value in "quotation marks".
   bz.setChannel(4);
   bz.setXMLAttribute("size=\"2\"");
 
@@ -121,18 +155,20 @@ void setup() {
   bg.setChannel(5);
   bg.setXMLAttribute("size=\"2\"");
 
-  firstView.addElement(firstGraph);            //attach graph to view
-  firstView.addElement(secondGraph);            //attach graph to view
-  firstView.addElement(thirdGraph);            //attach graph to view
-  firstView.addElement(fourthGraph);
+  firstView.addElement(xGraph);            //attach graph to view
+  firstView.addElement(yGraph);            //attach graph to view
+  firstView.addElement(zGraph);            //attach graph to view
 
   secondView.addElement(bx);
   secondView.addElement(by);
   secondView.addElement(bz);
   secondView.addElement(bg);
 
+  thirdView.addElement(multiGraph);
+
   magnet.addView(firstView);               //Attach view to experiment
   magnet.addView(secondView); 
+  magnet.addView(thirdView); 
   
   
   PhyphoxBLE::addExperiment(magnet);
