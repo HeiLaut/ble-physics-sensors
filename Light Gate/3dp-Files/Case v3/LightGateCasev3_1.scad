@@ -318,16 +318,16 @@ module lockscrew(l=10,d = 10,cut = true){
 
 difference(){
     union(){
-   up(00)rotate([0,180,0])Top(oled=false,led=true);
-   !down(30)Bottom();
+   *up(00)rotate([0,180,0])Top(oled=false,led=true);
+   *down(30)Bottom();
    }//end union
    *down(5)fwd(1)cube(40);
   }
 translate([-(xa/2-1.5*wall)-10,wall/2,-10])leftpanel(false,false);
-translate([xa/2-1.5*wall+10,wall/2,-10])rightpanel(jst=false,usb=false, usbC = true, switch=true);
+translate([xa/2-1.5*wall+10,wall/2,-10])rightpanel(jst=0,usb=1, usbC = 0, switch=1);
 
 *down(5)lockscrew(l=10);
-translate([0,-15,-33])rotate([0,0,90])standscrew();
+*translate([0,-15,-33])rotate([0,0,90])standscrew();
 
 
 
