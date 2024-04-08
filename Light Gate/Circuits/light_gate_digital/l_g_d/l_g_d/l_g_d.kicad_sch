@@ -1187,7 +1187,7 @@
     (property "Reference" "R_IR_D1" (id 0) (at 114.3 72.3899 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
-    (property "Value" "1k" (id 1) (at 114.3 74.9299 0)
+    (property "Value" "220" (id 1) (at 114.3 74.9299 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal" (id 2) (at 109.982 73.66 90)
@@ -1242,7 +1242,7 @@
       (reference "R_D1") (unit 1) (value "1k") (footprint "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal")
     )
     (path "/fbde843f-b9b4-48bb-ab60-be1fb10994a4"
-      (reference "R_IR_D1") (unit 1) (value "1k") (footprint "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal")
+      (reference "R_IR_D1") (unit 1) (value "220") (footprint "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal")
     )
     (path "/b3908863-1f0b-4105-aa33-a8468a4f004e"
       (reference "U1") (unit 1) (value "LM393P") (footprint "eec:Texas_Instruments-P_R-PDIP-T8-0-0-0")
