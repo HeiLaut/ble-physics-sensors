@@ -41,7 +41,7 @@ module rod(internal=false,l=20){
 }
 module wheel(){
    a = 360/20;
-   d = 50;
+   d = 55;
 difference(){
    union(){
       xcyl(d =d,h=4);
@@ -50,7 +50,7 @@ difference(){
    rotate([0,90,0])rotate_extrude()translate([d/2+2,0,0])scale([1.5,0.8,1])circle(2);
    xcyl(d= 3.5, h = 80);
    for(i=[0:a:360]){
-      left(5)rotate([i,0,0])rotate([0,90,0])rotate_extrude(angle=a/2)translate([10,0,0])square([d/2-14,10]);
+      left(5)rotate([i,0,0])rotate([0,90,0])rotate_extrude(angle=a/2)translate([12,0,0])square([d/2-14,10]);
    //rotate([i,0,0])scale([1,0.3,1])translate([0,0,12])xcyl(d=10,h=20);
    
   }
@@ -64,5 +64,5 @@ module nut(){
       }
 }
 base();
-wheel();
+!wheel();
 left(4.5)nut();
