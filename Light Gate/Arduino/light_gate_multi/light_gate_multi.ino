@@ -4,7 +4,7 @@
 #define SIGNAL_A_PIN 17 //pin for incoming signal A 
 #define SIGNAL_B_PIN 16 //pin for incoming signal B
 #define DETECT_PIN 25 //pin for detect second light gate
-
+#define LED_PIN 13 //pin for indication LED
 // Structure to represent a signal with its associated pin and timing information
 struct Signal{
     const int pin; // Pin number associated with the signal
@@ -25,13 +25,19 @@ int puffer1 = 0; //Time puffer to get runtime_A_A
 int puffer2 = 0; //Time puffer to get pendulum time 
 float T = 0;  // Pendulum time
 int n = 0;  // Counter for the number of times the light gate A is interrupted
+int n_puffer = 0; //puffer to check, if a change happend.
+float t = 0; //time passed
 float runtime_A_A=0; // Runtime between two rising signals of light gate A
+
+int spokes = 20; //number of spokes of encoder wheel
+int diameter = 53; //diameter of encoder wheel
 
 // Interrupt service routine for light gate A
 void IRAM_ATTR ISR1() {
-  n++; // Increment the counter for each interrupt
+   // Increment the counter for each interrupt
+    n++;
    if(signalA.high1){
-    signalA.t1 = (int)millis(); // Record the timestamp of the first event
+     signalA.t1 = (int)millis(); // Record the timestamp of the first event
     signalA.high1 = 0;  // Reset the state
   }else{
     signalA.t2 = (int)millis(); // Record the timestamp of the second event
@@ -57,6 +63,7 @@ void setup() {
   // Set the signal pins to input mode with internal pull-up resistors  pinMode(signalA.pin, INPUT_PULLUP);
   pinMode(signalB.pin, INPUT_PULLUP);
   pinMode(DETECT_PIN,INPUT_PULLUP);
+  pinMode(LED_PIN,OUTPUT);
 
   // Check if the second light gate or magnet is connected via RJ45
   single = digitalRead(DETECT_PIN);
@@ -83,13 +90,13 @@ void loop() {
     dual_loop();  // Run the dual light gate loop if both light gates are present
   }
     
-  delay(20); // Delay to reduce the loop execution rate
+  delay(10); // Delay to reduce the loop execution rate
 }
 
 // Function to handle the logic when operating with a single light gate
 void single_loop(){
   // Calculate the current time in seconds since the program started
-  float t = 0.001 * (float)millis(); 
+  t = 0.001 * (float)millis(); 
   // Calculate the darkening time, which is the time the light gate is blocked
   float darkeningA = abs((float)signalA.t1 - (float)signalA.t2)*0.001;
 
@@ -107,16 +114,27 @@ void single_loop(){
   // Update the time buffer to the latest timestamp of signal A
   puffer1 = signalA.t1;
   // Calculate the distance based on the number of interruptions
-  float dist = n/2;
-
+  float dist = PI*diameter*n/(2*spokes)*0.1;
+  
+  // turn LED on if no signal is detected and off if a signal is detected
+  if(signalB.high1 || signalA.high1){
+    digitalWrite(LED_PIN, LOW);
+  }else{
+    digitalWrite(LED_PIN, HIGH);
+  }
+  if(n_puffer != n){
   // Send the calculated values to the phyphox app via BLE
-  PhyphoxBLE::write(t, runtime_A_A, darkeningA, T, dist);  
+  
 
+  PhyphoxBLE::write(t, runtime_A_A, darkeningA, T, dist);  
   // Output the calculated values to the serial monitor for debugging
+  Serial.print(t);Serial.print(",");
   Serial.print(darkeningA);Serial.print(",");
   Serial.print(runtime_A_A);Serial.print(",");
   Serial.print(T);Serial.print(",");
   Serial.println(dist);
+  }
+  n_puffer = n;
 }
 
 // Function to handle the logic when operating with dual light gates
@@ -139,7 +157,7 @@ void dual_loop(){
 // Function to set up the phyphox BLE experiment for a single light gate
 void single_phyphox(){
   // Initialize the BLE experiment with a title
-  PhyphoxBLE::start("Einzellichtschranke");
+  PhyphoxBLE::start("Lichtschranke");
 
   // Create a new experiment object
   PhyphoxBleExperiment lightGate;
@@ -147,7 +165,7 @@ void single_phyphox(){
   // Set the properties of the experiment
   lightGate.setTitle("Lichtschranke");
   lightGate.setCategory("Sensor-Boxen");
-  lightGate.setDescription("Einzellichtschranke");
+  lightGate.setDescription("Laufzeit, Verdunklungszeit, Pendel, Speichenrad");
   lightGate.numberOfChannels = 5;
 
   // Create views and values for the experiment
@@ -186,9 +204,9 @@ void single_phyphox(){
   period.setXMLAttribute("size=\"2\"");
 
   PhyphoxBleExperiment::Value distance; // Distance value
-  distance.setLabel("Verdunklungen  n =");
-  distance.setPrecision(0);
-  distance.setUnit("");
+  distance.setLabel("Stecke  s =");
+  distance.setPrecision(1);
+  distance.setUnit("cm");
   distance.setColor("FFCC5C");
   distance.setChannel(5);
   distance.setXMLAttribute("size=\"2\"");
@@ -196,12 +214,18 @@ void single_phyphox(){
   // Define a graph to be displayed in the phyphox app
   PhyphoxBleExperiment::Graph distGraph; // Graph for distance over time
   distGraph.setLabel("Weg");
-  distGraph.setUnitY("");
+  distGraph.setUnitY("cm");
   distGraph.setUnitX("s");
   distGraph.setLabelX("Zeit t");
-  distGraph.setLabelY("n");
+  distGraph.setLabelY("s");
   distGraph.setColor("FFCC5C");
   distGraph.setChannel(1, 5);
+
+  // PhyphoxBleExperiment::Edit distance0;
+  // distance0.setLabel("StartStrecke");
+  // distance0.setUnit("cm");
+  // distance0.setChannel(1);
+  // distance0.setDecimal(0);
 
   // Add the defined values to their respective views
   mtimes.addElement(runtime);
@@ -211,7 +235,7 @@ void single_phyphox(){
 
   wheel.addElement(distance);
   wheel.addElement(distGraph);
-
+  // wheel.addElement(distance0);
   // Add the views to the experiment
   lightGate.addView(mtimes);
   lightGate.addView(pendulum);
@@ -224,15 +248,15 @@ void single_phyphox(){
 // Function to set up the phyphox BLE experiment for dual light gates
 void dual_phyphox(){
   // Initialize the BLE experiment with a title
-  PhyphoxBLE::start("Mehrfachlichtschranke");
+  PhyphoxBLE::start("Lichtschranke (2x)");
 
   // Create a new experiment object
   PhyphoxBleExperiment lightGate;
 
   // Set the properties of the experiment
-  lightGate.setTitle("2 Lichtschranken");
+  lightGate.setTitle("Lichtschranke (2x)");
   lightGate.setCategory("Sensor-Boxen");
-  lightGate.setDescription("Doppellichtschranke oder Magnetauslöser und Lichtschranke");
+  lightGate.setDescription("Zwei Lichtschranken - Laufzeit, Verdunklungszeit");
   lightGate.numberOfChannels = 3;
 
   // Create a view for the times measured by the light gates
@@ -275,3 +299,8 @@ void dual_phyphox(){
   // Add the experiment to the phyphox BLE interface
   PhyphoxBLE::addExperiment(lightGate);
 }
+// void receiveData(){
+//    float received_n;
+//    PhyphoxBLE::read(received_n);
+//    n =(int)received_n;
+// }
