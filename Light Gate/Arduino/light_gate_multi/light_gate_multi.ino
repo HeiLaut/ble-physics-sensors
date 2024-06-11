@@ -1,7 +1,7 @@
 #include <phyphoxBle.h>
 
 // Define pin numbers for the incoming signals and the detection pin
-#define SIGNAL_A_PIN 17 //pin for incoming signal A 
+#define SIGNAL_A_PIN 22 //pin for incoming signal A 
 #define SIGNAL_B_PIN 16 //pin for incoming signal B
 #define DETECT_PIN 25 //pin for detect second light gate
 #define LED_PIN 13 //pin for indication LED
