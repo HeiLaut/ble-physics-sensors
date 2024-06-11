@@ -2,12 +2,15 @@
 
 #define SignalPIN  16
 #define SignalPIN2 17
-#define Diameter 36
+#define Diameter 25 //in mm
+#define Interruptions 13 //per Rotation
 //puffer for difference in distance
 float s2 = 0;
+
 //define a great value for n so it doesnt get negative, subtractet later in the loop ; n must be integer to be handled int the interrupt function
 int n = 20000;
 int n1 = 0;
+
 //rotationspeed
 float rs = 0;
 //loop delay
@@ -27,14 +30,14 @@ void setup() {
   pinMode(SignalPIN2, INPUT);           // set pin to input
   pinMode(SignalPIN, INPUT);
   Serial.begin(115200);
-  attachInterrupt(digitalPinToInterrupt(SignalPIN), isr, RISING);
+  attachInterrupt(digitalPinToInterrupt(SignalPIN), isr, CHANGE);
   phyphox_init();
 }
 
 void loop() {
   float t = 0.001 * (float)millis();
-  //calculate diameter in cm
-  float s = (n-20000)*PI*Diameter/200;
+  //calculate diameter in cm, Interruptions are Multiplied bei 2 (because of a rising and falling signal) and by 10 to get cm
+  float s = (n-20000)*PI*Diameter/(Interruptions*20);
   s2 = s;
 
   //calculate rotation speed in rps
@@ -43,7 +46,7 @@ void loop() {
   timeOld=millis();
 
   //calculate velocity in cm/s
-  float v = rs*PI*Diameter/200;
+  float v = rs*PI*Diameter/(Interruptions*20);
 
 
 
