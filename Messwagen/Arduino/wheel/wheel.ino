@@ -1,7 +1,7 @@
 #include <phyphoxBle.h> 
 
-#define SignalPIN  16
-#define SignalPIN2 17
+#define SignalPIN  17
+#define SignalPIN2 16
 #define Diameter 25 //in mm
 #define Interruptions 13 //per Rotation
 //puffer for difference in distance
@@ -30,7 +30,7 @@ void setup() {
   pinMode(SignalPIN2, INPUT);           // set pin to input
   pinMode(SignalPIN, INPUT);
   Serial.begin(115200);
-  attachInterrupt(digitalPinToInterrupt(SignalPIN), isr, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(SignalPIN), isr, RISING);
   phyphox_init();
 }
 
@@ -50,9 +50,11 @@ void loop() {
 
 
 
-  Serial.print("t(s),");Serial.print(t);Serial.print(", s(cm),");Serial.print(s,1);
-  Serial.print(", n(1/s),");Serial.print(rs,1);
-
+  //Serial.print("t(s),");Serial.print(t);
+  Serial.print(", s(cm),");Serial.print(s,1);
+  //Serial.print(", n(1/s),");Serial.print(rs,1);
+  //Serial.print(digitalRead(SignalPIN));
+ // Serial.println(digitalRead(SignalPIN2));
   Serial.print(", v(cm/s),");Serial.println(v,1);
 
   PhyphoxBLE::write(t, s, v,rs);   
