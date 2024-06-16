@@ -50,9 +50,9 @@ void loop() {
 
 
 
-  //Serial.print("t(s),");Serial.print(t);
+  Serial.print("t(s),");Serial.print(t);
   Serial.print(", s(cm),");Serial.print(s,1);
-  //Serial.print(", n(1/s),");Serial.print(rs,1);
+  Serial.print(", n(1/s),");Serial.print(rs,1);
   //Serial.print(digitalRead(SignalPIN));
  // Serial.println(digitalRead(SignalPIN2));
   Serial.print(", v(cm/s),");Serial.println(v,1);
