@@ -2,8 +2,8 @@
 
 #define SignalPIN  17
 #define SignalPIN2 16
-#define Diameter 25 //in mm
-#define Interruptions 13 //per Rotation
+#define Diameter 35 //in mm
+#define Interruptions 20 //per Rotation
 //puffer for difference in distance
 float s2 = 0;
 
@@ -36,8 +36,8 @@ void setup() {
 
 void loop() {
   float t = 0.001 * (float)millis();
-  //calculate diameter in cm, Interruptions are Multiplied bei 2 (because of a rising and falling signal) and by 10 to get cm
-  float s = (n-20000)*PI*Diameter/(Interruptions*20);
+  //calculate distance in cm
+  float s = (n-20000)*PI*Diameter/(Interruptions*10);
   s2 = s;
 
   //calculate rotation speed in rps
@@ -46,7 +46,7 @@ void loop() {
   timeOld=millis();
 
   //calculate velocity in cm/s
-  float v = rs*PI*Diameter/(Interruptions*20);
+  float v = rs*PI*Diameter/(Interruptions*10);
 
 
 
