@@ -1,37 +1,39 @@
-#include <Wire.h>
+//#include <Wire.h>
 #include <Adafruit_INA219.h>
 #include <phyphoxBle.h> 
+#define SDA 15
+#define SCL 13
 
 Adafruit_INA219 ina219;
 
 float interval = 20;
 
-void setup(void) {
-  int sda = 15;
-  int scl = 13;
-  Wire.begin(sda, scl);
-  Serial.begin(115200);
-  Serial.println("Hello!");
-  
-  Serial.println("Getting differential reading from AIN0 (P) and AIN1 (N)");
-  Serial.println("ADC Range: +/- 6.144V (1 bit = 3mV)");
-  ads1015.begin(0x4A);
-  if (! ina219.begin()) {
-    Serial.println("Failed to find INA219 chip");
-    while (1) { delay(10); }
-  }
-  
-  int sda = 15;
-  int scl = 13;
-  //needed to select the scl and sda port for the lolin lite board Wire.begin(I2C_SDA, I2C_SCL)
-  Wire.begin(sda, scl);
+void receivedData();
 
+void setup(void) {
+  Wire.begin(SDA, SCL);
+  Serial.begin(115200);
+  
+  uint32_t currentFrequency;
+  
+  //needed to select the scl and sda port for the lolin lite board Wire.begin(I2C_SDA, I2C_SCL)
   pinMode(LED_BUILTIN, OUTPUT);  
   digitalWrite(LED_BUILTIN, LOW);
+
+  if (! ina219.begin()) {
+    Serial.println("Failed to find INA219 chip");
+    while (1){
+    digitalWrite(LED_BUILTIN, LOW);
+    delay(200);
+    digitalWrite(LED_BUILTIN, HIGH);
+    delay(200);
+    }
+  }
+ 
   
   PhyphoxBLE::start("Multimeter");  
   PhyphoxBLE::configHandler = &receivedData;  
-
+  
   PhyphoxBleExperiment multimeter;
 
   multimeter.setTitle("Multimeter");
@@ -45,12 +47,16 @@ void setup(void) {
    simple.setLabel("Einfach");//Create a "view"
    PhyphoxBleExperiment::View charac;
    charac.setLabel("Kennlinie");//Create a "view"
+   PhyphoxBleExperiment::View powerView;
+   powerView.setLabel("Leistung");//Create a "view"
+  
 
    PhyphoxBleExperiment::Graph voltG;    
    voltG.setLabel("U(t)");
    voltG.setUnitX("s");
    voltG.setUnitY("V");
    voltG.setLabelX("Zeit");
+   voltG.setColor("FF4000");
    voltG.setLabelY("Spannung");
    voltG.setChannel(1,2);
 
@@ -60,7 +66,28 @@ void setup(void) {
    currentG.setUnitY("mA");
    currentG.setLabelX("Zeit");
    currentG.setLabelY("Stromstärke");
+   currentG.setColor("00bfff");
    currentG.setChannel(1,3);
+  
+   PhyphoxBleExperiment::Graph powerGraph;    
+   powerGraph.setLabel("P(U)");
+   powerGraph.setUnitX("V");
+   powerGraph.setUnitY("mW");
+   powerGraph.setLabelX("Spannung");
+   powerGraph.setLabelY("Leistung");
+   powerGraph.setChannel(2,4);
+   powerGraph.setStyle("dots");
+   powerGraph.setColor("00FF00"); 
+
+   PhyphoxBleExperiment::Graph powerGraphTime;    
+   powerGraphTime.setLabel("P(t)");
+   powerGraphTime.setUnitX("t");
+   powerGraphTime.setUnitY("mW");
+   powerGraphTime.setLabelX("Zeit");
+   powerGraphTime.setLabelY("Leistung");
+   powerGraphTime.setChannel(1,4);
+   powerGraphTime.setColor("00FF00"); 
+   powerGraphTime.setStyle("line");
 
    PhyphoxBleExperiment::Graph characteristic;    
    characteristic.setLabel("I(U)");
@@ -75,7 +102,7 @@ void setup(void) {
    volt.setLabel("U");            
    volt.setPrecision(2);                  
    volt.setUnit("V");                      
-   volt.setColor("FFFFFF");    
+   volt.setColor("FF4000");    
    volt.setChannel(2);
    volt.setXMLAttribute("size=\"2\"");
 
@@ -83,7 +110,7 @@ void setup(void) {
    current.setLabel("I");            
    current.setPrecision(2);                  
    current.setUnit("mA");                      
-   current.setColor("FFFFFF");    
+   current.setColor("00bfff");    
    current.setChannel(3);
    current.setXMLAttribute("size=\"2\"");
 
@@ -91,7 +118,7 @@ void setup(void) {
    power.setLabel("P");            
    power.setPrecision(2);                  
    power.setUnit("mW");                      
-   power.setColor("FFFFFF");    
+   power.setColor("00FF00");    
    power.setChannel(4);
    power.setXMLAttribute("size=\"2\"");
 
@@ -104,25 +131,24 @@ void setup(void) {
    sampleR.setXMLAttribute("min=\"10\"");
 
   //Export
-//   PhyphoxBleExperiment::ExportSet mySet;       //Provides exporting the data to excel etc.
-//   mySet.setLabel("Multimeter");
-//
-//   PhyphoxBleExperiment::ExportData exTime;
-//   exTime.setLabel("t(s)");
-//   exTime.setDatachannel(1);
-//
-//   PhyphoxBleExperiment::ExportData exVoltage;
-//   exVoltage.setLabel("U(V)");
-//   exVoltage.setDatachannel(2);
-   
-//   PhyphoxBleExperiment::ExportData exCur;
-//   exCur.setLabel("I(mA)");
-//   exCur.setDatachannel(3);
-//
- //  PhyphoxBleExperiment::ExportData exPower;
- //  exPower.setLabel("p(mW)");
- //  exPower.setDatachannel(4);
+   PhyphoxBleExperiment::ExportSet mySet;       //Provides exporting the data to excel etc.
+   mySet.setLabel("Multimeter");
 
+   PhyphoxBleExperiment::ExportData exTime;
+   exTime.setLabel("t(s)");
+   exTime.setDatachannel(1);
+
+   PhyphoxBleExperiment::ExportData exVoltage;
+   exVoltage.setLabel("U(V)");
+   exVoltage.setDatachannel(2);
+   
+   PhyphoxBleExperiment::ExportData exCur;
+   exCur.setLabel("I(mA)");
+   exCur.setDatachannel(3);
+
+   PhyphoxBleExperiment::ExportData exPower;
+   exPower.setLabel("p(mW)");
+   exPower.setDatachannel(4);
 
   
    graph.addElement(voltG);
@@ -131,47 +157,29 @@ void setup(void) {
    
    simple.addElement(volt);
    simple.addElement(current);
-   simple.addElement(power);
+
+   powerView.addElement(volt);
+   powerView.addElement(current);
+   powerView.addElement(power);
+   powerView.addElement(powerGraphTime);
+   powerView.addElement(powerGraph);
+
 
    charac.addElement(characteristic);
 
    multimeter.addView(simple);
    multimeter.addView(graph);
    multimeter.addView(charac);
+   multimeter.addView(powerView);
 
-//   mySet.addElement(exTime);
-//   mySet.addElement(exVoltage);
-//   mySet.addElement(exCur);
- //  mySet.addElement(exPower);
+   mySet.addElement(exTime);
+   mySet.addElement(exVoltage);
+   mySet.addElement(exCur);
+  mySet.addElement(exPower);
    
-//   multimeter.addExportSet(mySet); 
+   multimeter.addExportSet(mySet); 
    
    PhyphoxBLE::addExperiment(multimeter);
-
-
-  Serial.begin(115200);
-  while (!Serial) {
-      // will pause Zero, Leonardo, etc until serial console opens
-      delay(1);
-  }
-  
-
-  uint32_t currentFrequency;
-    
-  Serial.println("Hello!");
-  
-  // Initialize the INA219.
-  // By default the initialization will use the largest range (32V, 2A).  However
-  // you can call a setCalibration function to change this range (see comments).
-  if (! ina219.begin()) {
-    Serial.println("Failed to find INA219 chip");
-    while (1) { delay(10); }
-  }
-  // To use a slightly lower 32V, 1A range (higher precision on amps):
-  //ina219.setCalibration_32V_1A();
-  // Or to use a lower 16V, 400mA range (higher precision on volts and amps):
-  //ina219.setCalibration_16V_400mA();
-
 }
 
 void loop(void) 
@@ -186,16 +194,9 @@ void loop(void)
   shuntvoltage = ina219.getShuntVoltage_mV();
   busvoltage = ina219.getBusVoltage_V();
   current_mA = ina219.getCurrent_mA();
-  power_mW = ina219.getPower_mW();
   loadvoltage = busvoltage + (shuntvoltage / 1000);
+  power_mW = current_mA*loadvoltage;
   
-//  Serial.print("Bus Voltage:   "); Serial.print(busvoltage); Serial.println(" V");
-//  Serial.print("Shunt Voltage: "); Serial.print(shuntvoltage); Serial.println(" mV");
-//  Serial.print("Load Voltage:  "); Serial.print(loadvoltage); Serial.println(" V");
-//  Serial.print("Current:       "); Serial.print(current_mA); Serial.println(" mA");
-//  Serial.print("Power:         "); Serial.print(power_mW); Serial.println(" mW");
-//  Serial.println("");
-
   PhyphoxBLE::write(t, loadvoltage, current_mA, power_mW);   
   
   Serial.print("t(s)");Serial.print(",");
