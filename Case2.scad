@@ -3,9 +3,16 @@ include<BOSL2/std.scad>
 include<BOSL2/threading.scad>
 $fn = 50;
 
-//case([30,52,25],part="bottom",explode = 10,rd=2,lolinspace = 7.4,button = true,reset = 1, thread = true);
+//test();
 
-//must be larger than 1.5 mm
+module test(){
+lolinspace = 5;
+z = 30;
+case([80,52,z],part="bottom",explode = 25,rd=2,lolinspace = lolinspace,button = true,reset = 1, thread = true,clearance = 0.2);
+case([80,52,z],part="plate",explode = 50,rd=2,lolinspace = lolinspace,button = 1,reset = 1, thread = true,usb = 1, jst = 1);
+color("red")translate([-11.5,16.5,lolinspace-12])rotate([180,0,-90])import("lolin32_lite.stl");
+}
+////must be larger than 1.5 mm
 module case(
    size = [15,15,15],
    clearance = 0.15, 
@@ -19,7 +26,17 @@ module case(
    lolinspace = 7.4,
    thread = false,
    button = false,
-   reset = false)
+   reset = false,
+   usb = false,
+   usbC = false,
+   jst = false,
+   lolinx = 0,
+   charge_view = 0,
+   power_view = 0,
+   buttonpos = [0,4],
+   switch = 1,
+   switchpos = [0,5]
+   )
    {
    x = size[0];
    y = size[1];
@@ -65,7 +82,7 @@ module case(
                both();
                translate([0,0,cutheight])cuboid(x*y,anchor=TOP);
                if(button){
-                  translate([0,0,z/2])cuboid([12.2,14.2,5]);
+                  translate([buttonpos[0],buttonpos[1],z/2])cuboid([12.2,14.2,5]);
                   }
                //reset button
                if(reset){
@@ -81,7 +98,12 @@ module case(
                         cyl(d=10,h=4);
                         cuboid([10,10,4],anchor=FRONT);
                   }//end union
-                  }
+                  //LED-cutouts
+                
+
+                  }//end if reset
+                  if(charge_view)translate([-5.75,-6.8,z/2])cyl(d=1.5,h=10);
+                  if(power_view)translate([7.15,15.4,z/2])cyl(d=1.5,h=10);
             }//end difference
             
             //snap connector male
@@ -92,7 +114,7 @@ module case(
                   }
                }//end for
             if(button){
-               translate([0,0,z/2+wall])buttoncase();
+               translate([buttonpos[0],buttonpos[1],z/2+wall])buttoncase();
                }
             if(reset){
                 translate([-0.8,-y/2+3.5,z/2+1])cyl(d=3,h=z-lolinspace-2.6,anchor=TOP);
@@ -118,9 +140,9 @@ module case(
                   }//end difference
                }//end for
               if(lolin32lite){
-                  difference(){
+                  translate([lolinx,-(y-52)/2,0])difference(){
                      union(){
-                        translate([0,-23,-z/2])cuboid([26,8,lolinspace],anchor = BOTTOM+FRONT);
+                        translate([0,-23,-z/2])cuboid([26,7.3,lolinspace],anchor = BOTTOM+FRONT);
                         translate([0,24,-z/2])cuboid([26,5.5,lolinspace],anchor = BOTTOM+BACK);
                      }//end union
                   translate([10.8,-17.6,-z/2])cyl(d=2,h=lolinspace+1,anchor = BOTTOM);
@@ -165,10 +187,45 @@ module case(
 
    }
    if(part == "plate"){
-      back(wall/2)fwd(explode)frontplate();
+      back(wall/2)fwd(explode)up(z/2-12){
+      difference(){
+         frontplate();
+         if(usb)translate([7.2+lolinx,0,-z/2+2.3+lolinspace])cuboid([7.5,5,3.8],rounding = 1, except=[FRONT,BACK]);
+         if(usbC)translate([6.4+lolinx,0,-z/2+2.3+lolinspace])cuboid([10,5,3.8],rounding = 1, except=[FRONT,BACK]);
+         if(jst)translate([-8.5+lolinx,0,-z/2+3.7
++lolinspace])cuboid([9,5,6],rounding = 1, except=[FRONT,BACK]);
+         //of/on switch hole
+         if(switch)translate([switchpos[0]+lolinx,0,switchpos[1]])rotate([-90,0,0])switchcase(1);
 
+         }
+         //of/on switch mount
+         if(switch)translate([switchpos[0]+lolinx,1,switchpos[1]])rotate([-90,0,0])switchcase(0);
+   }
    }
 }//end case
+
+module switchcase(hole = false){
+   a = [4.5,4.4,3];//top cut
+   b=[5,6,2];
+   c= [3.5,4.4,0.5];
+   if(hole){
+   cuboid([7,3.7,3*2]);
+   }else{
+   left(10.7/2)difference(){
+      cuboid(b,anchor=RIGHT+BOTTOM);
+      cuboid(a,anchor=RIGHT+BOTTOM);
+      cuboid(c,anchor=RIGHT+BOTTOM);
+      }
+    right(10.7/2)mirror([1,0,0])difference(){
+      cuboid(b,anchor=RIGHT+BOTTOM);
+      cuboid(a,anchor=RIGHT+BOTTOM);
+      cuboid(c,anchor=RIGHT+BOTTOM);
+      }  
+   left(12.5/2+1.25/2+0.4)cyl(d=2.3,h=2,anchor=BOTTOM);
+   right(12.5/2+1.25/2+0.4)cyl(d=2.3,h=2,anchor=BOTTOM);
+   }
+}
+
 
 module rodmount(){
       difference(){
@@ -193,13 +250,13 @@ module buttoncase(cap = true){
    // button cap
    if(cap){
       down(0.25)difference(){
-         cuboid([xi-tol,yi-tol,5],anchor = BOTTOM);
-         down(0.05)cylinder(d=7,h=3.5/2-0.1,anchor = BOTTOM);
+         cuboid([xi-tol,yi-tol,4],anchor = BOTTOM);
+         down(0.05)cylinder(d=8,h=3.5/2-0.1,anchor = BOTTOM);
          }//end difference
       for(i=[1:90:279]){
          rotate([0,0,i])translate([-4/2-0.75/2,0,0])union(){
             cuboid([0.75,2.7,3.5]);
-            translate([-0.75/2,0,0.25])cuboid([1,1,3]);
+            translate([-0.75,0,0.25])cuboid([1.5,1,3]);
             translate([0.75/2,2.7/2,-3.5/2+0.7])rotate([90,90,0])linear_extrude(2.7)polygon([[0,0],[0.7,0.5],[0.7,0]]);
          }//end union
       }//end for
