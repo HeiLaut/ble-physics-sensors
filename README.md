@@ -93,7 +93,7 @@ Diode characteristic https://youtu.be/DQ5L0hsJfBA
 
 Resistor characteristic https://youtu.be/PSxBtcULFwU
 
-Charge and Discharge of a capacitor https://youtube.com/shorts/HkM0g7PQ94s?feature=share
+Charge and discharge of a capacitor https://youtube.com/shorts/HkM0g7PQ94s?feature=share
 
 
 ### Barometer <a name="barometer"></a>
