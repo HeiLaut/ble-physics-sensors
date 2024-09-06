@@ -295,7 +295,7 @@ module Bottom(){
            
  }
  
-module standscrew(l=10,d = 10, h = 50,cut = true){
+module standscrew(l=6.5,d = 10, h = 50,cut = true){
    difference(){
       union(){
          threaded_rod(d=d-0.1, pitch = 2, l = l,orient=LEFT,anchor=TOP);
@@ -327,7 +327,7 @@ translate([-(xa/2-1.5*wall)-10,wall/2,-10])leftpanel(false,false);
 translate([xa/2-1.5*wall+10,wall/2,-10])rightpanel(jst=0,usb=1, usbC = 0, switch=1);
 
 *down(5)lockscrew(l=10);
-*translate([0,-15,-33])rotate([0,0,90])standscrew();
+!translate([0,-15,-33])rotate([0,0,90])standscrew();
 
 
 
