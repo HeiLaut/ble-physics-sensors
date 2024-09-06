@@ -18,6 +18,19 @@ y2 = 20;
 master = true;
 d_rod = 10.5;
 
+
+module hook(){
+   difference(){
+      linear_extrude(7)import("haken.svg");
+      translate([15,40,3.5])ycyl(d=5,h=20);
+      translate([15,38.5,3.5])ycyl(d=9,h=4,$fn=6);
+      rotate([5,-4,0])translate([20,25,5])cuboid([40,50,5]);
+      }
+}
+
+!hook();
+
+
 module rj45(){
    difference(){
       import("parts/keystone.stl");

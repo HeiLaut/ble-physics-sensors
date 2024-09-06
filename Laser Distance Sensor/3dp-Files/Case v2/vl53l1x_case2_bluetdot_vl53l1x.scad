@@ -4,8 +4,11 @@ x = 30;
 y = 60;//default  = 52
 z = 35;
 modules = 0;
-case([x,y,z],part="top",reset = false, button=true);
-down(z+20)case([x,y,z],part="bottom",thread=true);
+
+case([x,y,z],part="top",reset = false, button=true,cutheight = 8,charge_view = 1,
+   power_view = 1);
+down(z+20)case([x,y,z],part="bottom",thread=true,cutheight = 8,
+);
 if(modules){
     translate([-11.3,16.6,-27.4])color("grey")rotate([0,180,90])import("lolin32_lite.stl");
     }
@@ -34,11 +37,10 @@ module sensor(){
 }//end front     
 module plate(){
  difference(){
-   case([x,y,z],cutheight=2,part="plate",snap=2.5,explode=0);
-   translate([-7.7,-0.1,-5.8])cuboid([7,3,5.5],rounding=1,except=[FRONT,BACK],anchor=FRONT);
-   translate([7.3,-0.1,-7.5])cuboid([10.5,3,4.5],rounding=1,except=[FRONT,BACK],anchor=FRONT);
+   case([x,y,z],cutheight=2,part="plate",explode=0,switch = 1,jst=0,usb=1);
+   
    }//end difference
    }//end frontplate
  
-*down(18)fwd(50)plate();
-*back(50)sensor();
+down(18)fwd(50)plate();
+back(50)sensor();

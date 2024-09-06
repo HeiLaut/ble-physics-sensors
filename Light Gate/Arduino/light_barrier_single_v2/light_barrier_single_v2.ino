@@ -6,6 +6,7 @@ int t2 = 0;
 int t3 = 0;
 int t4 = 0;
 int puffer = 0;
+int n_puffer = 0; //puffer to check, if a change happend.
 
 float pendelT = 0;
 
@@ -75,6 +76,9 @@ if(puffer!=t1){
 }puffer = t1;
 float pendelF = 1/pendelT;
 
+if(n_puffer != n){
+
+
 float values[6] = {t,laufT,verdT,pendelT,pendelF,n};
 PhyphoxBLE::write(&values[0], 6);  
 
@@ -84,8 +88,8 @@ Serial.print(",Verdunklungszeit,"); Serial.print(verdT,3);
 Serial.print(",Schwingungsdauer,");Serial.print(pendelT,3);
 Serial.print(",Frequenz,");Serial.print(pendelF,3);
 Serial.print(",n,");Serial.println(n);
-
-delay(20);                                  
+}
+n_puffer = n;
 
 
 }
