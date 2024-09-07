@@ -175,7 +175,7 @@ void setup(void) {
    mySet.addElement(exTime);
    mySet.addElement(exVoltage);
    mySet.addElement(exCur);
-   mySet.addElement(exPower);
+    mySet.addElement(exPower);
    
    multimeter.addExportSet(mySet); 
    
