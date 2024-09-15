@@ -1,37 +1,24 @@
 #include <phyphoxBle.h>
+#define SIGNAL_PIN 22
 
 int n = 0;
 int t1 = 0;
 int t2 = 0;
-int t3 = 0;
-int t4 = 0;
-int puffer = 0;
+int timeArray[3] = {0,0,0};
 int n_puffer = 0; //puffer to check, if a change happend.
 
+float verdT = 0;
+float laufT = 0;
 float pendelT = 0;
-
-bool s1 = false;
-bool s2 = false;
 
 float radius = 0;
 
 void isr1() {
   n++;
-  if(!s1 && !s2){
+  if(digitalRead(SIGNAL_PIN)){
     t1=(int)millis();
-    s1 = true;
-  }else if(!s2){
-    t2=(int)millis();
-    s1=false;
-    s2=true;
-  }else if(!s1&&s2){
-    t3=(int)millis();
-    s1=true;
-    s2=true;
   }else{
-    t4=(int)millis();
-    s1=0;
-    s2=0;
+    t2=(int)millis();
   }
 }
 
@@ -50,38 +37,42 @@ void setup() {
   );
 
   Serial.begin(115200);
-  attachInterrupt(digitalPinToInterrupt(22), isr1, CHANGE);
+  pinMode(SIGNAL_PIN, INPUT_PULLUP);
+  attachInterrupt(digitalPinToInterrupt(SIGNAL_PIN), isr1, CHANGE);
 
 }
 
 void loop() {
-//gets runtime
+
+// Gets the current runtime in seconds
 float t = 0.001 * (float)millis();
 
-//calculating distance of rotation
-float s = 2*radius*PI/40*n;
 //gets darkening Time of the sensor
-//because of capturing multiple si
-float verdT = 0;
-  if(!s1&&s2){verdT = (t2-t1)*0.001;}
-  else{verdT = (t4-t3)*0.001;}
+if(t2>t1){
+  verdT = (t2-t1)*0.001;
+}
  
-//measures time between t
-float laufT = abs((float)t3-(float)t1)*0.001;
+// Measures the time between t1 and the last two rising timestamps
+if(t1!=timeArray[2]){
+  // Shift the timeArray to make room for the new timestamp
+  for(int i = 0; i<2 ;i++){
+    timeArray[i] = timeArray[i+1];
+  }
+  timeArray[2]=t1;
+  // Calculate the time difference between the most recent and the previous rising timestamp
+  laufT = (timeArray[2]-timeArray[1])*0.001;
+  // Calculate the time difference between the most recent and the timestamp before the previous one
+  pendelT = (timeArray[2]-timeArray[0])*0.001;
+}
 
 //calculates the time every second pass of a body bewtween gate
 //useful for oscillations
-if(puffer!=t1){
-  pendelT = (float(t1)-float(puffer))*0.001;
-}puffer = t1;
+
 float pendelF = 1/pendelT;
 
 if(n_puffer != n){
-
-
 float values[6] = {t,laufT,verdT,pendelT,pendelF,n};
 PhyphoxBLE::write(&values[0], 6);  
-
 Serial.print("t,");Serial.print(t,3);
 Serial.print(",Laufzeit,");Serial.print(laufT,3);
 Serial.print(",Verdunklungszeit,"); Serial.print(verdT,3);
@@ -90,8 +81,6 @@ Serial.print(",Frequenz,");Serial.print(pendelF,3);
 Serial.print(",n,");Serial.println(n);
 }
 n_puffer = n;
-
-
 }
 
 void generateExperiment(void * parameter) {
@@ -153,6 +142,14 @@ void generateExperiment(void * parameter) {
   freq.setChannel(5);
   freq.setXMLAttribute("size=\"2\"");
 
+  PhyphoxBleExperiment::Graph periodGraph; // Graph for period over 
+  periodGraph.setLabel("Schwingungsdauer");
+  periodGraph.setUnitY("s");
+  periodGraph.setUnitX("");
+  periodGraph.setLabelX("n");
+  periodGraph.setLabelY("T");
+  periodGraph.setColor("76a5af");
+  periodGraph.setChannel(6, 4);
 
   simple.addElement(verd);
   simple.addElement(laufz);
@@ -161,6 +158,7 @@ void generateExperiment(void * parameter) {
   
   multi.addElement(schwingd);
   multi.addElement(freq);
+  multi.addElement(periodGraph);
 
   lightBarrier.addView(simple);
   lightBarrier.addView(multi);
