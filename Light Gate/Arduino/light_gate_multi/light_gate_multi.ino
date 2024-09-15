@@ -1,14 +1,14 @@
 #include <phyphoxBle.h>
 
 // Define pin numbers for the incoming signals and the detection pin
-#define SIGNAL_A_PIN 22 //pin for incoming signal A 
+#define SIGNAL_A_PIN 17 //pin for incoming signal A 
 #define SIGNAL_B_PIN 16 //pin for incoming signal B
 #define DETECT_PIN 25 //pin for detect second light gate
 #define LED_PIN 13 //pin for indication LED
 // Structure to represent a signal with its associated pin and timing information
 struct Signal{
     const int pin; // Pin number associated with the signal
-    bool high1;    // State to track the first HIGH signal
+    //bool high1;    // State to track the first HIGH signal
     int t1;        // Timestamp for the first event (rising or falling edge)
     int t2;        // Timestamp for the second event (rising or falling edge)
 
@@ -17,8 +17,8 @@ struct Signal{
 bool single = 0;
 
 // Initialize signalA and signalB with their respective pins and initial states
-Signal signalA = {SIGNAL_A_PIN,0,0,0};
-Signal signalB = {SIGNAL_B_PIN,0,0,0};
+Signal signalA = {SIGNAL_A_PIN,0,0};
+Signal signalB = {SIGNAL_B_PIN,0,0};
 
 // Time buffers to calculate different time intervals
 int puffer1 = 0; //Time puffer to get runtime_A_A 
@@ -36,23 +36,24 @@ int diameter = 53; //diameter of encoder wheel
 void IRAM_ATTR ISR1() {
    // Increment the counter for each interrupt
     n++;
-   if(signalA.high1){
+  //evantually turn into !digitalRead, if use a sensor module
+   if(digitalRead(SIGNAL_A_PIN)){
      signalA.t1 = (int)millis(); // Record the timestamp of the first event
-    signalA.high1 = 0;  // Reset the state
+    //signalA.high1 = 0;  // Reset the state
   }else{
     signalA.t2 = (int)millis(); // Record the timestamp of the second event
-    signalA.high1 = 1; // Set the state to indicate the first event occurred
+    //signalA.high1 = 1; // Set the state to indicate the first event occurred
   }
 }
 
 // Interrupt service routine for light gate B
 void IRAM_ATTR ISR2() {
-  if(signalB.high1){
+  if(digitalRead(SIGNAL_B_PIN)){
     signalB.t1 = (int)millis();  // Record the timestamp of the first event
-    signalB.high1 = 0; // Reset the state
+    //signalB.high1 = 0; // Reset the state
   }else{
     signalB.t2 = (int)millis(); // Record the timestamp of the second event
-    signalB.high1 = 1;  // Set the state to indicate the first event occurred
+   // signalB.high1 = 1;  // Set the state to indicate the first event occurred
   }
   
 }
@@ -60,7 +61,8 @@ void IRAM_ATTR ISR2() {
 // Setup function to initialize the system
 void setup() {
   Serial.begin(115200);
-  // Set the signal pins to input mode with internal pull-up resistors  pinMode(signalA.pin, INPUT_PULLUP);
+  // Set the signal pins to input mode with internal pull-up resistors  
+  pinMode(signalA.pin, INPUT_PULLUP);
   pinMode(signalB.pin, INPUT_PULLUP);
   pinMode(DETECT_PIN,INPUT_PULLUP);
   pinMode(LED_PIN,OUTPUT);
@@ -117,7 +119,7 @@ void single_loop(){
   float dist = PI*diameter*n/(2*spokes)*0.1;
   
   // turn LED on if no signal is detected and off if a signal is detected
-  if(signalB.high1 || signalA.high1){
+  if(!digitalRead(SIGNAL_A_PIN)){
     digitalWrite(LED_PIN, LOW);
   }else{
     digitalWrite(LED_PIN, HIGH);
@@ -128,10 +130,10 @@ void single_loop(){
 
   PhyphoxBLE::write(t, runtime_A_A, darkeningA, T, dist);  
   // Output the calculated values to the serial monitor for debugging
-  Serial.print(t);Serial.print(",");
-  Serial.print(darkeningA);Serial.print(",");
-  Serial.print(runtime_A_A);Serial.print(",");
-  Serial.print(T);Serial.print(",");
+  Serial.print(t,3);Serial.print(",");
+  Serial.print(darkeningA,3);Serial.print(",");
+  Serial.print(runtime_A_A,3);Serial.print(",");
+  Serial.print(T,3);Serial.print(",");
   Serial.println(dist);
   }
   n_puffer = n;
@@ -143,12 +145,12 @@ void dual_loop(){
   float darkeningA = abs((float)signalA.t1 - (float)signalA.t2)*0.001;
   float darkeningB = abs((float)signalB.t1 - (float)signalB.t2)*0.001; 
   // Calculate the runtime between the rising edges of both light gates
-  float runtime_A_B = abs(signalA.t2 - signalB.t2) * 0.001;
+  float runtime_A_B = abs(signalA.t1 - signalB.t1) * 0.001;
 
   // Output the calculated values to the serial monitor for debugging
-  Serial.print(darkeningA);Serial.print(",");
-  Serial.print(darkeningB);Serial.print(",");
-  Serial.println(runtime_A_B);
+  Serial.print(darkeningA,3);Serial.print(",");
+  Serial.print(darkeningB,3);Serial.print(",");
+  Serial.println(runtime_A_B,3);
 
   // Send the calculated values to the phyphox app via BLE
   PhyphoxBLE::write(runtime_A_B, darkeningA, darkeningB);  
@@ -210,6 +212,15 @@ void single_phyphox(){
   distance.setColor("FFCC5C");
   distance.setChannel(5);
   distance.setXMLAttribute("size=\"2\"");
+  
+  PhyphoxBleExperiment::Graph periodGraph; // Graph for period over 
+  periodGraph.setLabel("Schwingungsdauer");
+  periodGraph.setUnitY("s");
+  periodGraph.setUnitX("");
+  periodGraph.setLabelX("n");
+  periodGraph.setLabelY("T");
+  periodGraph.setColor("76a5af");
+  periodGraph.setChannel(5, 4);
 
   // Define a graph to be displayed in the phyphox app
   PhyphoxBleExperiment::Graph distGraph; // Graph for distance over time
@@ -232,6 +243,7 @@ void single_phyphox(){
   mtimes.addElement(darktime);
 
   pendulum.addElement(period);
+  pendulum.addElement(periodGraph);
 
   wheel.addElement(distance);
   wheel.addElement(distGraph);
