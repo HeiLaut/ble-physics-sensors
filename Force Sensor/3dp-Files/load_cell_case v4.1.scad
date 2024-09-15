@@ -28,7 +28,7 @@ module hook(){
       }
 }
 
-!hook();
+
 
 
 module rj45(){
@@ -115,7 +115,7 @@ module connectorB(){
 
 module load_connector(){
     difference(){
-       left(12.5)fwd(21)cuboid([x-30,9,y-5]);
+       left(18)fwd(21)cuboid([x-35,9,y-5]);
         holes();
         fwd(10)rotate([90,0,0])cylinder(h=20,d=5);
        translate([0,-19.5,0])rotate([90,0,0]){
@@ -237,6 +237,7 @@ rotate([-90,0,0])load_cell_case();
 up(wall/2)back(22.5)connectorA();
 *fwd(60)up(wall/2)back(22.5)translate([0,-16,0])connectorB();
 
-fwd(60)up(wall/2)load_connector();
+!fwd(60)up(wall/2)load_connector();
 
 *fwd(8)loadcell();
+*hook();
