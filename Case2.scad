@@ -83,7 +83,7 @@ module case(
                both();
                translate([0,0,cutheight])cuboid(x*y,anchor=TOP);
                if(button){
-                  translate([buttonpos[0],buttonpos[1],z/2])cuboid([12.2,14.2,5]);
+                  translate([buttonpos[0],buttonpos[1],z/2])cuboid([12.2,14.2,5+wall]);
                   }
                //reset button
                if(reset){
@@ -230,7 +230,7 @@ module switchcase(hole = false){
 module rodmount(){
       difference(){
       cuboid([15,15,8],rounding=2,except=[TOP,BOTTOM],anchor=BOTTOM);
-      threaded_rod(d=10, pitch = 2, $slop=0.2,internal=true,l = 30,orient=TOP,anchor=BOTTOM);
+      down(0.1)threaded_rod(d=10, pitch = 2, $slop=0.2,internal=true,l = 30,orient=TOP,anchor=BOTTOM);
       }//end difference
 }//end rodmount
 
