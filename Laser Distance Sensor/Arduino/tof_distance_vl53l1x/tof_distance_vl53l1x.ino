@@ -3,13 +3,15 @@
 
 #define BUTTON_PIN 27
 #define READBAT_PIN 25
-#define SDA 16
-#define SCL 17
+#define SDA 16//15//16
+#define SCL 17//13// 17
 
 float d1, d2, d3, d4, d5, t1, t2, t3, t4, t5;
-float duration, distance, d_old, velocity, offset, t_offset;
-float intervall = 20;
-
+float duration, distance, d_old, velocity, offset, t_offset,readDist;
+//float intervall = 20;
+int stopped = 1;
+int pressed = 0;
+int synced = 0;
 Adafruit_VL53L1X vl53 = Adafruit_VL53L1X();
 
 
@@ -47,7 +49,8 @@ void setup() {
     delay(10);
   }
   Serial.println(F("Ranging started"));
-
+  offset = 0;
+  t_offset = 0;
   // Valid timing budgets: 15, 20, 33, 50, 100, 200 and 500ms!
   vl53.setTimingBudget(50);
   //Serial.print(F("Timing budget (ms): "));
@@ -60,7 +63,8 @@ void setup() {
 
   PhyphoxBLE::start("Laser-Distanz");
   // PhyphoxBLE::configHandler = &receivedData;
-
+  PhyphoxBLE::experimentEventHandler = &newExperimentEvent;
+  PhyphoxBLE::printXML(&Serial);
   //Experiment
   PhyphoxBleExperiment entfernung;  //generate experiment on Arduino which plot random values
 
@@ -188,22 +192,31 @@ void setup() {
 
 
 void loop() {
+  int buttonState = digitalRead(BUTTON_PIN);
+
+  if (!buttonState && stopped) {
+    Serial.println("press");
+    //t = 0.001 * (float)millis();
+    //t_offset =  0.001 * (float)millis();
+    offset = vl53.distance() / 10.00;
+    pressed = 1;
+    delay(200);
+  }
   float batValue = analogRead(READBAT_PIN);
 
-  float t = 0.001 * (float)millis() - t_offset;
-  int buttonState = digitalRead(BUTTON_PIN);
-  if (vl53.dataReady()) {
-    digitalWrite(LED_BUILTIN, LOW);
+  if (vl53.dataReady() && (!stopped || !synced)) {
+    //digitalWrite(LED_BUILTIN, LOW);
     distance = vl53.distance() / 10.00 - offset;
+    float t = 0.001 * (float)millis() - t_offset;
 
-    if (!buttonState) {
-      Serial.println("press");
-      distance = vl53.distance() / 10.00;
+    // if (!buttonState) {
+    //   Serial.println("press");
+    //   distance = vl53.distance() / 10.00;
 
-      t = 0.001 * (float)millis();
-      t_offset = t;
-      offset = distance;
-    }
+    //   t = 0.001 * (float)millis();
+    //   t_offset = t;
+    //   offset = distance;
+    // }
 
     d1 = d2;
     d2 = d3;
@@ -240,9 +253,26 @@ void loop() {
     //delay(intervall);
     vl53.clearInterrupt();
   }else{ 
-    digitalWrite(LED_BUILTIN, HIGH);
+    //digitalWrite(LED_BUILTIN, HIGH);
     }
-  delay(20);
+}
+void newExperimentEvent(){
+  if(PhyphoxBLE::eventType==1){
+    if(pressed){
+      t_offset =  0.001 * (float)millis();
+      pressed = 0;1
+    }
+    Serial.println("Start");
+    stopped = 0;
+
+  }
+  if(PhyphoxBLE::eventType == 0 || PhyphoxBLE::eventType == 2){
+    stopped = 1;
+    Serial.println("Pause");
+  }
+  if(PhyphoxBLE::eventType==255){
+    synced  = 1;
+  }
 }
 
 // void receivedData() {  // get data from PhyPhox app

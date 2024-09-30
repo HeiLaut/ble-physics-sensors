@@ -2,6 +2,8 @@ include<BOSL2/std.scad>
 include<BOSL2/threading.scad>
 
 
+
+
 z = 28;
 xi = 80;//60
 xa = 135;//100
@@ -20,49 +22,26 @@ $fn=50;
 lolinspace = 7.4;
 dLED = 5.1;
 
-//module int_thread(){
-//   d = 11;
-//   threaded_rod(d = d, l = 15, pitch = 3, bevel = 1,internal = true);
-//}
-//
-//module screw(l = 15,knob_a = 20, knob_c = 10){
-//    d = 11;
-//    knob_b = 6.2;
-//    difference(){
-//    translate([0,0,l/2+knob_c])threaded_rod(d = d, l = l, pitch = 3, bevel = true);
-//    translate([0,d/2+3.1,l/2+knob_c])cube([d,d,l+2],center = true);
-//    }
-//    translate([0,0,knob_c/2])cuboid([knob_a,knob_b,knob_c], fillet = 2,edges=EDGES_BOTTOM + EDGES_Z_ALL);
-//    
-//}
-////color("green")translate([5.1,5.2,-6.3])rotate([-180,0,0])import("lolin32_lite.stl");
-//
-//
-//module mount(screw = false,rod = false,internal = false,l=15){
-//   $slop = 0.13;
-//   dS = 7;
-//   pitch = 2;
-//   starts=2;
-//   h = 10;
-//   module screwrod(l = 20,internal = internal){
-//      threaded_rod(l=l, internal = internal,pitch=pitch, d=dS,starts=starts,anchor=BOTTOM);
-//   }
-//   if(screw){
-//      left(40){
-//      intersection(){
-//         rotate([0,90,0])screwrod(l=l);
-//         up(1)cuboid([50,30,6],anchor=LEFT);
-//      }
-//         up(1)cuboid([10,15,6], chamfer=1, edges=[LEFT,TOP+FRONT,TOP+BACK,BOTTOM+FRONT,BOTTOM+BACK],anchor = RIGHT);}
-//       }
-//    if(rod){
-//      screwrod();
-//      }
-//
-//}
-// 
-//
-//
+
+//add parts here
+
+difference(){
+    union(){
+   up(00)rotate([0,0,0])Top(oled=false,led=true);
+   down(30)Bottom();
+   }//end union
+   *down(5)fwd(1)cube(40);
+  }
+!translate([-(xa/2-1.5*wall)-10,wall/2,-10])leftpanel(button=false,rj45=1, switch = 1);
+translate([xa/2-1.5*wall+10,wall/2,-10])rightpanel(jst=0,usb=0, usbC = 0, switch=0);
+
+down(5)lockscrew(l=10);
+*translate([0,-15,-33])rotate([0,0,90])standscrew();
+
+//dont modify following code
+
+
+
 module rodmount(mount = true,hole=0,l = 30){
       difference(){
       if(!hole)cuboid([15,15,8],rounding=2,except=[TOP,BOTTOM],anchor=BOTTOM);
@@ -152,16 +131,22 @@ module Sidepanel(assemble = 0){
 
  }
 
-module leftpanel(button=false,rj45=false){
+module leftpanel(button=false,rj45=false, switch = false){
    difference(){
       Sidepanel();
       if(button)translate([-wall/3,15,0])cuboid([wall*2,17,14]);
       if(rj45)translate([0,18.9,0])cuboid([2*wall,20,17]);
+       if(switch)translate([-0.75,70,0])rotate([90,0,-90])  {   
+       switchcase(true);
+       down(0.15)left(6)cyl(d=1.5,h=0.4);
+       }
    }//end difference
       if(button)translate([-wall/2+0.2,15,0])rotate([0,90,180])buttoncase(false);
       if(rj45){
          translate([-0.8,30.6,0])rotate([90,0,0])import("keystone1.stl");
+        
          }
+         if(switch)translate([+2.7,70,0])rotate([90,0,-90])switchcase(false);
 }//end leftpanel
  
 module rightpanel(jst=false,switch=false,usb=false, usbC=false){
@@ -314,20 +299,6 @@ module lockscrew(l=10,d = 10,cut = true){
       if(cut)down(4)cuboid([80,80,d],anchor=TOP);
 }
 }
-
-
-difference(){
-    union(){
-   *up(00)rotate([0,180,0])Top(oled=false,led=true);
-   *down(30)Bottom();
-   }//end union
-   *down(5)fwd(1)cube(40);
-  }
-translate([-(xa/2-1.5*wall)-10,wall/2,-10])leftpanel(false,false);
-translate([xa/2-1.5*wall+10,wall/2,-10])rightpanel(jst=0,usb=1, usbC = 0, switch=1);
-
-*down(5)lockscrew(l=10);
-!translate([0,-15,-33])rotate([0,0,90])standscrew();
 
 
 

@@ -17,8 +17,8 @@ module rodmount(mount = true,hole=0,l = 30){
 
 module base(){
 difference(){
-   cuboid([30,120,h],chamfer=2,except=[TOP,BOTTOM],anchor = FRONT);
-   cuboid([15,60,h+.2],chamfer=2,except=[TOP,BOTTOM,FRONT],anchor = FRONT);
+   cuboid([28,120,h],chamfer=2,except=[TOP,BOTTOM],anchor = FRONT);
+   cuboid([13,60,h+.2],chamfer=2,except=[TOP,BOTTOM,FRONT],anchor = FRONT);
    translate([0,15,0])xcyl(d= 3.1, h = 80);
    translate([0,110,0])cyl(d=10.5,h = 30);
    #translate([0,110,0])rotate([-90,0,0])rodmount(hole=1);
@@ -64,5 +64,5 @@ module nut(){
       }
 }
 base();
-!wheel();
-left(4.5)nut();
+right(1)wheel();
+left(3.5)nut();

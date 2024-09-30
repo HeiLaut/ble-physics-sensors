@@ -1,0 +1,12 @@
+esp32 lolin lite
+1kg load cell with hx711
+
+2 m4x20 screws
+2 m4 nuts
+1 m5 hook
+2 m5x14 screws
+12 x 12 x 7.3 mm tactile push button
+
+optional:
+SS-12F15 on/off-switch
+lipo battery

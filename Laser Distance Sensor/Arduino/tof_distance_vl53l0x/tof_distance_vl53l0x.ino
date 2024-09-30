@@ -9,9 +9,9 @@ Adafruit_VL53L0X lox = Adafruit_VL53L0X();
 
 float d1, d2, d3, d4, d5, t1, t2, t3, t4, t5;
 float duration, distance, d_old, velocity, offset, t_offset, t, readDist;
-int stopped = 1;
-int pressed = 0;
-int synced = 0;
+bool stopped = 0;
+bool pressed = 0;
+bool synced = 0;
 //float intervall = 20;
 
 
@@ -50,7 +50,7 @@ void setup() {
   
   //phyphox setup
 
-  PhyphoxBLE::start("Laser-Distanz");
+  PhyphoxBLE::start("Laser-Distanz_#2");
   // PhyphoxBLE::configHandler = &receivedData;
   PhyphoxBLE::experimentEventHandler = &newExperimentEvent; // declare which function should be called after receiving an experiment event 
   PhyphoxBLE::printXML(&Serial);
@@ -89,6 +89,7 @@ void setup() {
   secondGraph.setUnitY("cm/s");
   secondGraph.setLabelX("Zeit");
   secondGraph.setLabelY("Geschwindigkeit");
+  secondGraph.setColor("308ead");
  // secondGraph.setStyle(STYLE_DOTS);
   //secondGraph.setStyle("dots");
 
@@ -106,24 +107,10 @@ void setup() {
   vel.setLabel("v");                //Sets the label
   vel.setPrecision(0);              //The amount of digits shown after the decimal point.
   vel.setUnit("cm/s");              //The physical unit associated with the displayed value.
-  vel.setColor("FFFFFF");           //Sets font color. Uses a 6 digit hexadecimal value in "quotation marks".
+  vel.setColor("308ead");           //Sets font color. Uses a 6 digit hexadecimal value in "quotation marks".
   vel.setChannel(3);
   vel.setXMLAttribute("size=\"2\"");
 
-  //Edit
-  // PhyphoxBleExperiment::Edit myEdit;
-  // myEdit.setLabel("Abtastrate");
-  // myEdit.setUnit("ms");
-  // myEdit.setSigned(false);
-  // myEdit.setDecimal(false);
-  // myEdit.setChannel(1);
-  // myEdit.setXMLAttribute("min=\"20\"");
-
-  /* Assign Channels, so which data is plotted on x or y axis 
-   *  first parameter represents x-axis, second y-axis
-   *  Channel 0 means a timestamp is created after the BLE package arrives in phyphox
-   *  Channel 1 to N corresponding to the N-parameter which is written in server.write()
-   */
   //Export
   PhyphoxBleExperiment::ExportSet mySet;  //Provides exporting the data to excel etc.
   mySet.setLabel("Distanz");
@@ -146,7 +133,8 @@ void setup() {
   //firstView.addElement(myEdit);
 
   secondView.addElement(dist);
-
+  
+  thirdView.addElement(dist);
   thirdView.addElement(firstGraph);
   thirdView.addElement(vel);
   thirdView.addElement(secondGraph);  //attach second graph to view
@@ -168,13 +156,13 @@ void setup() {
 void loop() {
   int buttonState = digitalRead(BUTTON_PIN);
 
-  if (!buttonState && stopped) {
+  if (!buttonState && (stopped || synced == 0)) {
     Serial.println("press");
-    //t = 0.001 * (float)millis();
-    //t_offset =  0.001 * (float)millis();
-    offset = readDist;
-    pressed = 1;
     delay(200);
+  // muss noch geändert werden while(!lox.isRangeComplete()){}...
+    offset = lox.readRange() * 0.1;
+    Serial.println(offset);
+    pressed = 1;
   }
 
   if (lox.isRangeComplete() && (!stopped || !synced)) {
@@ -201,8 +189,8 @@ void loop() {
   if (velocity < -500) {
     velocity = -500;
   }
-
   //serial Outputs for the web-serial-plotter https://github.com/HeiLaut/web-serial-plotter
+  if(synced==0){
   Serial.print("t(s)");
   Serial.print(",");
   Serial.print(t);
@@ -214,7 +202,7 @@ void loop() {
   Serial.print("v(cm/s)");
   Serial.print(",");
   Serial.println(velocity);
-
+  }
 
   PhyphoxBLE::write(t, distance, velocity);
   }
@@ -235,7 +223,9 @@ void newExperimentEvent(){
     Serial.println("Pause");
   }
   if(PhyphoxBLE::eventType==255){
+    stopped = 1;
     synced  = 1;
+    Serial.println(synced);
   }
 }
 

@@ -11,14 +11,30 @@ parts = 0;
 bottom();
 
 up(z+20)case([x,y,z],part = "top",cutheight=cutheight,button = 1,wall=wall);
-translate([60,43,23])plate1();
+translate([0,60,23])plate1();
 
-!translate([-60,43,23])plate2();
+translate([-0,-60,11])plate2();
+
+up(25)load_connector();
 
 module plate2(){
-case([x,y,z],part = "plate",cutheight=cutheight,switch=0, jst=0,usb = 0,wall=wall);
+case([x,y,z],part = "plate",cutheight=cutheight,switchpos=[0,15],switch=1, jst=0,usb = 1,wall=wall);
 }
 
+module load_connector(){
+    rotate([0,0,90])difference(){
+       left(18)cuboid([50,9,15]);
+        for(i=[[-20,0,0],[-35,0,0]]){
+            translate(i)ycyl(h = 60, d = 4);   
+        }
+        ycyl(h=20,d=5);
+         translate([0,2,0])rotate([90,0,0]){
+            rotate([0,0,90])cylinder(h = 4, d=9.5, $fn = 6);
+            translate([0,10,2])cube([8,20,4],center = true);
+             translate([0,0,-2.5])cylinder(d = 5, h =10);
+          }
+    }
+ }
 
 module plate1(){
     xR=-8;
@@ -32,13 +48,13 @@ module plate1(){
 
 }
 module rodmount(){
-    h=15;
+    h=17;
     difference(){
        rotate([0,90,0])prismoid(size1=[35,30], size2=[15,25], h=h);
-       right(h/2-2){
+       right(h/2-3){
         ycyl(d=10.5,h=200);
         zcyl(d=10.5,h=200);
-        right(x/2+10)threaded_rod(d=10, pitch = 2, $slop=0.2,internal=true,l = 30,orient=LEFT,anchor=BOTTOM);
+        right(x/2+10)threaded_rod(d=10, pitch = 2, $slop=0.15,internal=true,l = 30,orient=LEFT,anchor=BOTTOM);
         }
 
     }

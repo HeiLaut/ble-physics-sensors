@@ -1,8 +1,8 @@
 #include <phyphoxBle.h>
 
 // Define pin numbers for the incoming signals and the detection pin
-#define SIGNAL_A_PIN 17 //pin for incoming signal A 
-#define SIGNAL_B_PIN 16 //pin for incoming signal B
+#define SIGNAL_A_PIN 17//22// 17 //pin for incoming signal A 
+#define SIGNAL_B_PIN 16// 21// 16 //pin for incoming signal B
 #define DETECT_PIN 25 //pin for detect second light gate
 #define LED_PIN 13 //pin for indication LED
 // Structure to represent a signal with its associated pin and timing information
@@ -16,6 +16,7 @@ struct Signal{
 // Flag to recognize if it's a single light gate or a magnet on RJ45 input
 bool single = 0;
 
+float t_offset = 0;
 // Initialize signalA and signalB with their respective pins and initial states
 Signal signalA = {SIGNAL_A_PIN,0,0};
 Signal signalB = {SIGNAL_B_PIN,0,0};
@@ -37,23 +38,21 @@ void IRAM_ATTR ISR1() {
    // Increment the counter for each interrupt
     n++;
   //evantually turn into !digitalRead, if use a sensor module
-   if(digitalRead(SIGNAL_A_PIN)){
+   if(!digitalRead(SIGNAL_A_PIN)){
      signalA.t1 = (int)millis(); // Record the timestamp of the first event
-    //signalA.high1 = 0;  // Reset the state
   }else{
     signalA.t2 = (int)millis(); // Record the timestamp of the second event
-    //signalA.high1 = 1; // Set the state to indicate the first event occurred
   }
 }
 
 // Interrupt service routine for light gate B
 void IRAM_ATTR ISR2() {
-  if(digitalRead(SIGNAL_B_PIN)){
+  //evantually turn into !digitalRead, if use a sensor module
+
+  if(!digitalRead(SIGNAL_B_PIN)){
     signalB.t1 = (int)millis();  // Record the timestamp of the first event
-    //signalB.high1 = 0; // Reset the state
   }else{
     signalB.t2 = (int)millis(); // Record the timestamp of the second event
-   // signalB.high1 = 1;  // Set the state to indicate the first event occurred
   }
   
 }
@@ -98,7 +97,7 @@ void loop() {
 // Function to handle the logic when operating with a single light gate
 void single_loop(){
   // Calculate the current time in seconds since the program started
-  t = 0.001 * (float)millis(); 
+  t = 0.001 * (float)millis() - t_offset; 
   // Calculate the darkening time, which is the time the light gate is blocked
   float darkeningA = abs((float)signalA.t1 - (float)signalA.t2)*0.001;
 
@@ -160,7 +159,8 @@ void dual_loop(){
 void single_phyphox(){
   // Initialize the BLE experiment with a title
   PhyphoxBLE::start("Lichtschranke");
-
+  PhyphoxBLE::experimentEventHandler = &newExperimentEvent;
+  PhyphoxBLE::printXML(&Serial);
   // Create a new experiment object
   PhyphoxBleExperiment lightGate;
 
@@ -261,7 +261,8 @@ void single_phyphox(){
 void dual_phyphox(){
   // Initialize the BLE experiment with a title
   PhyphoxBLE::start("Lichtschranke (2x)");
-
+  PhyphoxBLE::experimentEventHandler = &newExperimentEvent;
+  PhyphoxBLE::printXML(&Serial);
   // Create a new experiment object
   PhyphoxBleExperiment lightGate;
 
@@ -310,6 +311,13 @@ void dual_phyphox(){
 
   // Add the experiment to the phyphox BLE interface
   PhyphoxBLE::addExperiment(lightGate);
+}
+
+void newExperimentEvent(){
+  if(PhyphoxBLE::eventType == 1 || PhyphoxBLE::eventType == 2){
+    n = 0;
+    t_offset = 0.001 * (float)millis();     
+  }
 }
 // void receiveData(){
 //    float received_n;

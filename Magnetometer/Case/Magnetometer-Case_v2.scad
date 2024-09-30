@@ -1,18 +1,18 @@
 include<BOSL2/std.scad>
 include<CASE/Case2.scad>
-
-translate([0,-40,0])sensor(false,true, "li2mdl");
-left(100)frontplate();
+//gy271 //li2mdl //mlx90393
+rotate([0,0,180])translate([0,-40,0])sensor(true,true, "li2mdl");
+fwd(40)frontplate();
 bottom();
-top();
+up(50)top();
 
 
-!down(80)standscrew(l=9,h=40);
+*down(80)standscrew(l=9,h=40);
 
 
-x = 30;
+x = 40;
 y = 52;
-z = 25;
+z = 30;
 modules = 0;
 
 module standscrew(l=10,d = 10, h = 50){
@@ -35,7 +35,7 @@ module bottom(){
 if(modules){
    translate([-11.3,16.6,-10])color("grey")rotate([0,180,90])import("lolin32_lite.stl");
    }
-      case([x,y,z],cutheight=2,part="bottom",snap=2.5,thread = true);
+      case([x,y,z],cutheight=2,part="bottom",snap=2.5,lolinx=-5,thread = true);
 }//end bottom
 
 
@@ -49,7 +49,7 @@ module sensor(base = true, cover = true,sensor = "gy271"){
    
    if(base){
    difference(){
-   #case([x,y,z],cutheight=2,part="plate",snap=2.5,explode=2.1);
+   case([x,y,z],cutheight=2,part="plate",snap=2.5,explode=2.1);
    scale([4,1,1])ycyl(d=3,h=20);
    }//end difference
    fwd(20)difference(){
@@ -69,7 +69,7 @@ module sensor(base = true, cover = true,sensor = "gy271"){
   }//end if
   
    if(cover){
-   translate([0,-40,0])difference(){
+   translate([0,-80,0])difference(){
       translate([0,-10.5,0])color("red")cuboid([xs+3*wall,10,zs+3*wall],chamfer = 1.5, except=[FRONT,BACK]);
       cuboid([xs+2*wall+.2,ys,zs+2*wall+0.2],chamfer = 1.5, except=[FRONT,BACK],anchor=BACK);
       translate([0,-9,(zs+3*wall)/2-0.4]){
@@ -114,12 +114,12 @@ module sensor(base = true, cover = true,sensor = "gy271"){
   }//end if
   
    if(cover){
-   translate([0,-40,0])difference(){
+   translate([0,-80,0])difference(){
       translate([0,-10.5,0])color("red")cuboid([xs+3.5*wall,ys,zs+3.5*wall],chamfer = 1.5, except=[FRONT,BACK]);
       for(i=[0,180]){
       rotate([0,i,0])
       union(){
-      #translate([0,1.8,0])cuboid([xs+2*wall+.2,ys,zs+2*wall+0.2],chamfer = 1.5, except=[FRONT,BACK],anchor=BACK);
+      translate([0,1.8,0])cuboid([xs+2*wall+.2,ys,zs+2*wall+0.2],chamfer = 1.5, except=[FRONT,BACK],anchor=BACK);
       translate([0,-10.5,(zs+3.5*wall)/2-0.4]){
       rotate([0,0,-0+i])arrow();
       rotate([0,0,-90])arrow();
@@ -172,7 +172,7 @@ module sensor(base = true, cover = true,sensor = "gy271"){
   }//end if
   
    if(cover){
-   translate([0,-40,0])difference(){
+   translate([0,-80,0])difference(){
       translate([0,-10.5,0])color("red")cuboid([xs+3.5*wall,ys,zs+3.5*wall],chamfer = 1.5, except=[FRONT,BACK]);
       for(i=[0,180]){
       rotate([0,i,0])
@@ -203,15 +203,13 @@ module sensor(base = true, cover = true,sensor = "gy271"){
 
  module frontplate(){
  difference(){
-   case([x,y,z],cutheight=2,part="plate",snap=2.5,explode=0);
-   translate([-7.2,-0.2,-1])cuboid([7,3,5.5],rounding=1,except=[FRONT,BACK],anchor=FRONT);
-   translate([7.3,-0.2,-2.5])cuboid([10.5,3,4.5],rounding=1,except=[FRONT,BACK],anchor=FRONT);
+   case([x,y,z],cutheight=2,part="plate",snap=2.5,explode=0,usbC = 1, switch = 1,lolinx=-5);
 }//end difference
    }//end frontplate
 
 module top(){
    difference(){
-      down(5)case([x,y,z],cutheight=2,part="top",snap=2.5,button = true, reset = true,explode=0);
+      down(5)case([x,y,z],cutheight=2,part="top",snap=2.5,button = true, reset = 0,explode=0);
       translate([-0.8,-y/2+5,9])difference(){
          union(){
             cyl(d=10,h=4);
