@@ -18,6 +18,19 @@ y2 = 20;
 master = true;
 d_rod = 10.5;
 
+
+module hook(){
+   difference(){
+      linear_extrude(7)import("haken.svg");
+      translate([15,40,3.5])ycyl(d=5,h=20);
+      translate([15,38.5,3.5])ycyl(d=9,h=4,$fn=6);
+      rotate([5,-4,0])translate([20,25,5])cuboid([40,50,5]);
+      }
+}
+
+
+
+
 module rj45(){
    difference(){
       import("parts/keystone.stl");
@@ -102,7 +115,7 @@ module connectorB(){
 
 module load_connector(){
     difference(){
-       left(12.5)fwd(21)cuboid([x-30,9,y-5]);
+       left(18)fwd(21)cuboid([x-35,9,y-5]);
         holes();
         fwd(10)rotate([90,0,0])cylinder(h=20,d=5);
        translate([0,-19.5,0])rotate([90,0,0]){
@@ -224,6 +237,7 @@ rotate([-90,0,0])load_cell_case();
 up(wall/2)back(22.5)connectorA();
 *fwd(60)up(wall/2)back(22.5)translate([0,-16,0])connectorB();
 
-fwd(60)up(wall/2)load_connector();
+!fwd(60)up(wall/2)load_connector();
 
 *fwd(8)loadcell();
+*hook();

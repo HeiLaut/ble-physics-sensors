@@ -4,7 +4,7 @@ include<BOSL2/threading.scad>
 
 z = 28;
 xi = 80;//60
-xa = 135;//100
+xa = 140;//100
 yi = 85;//80
 widthbase = 37; //Minimum for lolin lite 32
 rod = 1;
@@ -17,8 +17,13 @@ clearance = 0.2;
 cutheight = 4;
 d1 = 2;
 $fn=50;
-lolinspace = 7.4;
+lolinspace = 17;
 dLED = 5.1;
+
+
+*color("green")translate([-38,18,-29+29])rotate([0,0,-90])import("Wemos-Lolin32.stl");
+//
+
 
 //module int_thread(){
 //   d = 11;
@@ -35,8 +40,7 @@ dLED = 5.1;
 //    translate([0,0,knob_c/2])cuboid([knob_a,knob_b,knob_c], fillet = 2,edges=EDGES_BOTTOM + EDGES_Z_ALL);
 //    
 //}
-////color("green")translate([5.1,5.2,-6.3])rotate([-180,0,0])import("lolin32_lite.stl");
-//
+
 //
 //module mount(screw = false,rod = false,internal = false,l=15){
 //   $slop = 0.13;
@@ -164,22 +168,24 @@ module leftpanel(button=false,rj45=false){
          }
 }//end leftpanel
  
-module rightpanel(jst=false,switch=false,usb=false, usbC=false){
+module rightpanel(jst=false,switch=false,usb=false, usbC=false,screw=1){
    difference(){
       Sidepanel();
       if(switch)translate([-0.75,70,0])rotate([90,0,-90])switchcase(true);
       translate([wall,15.5,-1.8])rotate([0,0,90]){
        if(jst)translate([-7.7,-0.1,-0.4])cuboid([7,3,5.5],rounding=1,except=[FRONT,BACK],anchor=FRONT);
-       if(usb)translate([7.3,-0.1,-2.0])cuboid([10.5,3,4.5],rounding=1,except=[FRONT,BACK],anchor=FRONT);
+       if(usb)translate([-1.2,-0.1,7.5])cuboid([10.5,3,4.5],rounding=1,except=[FRONT,BACK],anchor=FRONT);
        if(usbC)translate([7.3-2.5,-0.1,-2.0])cuboid([10.5,3,4.5],rounding=1,except=[FRONT,BACK],anchor=FRONT);
        }
-      translate([+wall+1,ya/2.5,0])rotate([0,-90,0])rodmount(false);
-
+       if(screw){
+      translate([+wall+1,ya/2.5,0])rotate([0,-90,0])rodmount(false);  
       }
-      translate([+wall/2-0.2,ya/2.5,0])rotate([0,-90,0])rodmount();
+      }
+      if(screw)translate([+wall/2-0.2,ya/2.5,0])rotate([0,-90,0])rodmount();
+
       if(switch)translate([-0.74,70,0])rotate([90,0,-90])switchcase(false);
-
-      }
+   }
+      
       
 module Top(oled=1,led=1){
     difference(){
@@ -284,18 +290,18 @@ module Bottom(){
     translate([0,widthy/2-wall+0.01,d1-d1/4+cutheight-1])SnapFemale(l = xi-3*wall,angy=90,angz = 90);
     
     //lolin mount
-    translate([xa/2-28.2-wall+1,16.5,0])rotate([0,0,90])difference(){
+    translate([-xa/2+25+wall+1,17.5,0])rotate([0,0,90])difference(){
         union(){
-          translate([0,-23,-z/2])cuboid([26,8,lolinspace],anchor = BOTTOM+FRONT);
+          translate([0,-33,-z/2])cuboid([26,8,lolinspace],anchor = BOTTOM+FRONT);
           translate([0,24,-z/2])cuboid([26,5.5,lolinspace],anchor = BOTTOM+BACK);
            }//end union
-           translate([10.8,-17.6,-z/2])cyl(d=2,h=lolinspace+1,anchor = BOTTOM);
-           translate([-10.3,21,-z/2])cyl(d=2,h=lolinspace+1,anchor = BOTTOM);
+           #translate([11,-31,-z/2])cyl(d=2,h=lolinspace+1,anchor = BOTTOM);
+           #translate([-10.3,-31,-z/2])cyl(d=2,h=lolinspace+1,anchor = BOTTOM);
     }//end difference
            
  }
  
-module standscrew(l=6.5,d = 10, h = 50,cut = true){
+module standscrew(l=10,d = 10, h = 50,cut = true){
    difference(){
       union(){
          threaded_rod(d=d-0.1, pitch = 2, l = l,orient=LEFT,anchor=TOP);
@@ -318,16 +324,16 @@ module lockscrew(l=10,d = 10,cut = true){
 
 difference(){
     union(){
-   *up(00)rotate([0,180,0])Top(oled=false,led=true);
-   *down(30)Bottom();
+   up(15)rotate([0,0,0])Top(oled=false,led=true);
+   down(00)Bottom();
    }//end union
    *down(5)fwd(1)cube(40);
   }
-translate([-(xa/2-1.5*wall)-10,wall/2,-10])leftpanel(false,false);
-translate([xa/2-1.5*wall+10,wall/2,-10])rightpanel(jst=0,usb=1, usbC = 0, switch=1);
+mirror([1,0,0])translate([xa/2-1.5*wall+10,wall/2,0])rightpanel(jst=0,usb=1, usbC = 0, switch=1,screw=0);
+translate([xa/2-1.5*wall+10,wall/2,0])rightpanel(jst=0,usb=0,screw=1, usbC = 0, switch=0);
 
-*down(5)lockscrew(l=10);
-!translate([0,-15,-33])rotate([0,0,90])standscrew();
+down(20)lockscrew(l=10);
+*translate([0,-15,-33])rotate([0,0,90])standscrew();
 
 
 

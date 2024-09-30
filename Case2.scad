@@ -9,7 +9,7 @@ module test(){
 lolinspace = 5;
 z = 30;
 case([80,52,z],part="bottom",explode = 25,rd=2,lolinspace = lolinspace,button = true,reset = 1, thread = true,clearance = 0.2);
-case([80,52,z],part="plate",explode = 50,rd=2,lolinspace = lolinspace,button = 1,reset = 1, thread = true,usb = 1, jst = 1);
+case([80,52,z],part="plate",explode = 50,rd=2,lolinspace = lolinspace,button = 1,reset = 1, thread = true,usb = 1, jst = 1,switch=1);
 color("red")translate([-11.5,16.5,lolinspace-12])rotate([180,0,-90])import("lolin32_lite.stl");
 }
 ////must be larger than 1.5 mm
@@ -34,8 +34,9 @@ module case(
    charge_view = 0,
    power_view = 0,
    buttonpos = [0,4],
-   switch = 1,
-   switchpos = [0,5]
+   switch = 0,
+   switchpos = [0,5],
+   switchrot = 0,
    )
    {
    x = size[0];
@@ -82,7 +83,7 @@ module case(
                both();
                translate([0,0,cutheight])cuboid(x*y,anchor=TOP);
                if(button){
-                  translate([buttonpos[0],buttonpos[1],z/2])cuboid([12.2,14.2,5]);
+                  translate([buttonpos[0],buttonpos[1],z/2])cuboid([12.2,14.2,5+wall]);
                   }
                //reset button
                if(reset){
@@ -102,8 +103,8 @@ module case(
                 
 
                   }//end if reset
-                  if(charge_view)translate([-5.75,-6.8,z/2])cyl(d=1.5,h=10);
-                  if(power_view)translate([7.15,15.4,z/2])cyl(d=1.5,h=10);
+                  if(charge_view)translate([-5.75+lolinx,-6.8,z/2])cyl(d=1.5,h=10);
+                  if(power_view)translate([7.15+lolinx,15.4,z/2])cyl(d=1.5,h=10);
             }//end difference
             
             //snap connector male
@@ -195,11 +196,10 @@ module case(
          if(jst)translate([-8.5+lolinx,0,-z/2+3.7
 +lolinspace])cuboid([9,5,6],rounding = 1, except=[FRONT,BACK]);
          //of/on switch hole
-         if(switch)translate([switchpos[0]+lolinx,0,switchpos[1]])rotate([-90,0,0])switchcase(1);
-
+         if(switch)translate([switchpos[0],0,switchpos[1]])rotate([-90,switchrot,0])switchcase(1);
          }
          //of/on switch mount
-         if(switch)translate([switchpos[0]+lolinx,1,switchpos[1]])rotate([-90,0,0])switchcase(0);
+         if(switch)translate([switchpos[0],1,switchpos[1]])rotate([-90,switchrot,0])switchcase(0);
    }
    }
 }//end case
@@ -230,7 +230,7 @@ module switchcase(hole = false){
 module rodmount(){
       difference(){
       cuboid([15,15,8],rounding=2,except=[TOP,BOTTOM],anchor=BOTTOM);
-      threaded_rod(d=10, pitch = 2, $slop=0.2,internal=true,l = 30,orient=TOP,anchor=BOTTOM);
+      down(0.1)threaded_rod(d=10, pitch = 2, $slop=0.2,internal=true,l = 30,orient=TOP,anchor=BOTTOM);
       }//end difference
 }//end rodmount
 

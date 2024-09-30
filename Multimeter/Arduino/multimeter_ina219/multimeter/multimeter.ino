@@ -1,5 +1,5 @@
 //#include <Wire.h>
-#include <Adafruit_INA219.h>
+#include <Adafruit_INA219.h>c:\Users\Heinrich\Nextcloud\Physik\DIY\Physics-Arduino-Sensors\Laser Distance Sensor\Arduino\tof_distance_vl53l1x\tof_distance_vl53l1x.ino
 #include <phyphoxBle.h> 
 #define SDA 15
 #define SCL 13
@@ -175,7 +175,7 @@ void setup(void) {
    mySet.addElement(exTime);
    mySet.addElement(exVoltage);
    mySet.addElement(exCur);
-  mySet.addElement(exPower);
+    mySet.addElement(exPower);
    
    multimeter.addExportSet(mySet); 
    

@@ -8,7 +8,10 @@
 Adafruit_VL53L0X lox = Adafruit_VL53L0X();
 
 float d1, d2, d3, d4, d5, t1, t2, t3, t4, t5;
-float duration, distance, d_old, velocity, offset, t_offset;
+float duration, distance, d_old, velocity, offset, t_offset, t, readDist;
+int stopped = 1;
+int pressed = 0;
+int synced = 0;
 //float intervall = 20;
 
 
@@ -49,7 +52,8 @@ void setup() {
 
   PhyphoxBLE::start("Laser-Distanz");
   // PhyphoxBLE::configHandler = &receivedData;
-
+  PhyphoxBLE::experimentEventHandler = &newExperimentEvent; // declare which function should be called after receiving an experiment event 
+  PhyphoxBLE::printXML(&Serial);
   //Experiment
   PhyphoxBleExperiment entfernung;  //generate experiment on Arduino which plot random values
 
@@ -74,6 +78,7 @@ void setup() {
   firstGraph.setUnitY("cm");
   firstGraph.setLabelX("Zeit");
   firstGraph.setLabelY("Entfernung");
+  //firstGraph.setStyle(STYLE_DOTS);
 
 
   firstGraph.setChannel(1, 2);
@@ -84,8 +89,8 @@ void setup() {
   secondGraph.setUnitY("cm/s");
   secondGraph.setLabelX("Zeit");
   secondGraph.setLabelY("Geschwindigkeit");
+ // secondGraph.setStyle(STYLE_DOTS);
   //secondGraph.setStyle("dots");
-
 
   secondGraph.setChannel(1, 3);
 
@@ -161,21 +166,22 @@ void setup() {
 
 
 void loop() {
-  if (lox.isRangeComplete()) {
-  float readDist = lox.readRange() * 0.1;
-  distance = readDist - offset;
-  
-  float t = 0.001 * (float)millis() - t_offset;
   int buttonState = digitalRead(BUTTON_PIN);
 
-  if (!buttonState) {
+  if (!buttonState && stopped) {
     Serial.println("press");
-    //distance = lox.readRange()*0.1;;
     //t = 0.001 * (float)millis();
-    t_offset =  0.001 * (float)millis();
+    //t_offset =  0.001 * (float)millis();
     offset = readDist;
-    delay(100);
+    pressed = 1;
+    delay(200);
   }
+
+  if (lox.isRangeComplete() && (!stopped || !synced)) {
+  readDist = lox.readRange() * 0.1;
+  distance = readDist - offset;
+   
+  float t = 0.001 * (float)millis() - t_offset;
 
   //save multiple values to calculate velocity
   d1 = d2;  d2 = d3;  d3 = d4; d4 = d5; 
@@ -214,6 +220,24 @@ void loop() {
   }
 }
 
+void newExperimentEvent(){
+  if(PhyphoxBLE::eventType==1){
+    if(pressed){
+      t_offset =  0.001 * (float)millis();
+      pressed = 0;
+    }
+    Serial.println("Start");
+    stopped = 0;
+
+  }
+  if(PhyphoxBLE::eventType == 0 || PhyphoxBLE::eventType == 2){
+    stopped = 1;
+    Serial.println("Pause");
+  }
+  if(PhyphoxBLE::eventType==255){
+    synced  = 1;
+  }
+}
 
 //void receivedData() {           // get data from PhyPhox app
 //  float readInput;

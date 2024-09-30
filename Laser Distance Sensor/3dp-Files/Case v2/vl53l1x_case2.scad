@@ -1,10 +1,11 @@
 include<CASE/Case2.scad>
-x = 30;
-y = 52;
-z = 25;
+x = 40;
+y = 55;
+z = 30;
+cutheight = 6;
 
-case([x,y,z],part="top",reset = true, button=true);
-down(50)case([x,y,z],part="bottom",thread=true);
+case([x,y,z],part="top",reset = 1,charge_view = 1, power_view = 1,lolinx=4,cutheight=cutheight, button=true);
+down(50)case([x,y,z],part="bottom",cutheight=cutheight,thread=true,lolinx=4);
 
 module sensor(){
     up(3.7)difference(){
@@ -24,9 +25,8 @@ module sensor(){
 }//end front     
 module plate(){
  difference(){
-   case([x,y,z],cutheight=2,part="plate",snap=2.5,explode=0);
-   translate([-7.7,-0.1,-0.8])cuboid([7,3,5.5],rounding=1,except=[FRONT,BACK],anchor=FRONT);
-   translate([7.3,-0.1,-2.5])cuboid([10.5,3,4.5],rounding=1,except=[FRONT,BACK],anchor=FRONT);
+   case([x,y,z],cutheight=2,part="plate",snap=2,explode=0,jst = 0, usb = 1,switch= 1,switchrot=90,switchpos=[-14,3],lolinx = 4);
+  
    }//end difference
    }//end frontplate
  
