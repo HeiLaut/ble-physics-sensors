@@ -3,11 +3,12 @@ x = 40;
 y = 53;
 z = 35;
 lolinspace = 9;
+sidewalltext = "L-D_#1";
 
 case([x,y,z],part="top",reset = 0, button=true,lolinspace=lolinspace,cutheight = 6,lolinx=-4,charge_view=1,power_view = 1);
 down(50)difference(){
    case([x,y,z],part="bottom",lolinx=-4,thread=true,lolinspace=lolinspace,cutheight = 6);
-   #translate([x/2+1.6,0,7])rotate([90,0,90])linear_extrude(0.4)text("L-D_#5",size = 7,halign="center");
+   #translate([x/2+1.6,0,7])rotate([90,0,90])linear_extrude(0.4)text(sidewalltext,size = 7,halign="center");
    }
 down(25)fwd(50)plate();
 down(25)back(50)sensor();

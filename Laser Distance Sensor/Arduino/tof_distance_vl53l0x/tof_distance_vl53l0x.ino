@@ -12,7 +12,6 @@ float duration, distance, d_old, velocity, offset, t_offset, t, readDist;
 bool stopped = 0;
 bool pressed = 0;
 bool synced = 0;
-//float intervall = 20;
 
 
 void setup() {
@@ -50,7 +49,7 @@ void setup() {
   
   //phyphox setup
 
-  PhyphoxBLE::start("Laser-Distanz_#2");
+  PhyphoxBLE::start("Laser-Distanz_#4");
   // PhyphoxBLE::configHandler = &receivedData;
   PhyphoxBLE::experimentEventHandler = &newExperimentEvent; // declare which function should be called after receiving an experiment event 
   PhyphoxBLE::printXML(&Serial);
