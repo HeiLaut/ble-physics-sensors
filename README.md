@@ -44,6 +44,8 @@ or
 
 VL53L1X
 
+[Assembly instructions see wiki](https://github.com/HeiLaut/ble-physics-sensors/wiki/Laser-Distance)
+
 ### Light Gate <a name="gate"></a>
 
 <img src="https://github.com/HeiLaut/ble-physics-sensors/blob/main/Light%20Gate/Pictures/Sensor.jpg" width="300">
