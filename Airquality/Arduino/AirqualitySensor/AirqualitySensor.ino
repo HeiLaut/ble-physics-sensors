@@ -2,12 +2,20 @@
 #include <Adafruit_AHTX0.h>
 #include "ScioSense_ENS160.h"  // ENS160 library
 #include <phyphoxBle.h>
+#include <OneWire.h>
+#include <DallasTemperature.h>
+
+
+#define LEDPIN 22
+#define SDA 17 //PIN for I2C SDA
+#define SCL 16 //PIN for I2C SCL
+#define ONE_WIRE_BUS 18
+
 
 Adafruit_AHTX0 aht;
 ScioSense_ENS160      ens160(ENS160_I2CADDR_1); //0x53..ENS160+AHT21
-
-#define LEDPIN 22
-
+OneWire oneWire(ONE_WIRE_BUS);
+DallasTemperature sensors(&oneWire);
 
 float tempC;        //To store the temperature in C
 float tempF;        //temp in F
@@ -18,7 +26,9 @@ float eCO2;
 
 void setup() {
   Serial.begin(115200);
-  Wire.begin(17,16);
+  sensors.begin();
+
+  Wire.begin(SDA, SCL);
   //Switch on LED for init
   pinMode(LEDPIN, OUTPUT);
   digitalWrite(LEDPIN, LOW);
@@ -56,6 +66,7 @@ void setup() {
   tempGraph.setUnitY("°C");
   tempGraph.setLabelX("Zeit");
   tempGraph.setLabelY("Temperatur");
+  tempGraph.setColor("ff0080");
   
   tempGraph.setChannel(0, 1);
 
@@ -65,6 +76,7 @@ void setup() {
   humGraph.setUnitY("%");
   humGraph.setLabelX("Zeit");
   humGraph.setLabelY("Luftfeuchtigkeit");
+  humGraph.setColor("0080FF");
   
   humGraph.setChannel(0, 2);
   
@@ -74,34 +86,36 @@ void setup() {
   aqiGraph.setUnitY("");
   aqiGraph.setLabelX("Zeit");
   aqiGraph.setLabelY("AQI");
+  aqiGraph.setColor("00ff00");  // Grün
+
   
   aqiGraph.setChannel(0, 3);
 
   PhyphoxBleExperiment::Graph ocGraph;
-
   ocGraph.setLabel("organische Verbindungen");
   ocGraph.setUnitX("s");
   ocGraph.setUnitY("ppb");
   ocGraph.setLabelX("Zeit");
   ocGraph.setLabelY("TVOC");
-  
+  ocGraph.setColor("ff00ff");  // Magenta
+
   ocGraph.setChannel(0, 4);
 
   PhyphoxBleExperiment::Graph co2Graph;
-
   co2Graph.setLabel("equivalent CO2");
   co2Graph.setUnitX("s");
   co2Graph.setUnitY("ppm");
   co2Graph.setLabelX("Zeit");
   co2Graph.setLabelY("eCO2");
-  
+  co2Graph.setColor("ffff00");  // Gelb
+
   co2Graph.setChannel(0, 5);
 
   PhyphoxBleExperiment::Value tempValue;
 tempValue.setLabel("T");
 tempValue.setPrecision(1);
 tempValue.setUnit("°C");
-tempValue.setColor("ff0000");  // Rot
+tempValue.setColor("ff0080");  // Rot
 tempValue.setChannel(1);
 tempValue.setXMLAttribute("size=\"2\"");
 
@@ -109,7 +123,7 @@ PhyphoxBleExperiment::Value humValue;
 humValue.setLabel("RH");
 humValue.setPrecision(0);
 humValue.setUnit("%");
-humValue.setColor("0000ff");  // Blau
+humValue.setColor("0080FF");  // Blau
 humValue.setChannel(2);
 humValue.setXMLAttribute("size=\"2\"");
 
@@ -163,6 +177,8 @@ PhyphoxBLE::addExperiment(umwelt);
 
 void loop() {
     ///// AHT20 start
+  sensors.requestTemperatures(); 
+  float rdTemp = sensors.getTempCByIndex(0);
   sensors_event_t humidity1, temp; //Tim had to change to  humidity1
   aht.getEvent(&humidity1, &temp);// populate temp and humidity objects with fresh data
   tempC = (temp.temperature);
@@ -183,15 +199,15 @@ void loop() {
   }
 
   Serial.print("Temperature: "); 
-  Serial.print(tempC); 
+  Serial.print(rdTemp); 
   Serial.println(" degrees C");
   Serial.print("Temperature: "); 
   Serial.print("Humidity: "); 
   Serial.print(humidity); 
   Serial.println("% rH");
 
-  PhyphoxBLE::write(tempC, humidity, aqi, tvOC, eCO2);
+  PhyphoxBLE::write(rdTemp, humidity, aqi, tvOC, eCO2);
 
-  delay(1000);
+  delay(5000);
 
 } //end void loop
