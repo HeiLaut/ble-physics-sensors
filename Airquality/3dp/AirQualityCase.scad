@@ -1,3 +1,4 @@
+
 include<CASE/Case2.scad>
 
 module ens160Aht2x(){
@@ -29,7 +30,7 @@ module bottom(){
          translate([i*(x/2),0,z/2+cutheight+2/8])rotate([0,i*90,0])prismoid(size1=[2*2,y-0.15*2], size2=[2*3,y-0.15*2], h=2,anchor=TOP);
          }//end for
       
-      up(3.3)cuboid([22,2,2.6],anchor=BOTTOM);
+      up(3.3)cuboid([22,2,3],anchor=BOTTOM);
       translate([9.6,1.8,20.3])ycyl(d=2,h=10);
       for(i=[-1,1])translate([-i*x/2,0,z/2+8])cuboid([0.3,5,5],anchor=BOTTOM);
       }//end difference
@@ -37,7 +38,17 @@ module bottom(){
      
    }//end bottom
 module top(){
-case([x,y,z],part = "top",cutheight=cutheight,charge_view = 1,power_view = 1,);
+   difference(){
+      case([x,y,z],part = "top",cutheight=cutheight,charge_view = 1,power_view = 1,);
+      for(i=[0:1:5]){
+         translate([0,-z/2+30+i*3,0])rotate([30,0,0])cuboid([x,1.5,8]);
+      }
+      }
+   back(19)left(10)difference(){
+      ycyl(d= 10.5,h=10);
+      fwd(1.5)ycyl(d= 8,h=10);
+      cuboid([10,30,10],anchor=BOTTOM);
+      }//end difference
 }
 
 module backplate(){
