@@ -1,4 +1,4 @@
-# BLE Sensors for physics lessons
+# BLE Sensors for physics class
 
 * [Goal](#goal)
 * [Microcontroller and Sensors](#sensors)
