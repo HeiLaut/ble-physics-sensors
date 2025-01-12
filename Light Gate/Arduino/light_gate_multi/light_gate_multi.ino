@@ -1,3 +1,5 @@
+//Version 0.8
+
 #include <phyphoxBle.h>
 
 // Define pin numbers for the incoming signals and the detection pin
@@ -5,6 +7,8 @@
 #define SIGNAL_B_PIN 16// 21// 16 //pin for incoming signal B
 #define DETECT_PIN 25 //pin for detect second light gate
 #define LED_PIN 13 //pin for indication LED
+
+#define BLENAME "Lichtschranke #4"
 // Structure to represent a signal with its associated pin and timing information
 struct Signal{
     const int pin; // Pin number associated with the signal
@@ -37,8 +41,8 @@ int diameter = 53; //diameter of encoder wheel
 void IRAM_ATTR ISR1() {
    // Increment the counter for each interrupt
     n++;
-  //evantually turn into !digitalRead, if use a sensor module
-   if(!digitalRead(SIGNAL_A_PIN)){
+  //evantually turn into !digitalRead, depends on the sensor module
+   if(digitalRead(SIGNAL_A_PIN)){
      signalA.t1 = (int)millis(); // Record the timestamp of the first event
   }else{
     signalA.t2 = (int)millis(); // Record the timestamp of the second event
@@ -47,9 +51,9 @@ void IRAM_ATTR ISR1() {
 
 // Interrupt service routine for light gate B
 void IRAM_ATTR ISR2() {
-  //evantually turn into !digitalRead, if use a sensor module
+  //evantually turn into !digitalRead
 
-  if(!digitalRead(SIGNAL_B_PIN)){
+  if(digitalRead(SIGNAL_B_PIN)){
     signalB.t1 = (int)millis();  // Record the timestamp of the first event
   }else{
     signalB.t2 = (int)millis(); // Record the timestamp of the second event
@@ -65,6 +69,14 @@ void setup() {
   pinMode(signalB.pin, INPUT_PULLUP);
   pinMode(DETECT_PIN,INPUT_PULLUP);
   pinMode(LED_PIN,OUTPUT);
+
+  delay(2000);
+
+  Serial.println("-----------------------------");
+  Serial.println("Lightgate Version 0.8");
+  Serial.println("-----------------------------");
+
+  delay(1000);
 
   // Check if the second light gate or magnet is connected via RJ45
   single = digitalRead(DETECT_PIN);
@@ -158,7 +170,7 @@ void dual_loop(){
 // Function to set up the phyphox BLE experiment for a single light gate
 void single_phyphox(){
   // Initialize the BLE experiment with a title
-  PhyphoxBLE::start("Lichtschranke");
+  PhyphoxBLE::start(BLENAME);
   PhyphoxBLE::experimentEventHandler = &newExperimentEvent;
   PhyphoxBLE::printXML(&Serial);
   // Create a new experiment object
@@ -260,7 +272,7 @@ void single_phyphox(){
 // Function to set up the phyphox BLE experiment for dual light gates
 void dual_phyphox(){
   // Initialize the BLE experiment with a title
-  PhyphoxBLE::start("Lichtschranke (2x)");
+  PhyphoxBLE::start(BLENAME);
   PhyphoxBLE::experimentEventHandler = &newExperimentEvent;
   PhyphoxBLE::printXML(&Serial);
   // Create a new experiment object

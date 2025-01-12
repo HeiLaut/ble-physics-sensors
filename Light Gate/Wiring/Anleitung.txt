@@ -1,0 +1,55 @@
+Benötigte Bauteile:
+
+IR-Geschwindigkeitsmesssensor
+
+IR-LED 5mm
+IR-Empfänger Diode 5mm
+
+5mm LED mit Vorwiderstand (z.B. 220 Ohm)
+
+Lolin32Lite
+
+Optional:
+Schalter
+
+Lipo-Batterie
+
+RJ45-Breakout Board
+
+
+Zusamenbau:
+Zunächst modifizieren wir den Geschwindigkeitssensor. Auf dem Gehäuse ist markeirt, auf welcher Seite die Infrarot-LED ist. Dies ist teilweise auch auf der Platine gekennzeichnet.
+Zunächst wird die schwarze Abdeckung mit einer Zange gelöst, so dass die eingebauten LEDs freiliegen. Diese werden mit einer Kneifzange agetrennt und werden nicht mehr benötigt.
+
+
+Nun werden an die Lötstellen der Infrarot-LED zwei Kabel von ca. 15 cm länge angelötet (siehe Abbildung). Normalerweise ist der +-Pol beschriftet. Allerdings ist die Beschriftung bei einigen Sensoren fehlerhaft. Also am besten testen, welche Lötstelle die Masse ist.
+
+
+Analog werden nun die Kabel für den Infrarot-Empfänger angelötet. Bei der Empfänger-Diode ist dir Polarisation genau entgegengesetzt zur LED. Das lange Bein der Diode muss also an den Minus-Pol und das kurze Bein an den Plus-Pol. Normalerweise liegen sich Plus- und Minuspol der Empfänger- und Emitter-Diode genau gegenüber. (Siehe Abbildung)
+
+An die Enden der Kabel werden entsprechend die Dioden angelötet.
+
+Nun empfielt sich ein erster Test, ob der Sensor mit den neuen Dioden funktioniert. Dazu ca. 3.3 V an den Sensor anschließen und testen, ob beim gegenüberhalten der beiden Dioden der Sensor anspricht. Dies wird in der Regel durch die eingebaute LED angezeigt.
+
+Nun wird der Sensor mit dem Lolin32Lite verbunden. VCC kommt an den 3V-Ausgang, GND an GND und der digitale Ausgang des Sensors an den PIN17.
+
+Die Anzeige-LED kann nun noch mit dem Sensor verbunden werden. Dazu wird ein Vorwiderstand an den Plus-Pol der Led angelötet und dieser dann an den digitalen Ausgang des Sensors.
+Der Minus-Pol der LED wird mit GND (Sensor oder Lolin32Lite) verbunden.
+
+Soll nur eine Einzellichtschranke gebaut werden, kann jetzt das ganze in das Gehäuse eingebaut werden. 
+
+Für die Doppellichtschranke wird nun noch der RJ45-Adapter angeschlossen.
+Dieser versorgt danach die zweite Lichtschranke mit Strom und empfängt gleichzeitig das Signal.
+
+Dazu wird der 3V-Anschluss des Lolin32Lite mit dem Anschluss 2 verbunden, GND mit Anschluss 7. Anschluss 3 wird mit dem PIN 16 des Lolin32Lite verbunden. Hier kommt dann das Signal der zweiten Lichtschranke an. Anschluss 6 wird mit PIN 25 verbunden. Dieser dient dazu, dass beim Start des Sensors erkannt wird, dass eine zweite Lichtschranke angeschlossen ist.
+
+Nun werden die Bauteile an die entsprechnden Stellen im Gehäuse verbaut.
+
+
+Bau der zweiten Lichtschranke.
+Zunächst wird der Geschwindigkeitssensor genau wie der erste mit den (Leucht-)Dioden modifiziert.
+
+Nun muss nur noch der RJ45-Adapter angeschlossen werden.
+VCC wird mit Anschluss 2 verbunden, der digitale Ausgang mit Anschluss 3 und GND mit Anschluss 6 UND 7 (kann einfach überbrückt werden)
+
+

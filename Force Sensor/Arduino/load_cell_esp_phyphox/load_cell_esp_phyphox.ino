@@ -14,7 +14,7 @@ void setup() {
   pinMode(LED_BUILTIN, OUTPUT);  
   digitalWrite(LED_BUILTIN, LOW);
   
-  PhyphoxBLE::start("Kraft2");
+  PhyphoxBLE::start("Kraftsensor B");
      // PhyphoxBLE::configHandler = &receivedData;
   PhyphoxBLE::experimentEventHandler = &newExperimentEvent;
   PhyphoxBLE::printXML(&Serial);
@@ -143,7 +143,7 @@ void loop() {
   float t = 0.001 * ((float)millis() - t_offset);
   float incDat = LoadCell.getData();
   float m = abs(incDat);
-  float f = -incDat *9.81/1000;
+  float f = incDat *9.81/1000;
   float incDat2 = LoadCell2.getData();
   float m2 = abs(incDat2);
   float f2 = -incDat2 *9.81/1000;

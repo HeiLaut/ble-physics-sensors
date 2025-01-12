@@ -1,3 +1,8 @@
+/*
+zu ändern: Bei Knopfdruck wird immer der Orstoffset gesetzt;Zeitoffset wird nur dann auf 0 gesetzt, wenn in Phyphox der Mülleimer gedrückt wird
+*/
+//Version 0.31
+
 #include <Adafruit_VL53L0X.h>
 #include <phyphoxBle.h>
 
@@ -5,29 +10,38 @@
 #define SDA 14 //PIN for I2C SDA
 #define SCL 12 //PIN for I2C SCL
 
+#define BLENAME "Laser-Distanz_#1"
+
 Adafruit_VL53L0X lox = Adafruit_VL53L0X();
 
 float d1, d2, d3, d4, d5, t1, t2, t3, t4, t5;
 float duration, distance, d_old, velocity, offset, t_offset, t, readDist;
 bool stopped = 0;
-bool pressed = 0;
+bool cleared = 0;
 bool synced = 0;
 
 
 void setup() {
   //needed to select the scl and sda port for the lolin lite board Wire.begin(I2C_SDA, I2C_SCL)
   Wire.begin(SDA, SCL);
-
-  //enable internal LED 
-  pinMode(LED_BUILTIN, OUTPUT);
-  digitalWrite(LED_BUILTIN, LOW);
-
+  //enable internal LED c:\Users\Heinrich\Nextcloud\Physik\DIY\Physics-Arduino-Sensors\Force Sensor\Arduino\load_cell_esp_phyphox\load_cell_esp_phyphox.ino
+ 
   Serial.begin(115200);
-    
-  // wait until serial port opens for native USB devices
+   // wait until serial port opens for native USB devices
   while (!Serial) {
     delay(1);
   }
+  delay(2000);
+
+  Serial.println("-----------------------------");
+  Serial.println("Vl53l0X-Sensor Version 0.31");
+  Serial.println("-----------------------------");
+
+  delay(1000);
+ 
+  pinMode(LED_BUILTIN, OUTPUT);
+  digitalWrite(LED_BUILTIN, LOW);
+
 
   //Serial.println("Adafruit VL53L0X test");
   if (!lox.begin()) {
@@ -49,10 +63,10 @@ void setup() {
   
   //phyphox setup
 
-  PhyphoxBLE::start("Laser-Distanz_#4");
+  PhyphoxBLE::start(BLENAME);
   // PhyphoxBLE::configHandler = &receivedData;
   PhyphoxBLE::experimentEventHandler = &newExperimentEvent; // declare which function should be called after receiving an experiment event 
-  PhyphoxBLE::printXML(&Serial);
+  //PhyphoxBLE::printXML(&Serial);
   //Experiment
   PhyphoxBleExperiment entfernung;  //generate experiment on Arduino which plot random values
 
@@ -155,13 +169,18 @@ void setup() {
 void loop() {
   int buttonState = digitalRead(BUTTON_PIN);
 
-  if (!buttonState && (stopped || synced == 0)) {
+  if (!buttonState) {
     Serial.println("press");
     delay(200);
   // muss noch geändert werden while(!lox.isRangeComplete()){}...
+    while(!lox.isRangeComplete()){
+       delay(1);
+    }
     offset = lox.readRange() * 0.1;
+    if(stopped){
+      cleared = 1;
+    }
     Serial.println(offset);
-    pressed = 1;
   }
 
   if (lox.isRangeComplete() && (!stopped || !synced)) {
@@ -177,7 +196,7 @@ void loop() {
   t5 = t;
 
   velocity = ((d5 - d4) / (t5 - t4) + (d4 - d3) / (t4 - t3) + (d3 - d2) / (t3 - t2) + (d2 - d1) / (t2 - t1)) / 4;
-
+  if(t<0.15)velocity=0;
   if (distance > 120) {
     distance = 120;
   }
@@ -208,23 +227,36 @@ void loop() {
 }
 
 void newExperimentEvent(){
-  if(PhyphoxBLE::eventType==1){
-    if(pressed){
-      t_offset =  0.001 * (float)millis();
-      pressed = 0;
-    }
-    Serial.println("Start");
-    stopped = 0;
-
-  }
-  if(PhyphoxBLE::eventType == 0 || PhyphoxBLE::eventType == 2){
-    stopped = 1;
+  //0 pause, 1 start, 2 clear, 255 sync
+  Serial.println(PhyphoxBLE::eventType);
+  if(PhyphoxBLE::eventType==0){
     Serial.println("Pause");
+    stopped = 1;
   }
+  
+  if(PhyphoxBLE::eventType==1){
+    Serial.println("Start");
+    if(cleared){
+     t_offset =  0.001 * (float)millis();
+     d1 = d2 = d3 = d4 = d5 = t1 = t2 = t3 = t4 = t5 = velocity = 0;
+    }
+    stopped = 0;
+    cleared = 0;
+      
+  }
+  if(PhyphoxBLE::eventType==2){
+    Serial.println("Clear");
+    stopped = 1;
+    synced  = 1;
+    cleared = 1;
+  }
+
   if(PhyphoxBLE::eventType==255){
     stopped = 1;
     synced  = 1;
-    Serial.println(synced);
+    cleared = 1;
+
+    Serial.println("synced");
   }
 }
 

@@ -6,6 +6,8 @@ dS = 7;
 pitch = 2;
 starts=2;
 h = 15;
+
+
 module rodmount(mount = true,hole=0,l = 30){
       difference(){
       if(!hole)cuboid([15,15,8],rounding=2,except=[TOP,BOTTOM],anchor=BOTTOM);
@@ -21,7 +23,7 @@ difference(){
    cuboid([13,60,h+.2],chamfer=2,except=[TOP,BOTTOM,FRONT],anchor = FRONT);
    translate([0,15,0])xcyl(d= 3.1, h = 80);
    translate([0,110,0])cyl(d=10.5,h = 30);
-   #translate([0,110,0])rotate([-90,0,0])rodmount(hole=1);
+   translate([0,110,0])rotate([-90,0,0])rodmount(hole=1);
    }
 }
 

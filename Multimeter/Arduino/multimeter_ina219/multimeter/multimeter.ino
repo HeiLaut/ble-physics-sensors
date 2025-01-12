@@ -1,5 +1,5 @@
 //#include <Wire.h>
-#include <Adafruit_INA219.h>c:\Users\Heinrich\Nextcloud\Physik\DIY\Physics-Arduino-Sensors\Laser Distance Sensor\Arduino\tof_distance_vl53l1x\tof_distance_vl53l1x.ino
+#include <Adafruit_INA219.h>
 #include <phyphoxBle.h> 
 #define SDA 15
 #define SCL 13
@@ -31,7 +31,7 @@ void setup(void) {
   }
  
   
-  PhyphoxBLE::start("Multimeter");  
+  PhyphoxBLE::start("Multimeter C");  
   PhyphoxBLE::configHandler = &receivedData;  
   
   PhyphoxBleExperiment multimeter;
