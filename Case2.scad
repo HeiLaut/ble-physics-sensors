@@ -1,6 +1,24 @@
-//universal electronic case
+/*
+  Universal Electronic Case
+  
+  Created by: Heinrich Lauterbach
+  License: CC-BY-SA
+  This file is licensed under the Creative Commons Attribution-ShareAlike 4.0 International License.
+  To view a copy of this license, visit http://creativecommons.org/licenses/by-sa/4.0/
+  
+  needs BOSL2 library
+  download BOSL2 to your libraries folder via: https://github.com/BelfrySCAD/BOSL2
+*/
+
+
+
+
+
 include<BOSL2/std.scad>
 include<BOSL2/threading.scad>
+
+
+
 $fn = 50;
 
 //test();
@@ -10,38 +28,38 @@ lolinspace = 5;
 z = 30;
 x=80;
 y=52;
-case([x,y,z],part="bottom",explode = 25,rd=2,lolinspace = lolinspace,button = true,reset = 1, thread = true,clearance = 0.2);
-case([x,y,z],part="top",explode = 50,rd=2,lolinspace = lolinspace,button = 1,reset = 0, thread = true,usbC = 1, jst = 1,switch=1,charge_view = 1,
+*case([x,y,z],part="bottom",explode = 25,rd=2,lolinspace = lolinspace,button = true,reset = 1, thread = true,clearance = 0.2);
+case([x,y,z],part="top",explode = 50,rd=2,lolinspace = lolinspace,button = 1,reset = 0, thread = true,usbC = 1, wall=2,jst = 1,switch=1,charge_view = 1,
    power_view = 1);
 *color("red")translate([-11.5,16.5,lolinspace-12])rotate([180,0,-90])import("lolin32_lite.stl");
 }
 ////must be larger than 1.5 mm
 module case(
-   size = [15,15,15],
-   clearance = 0.15, 
-   wall = 2,
-   rd = 2,
-   cutheight = 2,
-   snap = 2,
-   part = "all",
-   explode = 0,
-   lolin32lite = true,
-   lolinspace = 7.4,
-   thread = false,
-   button = false,
-   reset = false,
-   usb = false,
-   usbC = false,
-   jst = false,
-   lolinx = 0,
-   charge_view = 0,
-   power_view = 0,
-   buttonpos = [0,4],
-   switch = 0,
-   switchpos = [0,5],
-   switchrot = 0,
-   embosstext = "",
-   embossheight = 0
+   size = [15,15,15], //size [x,y,z]
+   clearance = 0.15, //overall clearance
+   wall = 2, //wall thickness
+   rd = 2, //chamfer radius
+   cutheight = 2, //offset of cutheight
+   snap = 2, //width of snap 
+   part = "all",//top, bottom, plate
+   explode = 0, //show parts seperate
+   lolin32lite = true, //lolin32lite mount
+   lolinspace = 7.4, //spacing of lolin32lite aboce bottom part
+   thread = false, //add thread on bottom part for rod
+   button = false,//add buttonhole on top part
+   reset = false, //add reset button
+   usb = false, //add cutout for micro usb on plate
+   usbC = false,//add cutout for usb-c on plate
+   jst = false,//add cutout for jst (battery)
+   lolinx = 0,//x-offset of lolin32lite
+   charge_view = 0,//add hole on top to see charging-LED
+   power_view = 0,//add hole on top to see power-LED
+   buttonpos = [0,4],//position of button in top part [x,y]
+   switch = 0, //mounting for on-off-switch in plate
+   switchpos = [0,5],//switch postion [y,z]
+   switchrot = 0,//rotation of switch in degree
+   embosstext = "",//embosstext on bottom part
+   embossheight = 0//embossheight means depth
    )
    {
    x = size[0];
@@ -88,7 +106,7 @@ module case(
                both();
                translate([0,0,cutheight])cuboid(x*y,anchor=TOP);
                if(button){
-                  translate([buttonpos[0],buttonpos[1],z/2])cuboid([12.2,14.2,5]);
+                  translate([buttonpos[0],buttonpos[1],z/2+wall/2])cuboid([12.2,14.2,wall+0.1]);
                   }
                //reset button
                if(reset){
@@ -282,5 +300,5 @@ module standscrew(l=10,d = 10, h = 50){
       }//end union
       translate([-(h+l)/2+l,0,-d+1.5])cuboid([h+l,d,d]);
       }
-}//end adjscrew
+}//end standscrew
 
