@@ -29,10 +29,10 @@ module bottom(){
 }
 module backplate(){
    difference(){
-      translate([0,-60,12])case([50,100,30],part="plate",explode = 0,rd=2,lolinspace = 20,button = false,reset = 0, thread = false,jst = false,usb=true,lolinx=8);
-      translate([-15,-59,15])rotate([0,90,90])switchcase(hole = true);
+      translate([0,-60,12])case([50,100,30],part="plate",explode = 0,rd=2,lolinspace = 20,button = false,reset = 0, thread = false,jst = false,usb=true,lolinx=8,switchpos=[-11,0],switch=1,switchrot=-90);
+     
       }
-      translate([-15,-58.4,15])rotate([0,90,90])switchcase(hole = 0);
+ 
   
 }
  module switchcase(hole = false){
