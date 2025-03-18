@@ -1,10 +1,38 @@
+/*
+  Case for phyphox dc multimeter
+  
+  Created by: Heinrich Lauterbach
+  License: CC-BY-SA
+  This file is licensed under the Creative Commons Attribution-ShareAlike 4.0 International License.
+  To view a copy of this license, visit http://creativecommons.org/licenses/by-sa/4.0/
+  
+  needs BOSL2 library
+  download BOSL2 to your libraries folder via:
+  
+  https://github.com/BelfrySCAD/BOSL2
+  
+  needs Case2.scad
+  https://github.com/HeiLaut/ble-physics-sensors/blob/main/Case2.scad
+*/
+
+
 include<CASE/Case2.scad>
 include<BOSL2/std.scad>
+
+
+top = true;
+bottom = true;
+leftpanel = true;
+rightpanel = true;
+sidewalltext = "DC-Multimeter";
+
+
+
 modules=0;
 
 if(modules){
-   translate([0,12,20])rotate([90,0,180])import("ina219_h.stl");
-   translate([-11.5+8,-7.2,20.2])rotate([180,0,-90])import("lolin32_lite.stl");
+   translate([0,12,20])rotate([90,0,180])import("parts/ina219_h.stl");
+   translate([-11.5+8,-7.2,20.2])rotate([180,0,-90])import("parts/lolin32_lite.stl");
    }
 
 module top(){
@@ -15,12 +43,12 @@ module top(){
          translate(i)cuboid([2,2,40],rounding=0.5,except=[TOP,BOTTOM]);
       }
       *for(i=[-40:25:50]){
-         #translate([0,i,41.6])cuboid([30,5,1],rounding=2,except=[TOP,BOTTOM]);
+         translate([0,i,41.6])cuboid([30,5,1],rounding=2,except=[TOP,BOTTOM]);
       }
       }
 }
 module bottom(){
-   case([50,100,30],part="bottom",clearance=0.25,explode = 0,rd=2,lolinspace = 20,button = true,reset = 1, thread = false,lolinx=8);
+   case([50,100,30],part="bottom",clearance=0.25,explode = 0,rd=2,lolinspace = 20,button = true,reset = 1, thread = false,lolinx=8,embosstext=sidewalltext,embossheight=5);
    right(8)difference(){
       translate([0,5,10])cuboid([26,10,20]);
       translate([10,3.5,12])cyl(d=2,h=20);
@@ -74,7 +102,7 @@ d_sock = 6;
          
         }
 }
-top();
-bottom();
-translate([0,60,12.5])frontplate();
-color("red")backplate();
+if(top)top();
+if(bottom)bottom();
+if(rightpanel)translate([0,60,12.5])frontplate();
+if(leftpanel)color("red")backplate();

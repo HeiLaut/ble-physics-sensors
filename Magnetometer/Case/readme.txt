@@ -10,3 +10,6 @@ For each sensor, you need to print:
 
 ..._sensor.stl
 ..._cap.stl
+
+you can also choose the build plate for the LIS2MDL and the MLX90393
+

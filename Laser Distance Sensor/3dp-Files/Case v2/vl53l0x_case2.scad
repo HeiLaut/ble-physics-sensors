@@ -1,9 +1,26 @@
+/*
+  Case for phyphox time-of-flight senso
+  
+  Created by: Heinrich Lauterbach
+  License: CC-BY-SA
+  This file is licensed under the Creative Commons Attribution-ShareAlike 4.0 International License.
+  To view a copy of this license, visit http://creativecommons.org/licenses/by-sa/4.0/
+  
+  needs BOSL2 library
+  download BOSL2 to your libraries folder via:
+  
+  https://github.com/BelfrySCAD/BOSL2
+  
+  needs Case2.scad
+  https://github.com/HeiLaut/ble-physics-sensors/blob/main/Case2.scad
+*/
+
 include<CASE/Case2.scad>
 x = 40;
 y = 53;
 z = 35;
 lolinspace = 9;
-sidewalltext = "L-D_#1";
+sidewalltext = "L-D_#234";
 
 case([x,y,z],part="top",reset = 0, button=true,lolinspace=lolinspace,cutheight = 6,lolinx=-4,charge_view=1,power_view = 1);
 down(50)difference(){

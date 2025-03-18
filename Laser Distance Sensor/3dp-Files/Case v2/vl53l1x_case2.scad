@@ -1,11 +1,36 @@
+/*
+  Case for phyphox time-of-flight sensor
+  
+  Created by: Heinrich Lauterbach
+  License: CC-BY-SA
+  This file is licensed under the Creative Commons Attribution-ShareAlike 4.0 International License.
+  To view a copy of this license, visit http://creativecommons.org/licenses/by-sa/4.0/
+  
+  needs BOSL2 library
+  download BOSL2 to your libraries folder via:
+  
+  https://github.com/BelfrySCAD/BOSL2
+  
+  needs Case2.scad
+  https://github.com/HeiLaut/ble-physics-sensors/blob/main/Case2.scad
+*/
+
+
 include<CASE/Case2.scad>
+
+top = true;
+bottom = true;
+leftpanel = true;
+rightpanel = true;
+
+
 x = 40;
 y = 55;
 z = 30;
 cutheight = 6;
 
-case([x,y,z],part="top",reset = 1,charge_view = 1, power_view = 1,lolinx=4,cutheight=cutheight, button=true);
-down(50)case([x,y,z],part="bottom",cutheight=cutheight,thread=true,lolinx=4);
+if(top)case([x,y,z],part="top",reset = 0,charge_view = 1, power_view = 1,lolinx=4,cutheight=cutheight, button=true);
+if(bottom)down(50)case([x,y,z],part="bottom",cutheight=cutheight,thread=true,lolinx=4);
 
 module sensor(){
     up(3.7)difference(){
@@ -30,5 +55,5 @@ module plate(){
    }//end difference
    }//end frontplate
  
-fwd(50)plate();
-back(50)sensor();
+if(leftpanel)fwd(50)plate();
+if(rightpanel)back(50)sensor();

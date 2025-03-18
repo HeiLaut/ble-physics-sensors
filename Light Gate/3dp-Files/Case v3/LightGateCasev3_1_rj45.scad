@@ -1,5 +1,33 @@
+/*
+  Case for phyphox light gate
+  
+  Created by: Heinrich Lauterbach
+  License: CC-BY-SA
+  This file is licensed under the Creative Commons Attribution-ShareAlike 4.0 International License.
+  To view a copy of this license, visit http://creativecommons.org/licenses/by-sa/4.0/
+  
+  needs BOSL2 library
+  download BOSL2 to your libraries folder via:
+  
+  https://github.com/BelfrySCAD/BOSL2
+  
+  needs Case2.scad
+  https://github.com/HeiLaut/ble-physics-sensors/blob/main/Case2.scad
+*/
 include<BOSL2/std.scad>
 include<BOSL2/threading.scad>
+
+
+TOPCASE = true;
+BOTTOMCASE = true;
+LEFTPANEL = true;
+RIGHTPANEL = true;
+LOCKSCREW = true;
+STANDSCREW = true;
+
+RJ45 = true;
+USBC = true;
+SWITCH = true;
 
 
 
@@ -22,20 +50,6 @@ d1 = 2;
 $fn=50;
 lolinspace = 7.4;
 dLED = 5.1;
-
-
-TOPCASE = true;
-BOTTOMCASE = true;
-LEFTPANEL = true;
-RIGHTPANEL = true;
-LOCKSCREW = true;
-STANDSCREW = true;
-
-RJ45 = true;
-USBC = true;
-SWITCH = true;
-
-
 
 
 *if($preview)color("tomato")translate([-17.5,-10.5,-9.9])rotate([0,0,90])import("RJ45.stl");

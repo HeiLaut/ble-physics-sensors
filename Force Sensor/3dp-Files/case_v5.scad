@@ -1,4 +1,29 @@
+/*
+  Case for phyphox force-sensor
+  
+  Created by: Heinrich Lauterbach
+  License: CC-BY-SA
+  This file is licensed under the Creative Commons Attribution-ShareAlike 4.0 International License.
+  To view a copy of this license, visit http://creativecommons.org/licenses/by-sa/4.0/
+  
+  needs BOSL2 library
+  download BOSL2 to your libraries folder via:
+  
+  https://github.com/BelfrySCAD/BOSL2
+  
+  needs Case2.scad
+  https://github.com/HeiLaut/ble-physics-sensors/blob/main/Case2.scad
+*/
+
+
 include<CASE/Case2.scad>
+
+panel1 = true;
+panel2 = true;
+keystone = true;
+bottom = true;
+top = true;
+loadcell_connector = true;
 
 
 x = 45;
@@ -8,14 +33,15 @@ wall=2;
 cutheight = 17.5;
 parts = 0;
 
-bottom();
+if(bottom)bottom();
 
-up(z+20)case([x,y,z],part = "top",cutheight=cutheight,button = 1,wall=wall);
-translate([0,60,23])plate1();
+if(top)up(z+20)case([x,y,z],part = "top",cutheight=cutheight,button = 1,wall=wall);
 
-translate([-0,-60,11])plate2();
+if(panel1)translate([0,60,23])plate1();
 
-up(25)load_connector();
+if(panel2)translate([-0,-60,11])plate2();
+
+if(loadcell_connector)up(25)load_connector();
 
 module plate2(){
 case([x,y,z],part = "plate",cutheight=cutheight,switchpos=[0,15],switch=1, jst=0,usb = 1,wall=wall);
@@ -41,10 +67,10 @@ module plate1(){
     zR=5;
     difference(){
         down(12)case([x,y,z],part = "plate",cutheight=cutheight,button = 1,wall=wall);
-        translate([xR,0,zR+2])cuboid([15.3,30,25.4]);
+        if(keystone)translate([xR,0,zR+2])cuboid([15.3,30,25.4]);
     }
-    translate([0.55+xR,-70.4,55+zR])rotate([0,0,-90])import("parts/keystone.stl");
-    mirror([0,1,0])if(parts)translate([xR,0,zR])import("parts/rj45.stl");
+    if(keystone)translate([0.55+xR,-70.4,55+zR])rotate([0,0,-90])import("parts/keystone.stl");
+    if(keystone)mirror([0,1,0])if(parts)translate([xR,0,zR])import("parts/rj45.stl");
 
 }
 module rodmount(){

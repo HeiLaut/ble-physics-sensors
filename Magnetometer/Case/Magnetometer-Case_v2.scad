@@ -1,10 +1,38 @@
+/*
+  Case for phyphox magnetometer
+  
+  Created by: Heinrich Lauterbach
+  License: CC-BY-SA
+  This file is licensed under the Creative Commons Attribution-ShareAlike 4.0 International License.
+  To view a copy of this license, visit http://creativecommons.org/licenses/by-sa/4.0/
+  
+  needs BOSL2 library
+  download BOSL2 to your libraries folder via:
+  
+  https://github.com/BelfrySCAD/BOSL2
+  
+  needs Case2.scad
+  https://github.com/HeiLaut/ble-physics-sensors/blob/main/Case2.scad
+*/
+
 include<BOSL2/std.scad>
 include<CASE/Case2.scad>
-//gy271 //li2mdl //mlx90393
-rotate([0,0,180])translate([0,-40,0])sensor(true,true, "li2mdl");
-fwd(40)frontplate();
-bottom();
-up(50)top();
+
+
+top = true;
+bottom = true;
+sensorplate = true;
+cap = true;
+backplate = true;
+sensortype = "lis2mdl"; 
+// "gy271" or "lis2mdl" (adafruit) or "mlx90393" (non-adafruit)
+
+
+
+if(sensorplate)rotate([0,0,180])translate([0,-40,0])sensor(true,true, sensortype);
+if(backplate)fwd(40)frontplate();
+if(bottom)bottom();
+if(top)up(50)top();
 
 
 *down(80)standscrew(l=9,h=40);
@@ -39,7 +67,7 @@ if(modules){
 }//end bottom
 
 
-module sensor(base = true, cover = true,sensor = "gy271"){
+module sensor(base = true, cover = true,sensor = sensortype){
    if(sensor == "gy271"){
    xs = 12.3;
    ys = 14.5;
@@ -139,10 +167,10 @@ module sensor(base = true, cover = true,sensor = "gy271"){
       }//end translate
    }// end difference
    }//end if
-   }//end if "li2mdl"
+   }//end if "lis2mdl"
    
    
-   if(sensor == "li2mdl"){
+   if(sensor == "lis2mdl"){
    xs = 17.8;
    ys = 26;
    zs = 5;
@@ -197,7 +225,7 @@ module sensor(base = true, cover = true,sensor = "gy271"){
       }//end translate
    }// end difference
    }//end if
-   }//end if "li2mdl"
+   }//end if "lis2mdl"
    
    }//end sensor
 
