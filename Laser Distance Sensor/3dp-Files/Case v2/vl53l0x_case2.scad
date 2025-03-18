@@ -1,5 +1,5 @@
 /*
-  Case for phyphox time-of-flight senso
+  Case for phyphox time-of-flight sensor
   
   Created by: Heinrich Lauterbach
   License: CC-BY-SA
@@ -16,19 +16,27 @@
 */
 
 include<CASE/Case2.scad>
+
+top = true;
+bottom = true;
+leftpanel = true;
+rightpanel = true;
+sidewalltext = "ToF-Sensor";
+
+
+
 x = 40;
 y = 53;
 z = 35;
 lolinspace = 9;
-sidewalltext = "L-D_#234";
 
-case([x,y,z],part="top",reset = 0, button=true,lolinspace=lolinspace,cutheight = 6,lolinx=-4,charge_view=1,power_view = 1);
-down(50)difference(){
+if(top)case([x,y,z],part="top",reset = 0, button=true,lolinspace=lolinspace,cutheight = 6,lolinx=-4,charge_view=1,power_view = 1);
+if(bottom)down(50)difference(){
    case([x,y,z],part="bottom",lolinx=-4,thread=true,lolinspace=lolinspace,cutheight = 6);
-   #translate([x/2+1.6,0,7])rotate([90,0,90])linear_extrude(0.4)text(sidewalltext,size = 7,halign="center");
+   translate([x/2+1.6,0,7])rotate([90,0,90])linear_extrude(0.4)text(sidewalltext,size = 7,halign="center");
    }
-down(25)fwd(50)plate();
-down(25)back(50)sensor();
+if(leftpanel)down(25)fwd(50)plate();
+if(rightpanel)down(25)back(50)sensor();
 
 module sensor(){
    // translate([-19.7,3,26.5])color("red")rotate([-90,0,0])import("VL53L0X.stl");
