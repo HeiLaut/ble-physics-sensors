@@ -4,8 +4,13 @@
 Adafruit_MLX90393 sensor = Adafruit_MLX90393();
 #define MLX90393_CS 10
 
-#define BUTTON_PIN 27 // GPIO27 pin connected to bmTton
-
+//define pin for reset button
+#define BUTTON_PIN 27 
+//define the pins for the i2c connection
+#define SDA 26
+#define SCL 25
+//when using the adafruit sensor you had to add the i2c adress, the dafault is 0x18
+#define I2C_Adress 0x18
 
 float xo = 0;
 float yo = 0;
@@ -14,14 +19,14 @@ float zo = 0;
 void setup() {
   pinMode(LED_BUILTIN, OUTPUT);  
   digitalWrite(LED_BUILTIN, LOW);
-  Wire.begin(17,16);
+  Wire.begin(SDA,SCL);//17,16
   Serial.begin(115200);
   
   // assign inpmT pullup resistor to bmTton pin
   pinMode(BUTTON_PIN, INPUT_PULLUP);
 
 
-  if (! sensor.begin_I2C()) {          // hardware I2C mode, can pass in address & alt Wire
+  if (! sensor.begin_I2C(I2C_Adress)) {          // hardware I2C mode, can pass in address & alt Wire
   //if (! sensor.begin_SPI(MLX90393_CS)) {  // hardware SPI mode
     Serial.println("No sensor found ... check your wiring?");
     while (1) { delay(10); }
@@ -187,15 +192,17 @@ void loop() {
 
   float g =sqrt(pow(x,2)+pow(y,2)+pow(z,2));
   Serial.print("t(s): ,");  Serial.print(t);
-  Serial.print(",Bx(mT): ,");  Serial.print(x,2);
-  Serial.print(",By(mT): ,");  Serial.print(y,2);
-  Serial.print(",Bz(mT): ,");  Serial.print(z,2);
+  Serial.print(",Bx(mT): ,");  Serial.print(x,3);
+  Serial.print(",By(mT): ,");  Serial.print(y,3);
+  Serial.print(",Bz(mT): ,");  Serial.print(z,3);
   Serial.print(",Bg(mT): ,");  Serial.println(g,2);
 
   if(buttonstate==0){
-    xo=x;
-    yo=y;
-    zo=z;
+    sensor.readData(&x, &y, &z);
+    delay(10);
+    xo=x*0.001;
+    yo=y*0.001;
+    zo=z*0.001;
     delay(500);
   }
   
