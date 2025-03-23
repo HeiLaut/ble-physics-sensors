@@ -8,7 +8,7 @@
 #define DETECT_PIN 25 //pin for detect second light gate
 #define LED_PIN 13 //pin for indication LED
 
-#define BLENAME "Lichtschranke #4"
+#define BLENAME "Lichtschranke #1"
 // Structure to represent a signal with its associated pin and timing information
 struct Signal{
     const int pin; // Pin number associated with the signal
