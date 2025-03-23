@@ -1,13 +1,20 @@
 #include <HX711_ADC.h>
 #include <phyphoxBle.h>
 
+#define BUTTON_PIN 2 
+
 HX711_ADC LoadCell(4, 5); //LoadCell(DT,SCK)
 HX711_ADC LoadCell2(33,14);
+
+//calibration factor for primary load cell
+const float calFactor = 1025;
+
+//calibration factor for secondary load cell (connected via rj45)
+const float calFactor2 = 1019.34;
 
 int tara = 0;
 int reset = 0;
 float t_offset = 0;
-#define BUTTON_PIN 2 
 
 void setup() {
   //Turn on the internal LED on lolin 32
@@ -106,11 +113,11 @@ void setup() {
    
   LoadCell.begin(); // start connection to HX711
   LoadCell.start(2000); // load cells gets 2000ms of time to stabilize
-  LoadCell.setCalFactor(1025); 
+  LoadCell.setCalFactor(calFactor); 
 
   LoadCell2.begin(); // start connection to HX711
   LoadCell2.start(2000); // load cells gets 2000ms of time to stabilize
-  LoadCell2.setCalFactor(1019.34); 
+  LoadCell2.setCalFactor(calFactor2); 
   
   
   Serial.begin(115200); 
