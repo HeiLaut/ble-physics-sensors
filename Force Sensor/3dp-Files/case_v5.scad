@@ -24,7 +24,7 @@ keystone = true;
 bottom = true;
 top = true;
 loadcell_connector = true;
-
+lockscrew = true;
 
 x = 45;
 y = 85;
@@ -42,6 +42,8 @@ if(panel1)translate([0,60,23])plate1();
 if(panel2)translate([-0,-60,11])plate2();
 
 if(loadcell_connector)up(25)load_connector();
+
+left(100)if(lockscrew)lockscrew(l=10,cut = true);
 
 module plate2(){
 case([x,y,z],part = "plate",cutheight=cutheight,switchpos=[0,15],switch=1, jst=0,usb = 1,wall=wall);
@@ -112,4 +114,14 @@ module loadcell(){
         fwd(i)xcyl(d=4,h=13);
     }//end for
     }//end difference
+}
+
+module lockscrew(l=10,d = 10,cut = true){
+   difference(){
+      union(){
+         threaded_rod(d=d-0.1, pitch = 2, l = l,orient=LEFT,anchor=TOP,bevel1=true);
+         cuboid([d*1.5,d*2.5,d],chamfer = 2, except=[RIGHT],anchor = RIGHT);
+         }
+      if(cut)down(4)cuboid([80,80,d],anchor=TOP);
+}
 }
