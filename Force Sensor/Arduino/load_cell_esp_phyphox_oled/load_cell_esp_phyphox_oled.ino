@@ -1,12 +1,12 @@
 #include <HX711_ADC.h>
 #include <phyphoxBle.h>
-#include <Button.h>
+//#include <Button.h>
 #include <SPI.h>
 #include <Wire.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
 
-HX711_ADC LoadCell(17, 16); //LoadCell(DT,SCK)
+HX711_ADC LoadCell(4, 5); //LoadCell(DT,SCK)
 HX711_ADC LoadCell2(0, 0); //LoadCell(DT,SCK)
 
 #define BUTTON_PIN 2 
@@ -28,7 +28,7 @@ int counter = 0;
 
 void setup() {
   //Turn on the internal LED on lolin 32
-  Wire.begin(32,33);
+  Wire.begin(32,33);//SDA SCL
   pinMode(LED_BUILTIN, OUTPUT);  
   digitalWrite(LED_BUILTIN, LOW);
   
@@ -121,7 +121,7 @@ void setup() {
    
   LoadCell.begin(); // start connection to HX711
   LoadCell.start(2000); // load cells gets 2000ms of time to stabilize
-  LoadCell.setCalFactor(371.365); 
+  LoadCell.setCalFactor(1066.4); 
 
   LoadCell2.begin(); // start connection to HX711
   LoadCell2.start(2000); // load cells gets 2000ms of time to stabilize

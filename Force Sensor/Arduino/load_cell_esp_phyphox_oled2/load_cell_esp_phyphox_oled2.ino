@@ -1,13 +1,21 @@
 #include <HX711_ADC.h>
 #include <phyphoxBle.h>
+#include <Adafruit_GFX.h>
+#include <Adafruit_SSD1306.h>
 
 #define BUTTON_PIN 2 
+#define SCREEN_WIDTH 128 // OLED display width, in pixels
+#define SCREEN_HEIGHT 32 // OLED display height, in pixels
+
+#define OLED_RESET     -1 // Reset pin # (or -1 if sharing Arduino reset pin)
+#define SCREEN_ADDRESS 0x3C ///< See datasheet for Address; 0x3D for 128x64, 0x3C for 128x32
+Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
 HX711_ADC LoadCell(4, 5); //LoadCell(DT,SCK)
 HX711_ADC LoadCell2(33,14);
 
 //calibration factor for primary load cell
-const float calFactor = 981;
+const float calFactor = 1066.4;
 
 //calibration factor for secondary load cell (connected via rj45)
 const float calFactor2 = 1019.34;
@@ -17,11 +25,12 @@ int reset = 0;
 float t_offset = 0;
 
 void setup() {
+  Wire.begin(32,33);//SDA SCL
   //Turn on the internal LED on lolin 32
-  pinMode(LED_BUILTIN, OUTPUT);  
+  pinMode(LED_BUILTIN, OUTPUT);
   digitalWrite(LED_BUILTIN, LOW);
   
-  PhyphoxBLE::start("Kraftsensor B");
+  PhyphoxBLE::start("Kraftsensor C");
      // PhyphoxBLE::configHandler = &receivedData;
   PhyphoxBLE::experimentEventHandler = &newExperimentEvent;
   PhyphoxBLE::printXML(&Serial);
@@ -123,6 +132,22 @@ void setup() {
   Serial.begin(115200); 
   pinMode(BUTTON_PIN, INPUT_PULLUP);
 
+  
+  if(!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) { // Address 0x3D for 128x64
+    Serial.println(F("SSD1306 allocation failed"));
+    for(;;);
+  }
+  //delay(2000);
+  display.clearDisplay();
+  display.setRotation(2);
+  display.setTextSize(1);
+  display.setTextColor(WHITE);
+  display.setCursor(0, 10);
+  // Display static text
+  display.println("Start");
+  display.display(); 
+  delay(500);
+
 }
 
 
@@ -155,6 +180,18 @@ void loop() {
   float m2 = abs(incDat2);
   float f2 = -incDat2 *9.81/1000;
   PhyphoxBLE::write(t,f,m,f2,m2);
+
+  display.clearDisplay();
+  display.setTextSize(2);
+  display.setCursor(10,0);
+  display.print(f);
+  display.setCursor(80,0);
+  display.print('N');
+  display.setCursor(10,15);
+  display.print(m,1);
+  display.setCursor(80,15);
+  display.print('g');
+  display.display();
 
   Serial.print("t(s)");Serial.print(",");Serial.print(t);Serial.print(",");
   Serial.print("F(N)");Serial.print(",");Serial.print(f,3);Serial.print(",");
