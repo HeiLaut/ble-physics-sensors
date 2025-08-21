@@ -17,14 +17,18 @@
 
 
 include<CASE/Case2.scad>
+include<CASE/oled_case.scad>
 
-panel1 = true;
-panel2 = true;
-keystone = true;
-bottom = true;
-top = true;
-loadcell_connector = true;
-lockscrew = true;
+
+
+panel1 = 1;
+panel2 = 0;
+keystone = 0;
+oled = 1;
+bottom = 0;
+top = 0;
+loadcell_connector = 0;
+lockscrew = 0;
 
 x = 45;
 y = 85;
@@ -70,10 +74,14 @@ module plate1(){
     difference(){
         down(12)case([x,y,z],part = "plate",cutheight=cutheight,button = 1,wall=wall);
         if(keystone)translate([xR,0,zR+2])cuboid([15.3,30,25.4]);
+        if(oled)translate([-10,0,0])rotate([90,90,0])oledCase("cutout");
+
     }
+    if(oled)translate([-10,0,0])rotate([90,90,0])oledCase("snap");
+    
     if(keystone)translate([0.55+xR,-70.4,55+zR])rotate([0,0,-90])import("parts/keystone.stl");
     if(keystone)mirror([0,1,0])if(parts)translate([xR,0,zR])import("parts/rj45.stl");
-
+    if(oled)translate([-10,-10,0])rotate([90,90,0])oledCase("cover");
 }
 module rodmount(){
     h=17;

@@ -1,16 +1,9 @@
 #include <HX711_ADC.h>
 #include <phyphoxBle.h>
-//#include <Button.h>
-#include <SPI.h>
-#include <Wire.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
 
-HX711_ADC LoadCell(4, 5); //LoadCell(DT,SCK)
-HX711_ADC LoadCell2(0, 0); //LoadCell(DT,SCK)
-
 #define BUTTON_PIN 2 
-
 #define SCREEN_WIDTH 128 // OLED display width, in pixels
 #define SCREEN_HEIGHT 32 // OLED display height, in pixels
 
@@ -18,25 +11,33 @@ HX711_ADC LoadCell2(0, 0); //LoadCell(DT,SCK)
 #define SCREEN_ADDRESS 0x3C ///< See datasheet for Address; 0x3D for 128x64, 0x3C for 128x32
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
-int lastState = LOW;  // the previous state from the input pin
-int currentState;     // the current reading from the input pin
+HX711_ADC LoadCell(4, 5); //LoadCell(DT,SCK)
+HX711_ADC LoadCell2(33,14);
 
-int touchValue;
-int counter = 0;
+//calibration factor for primary load cell
+const float calFactor = 1066.4;
 
+//calibration factor for secondary load cell (connected via rj45)
+const float calFactor2 = 1019.34;
 
+int tara = 0;
+int reset = 0;
+float t_offset = 0;
 
 void setup() {
-  //Turn on the internal LED on lolin 32
   Wire.begin(32,33);//SDA SCL
-  pinMode(LED_BUILTIN, OUTPUT);  
+  //Turn on the internal LED on lolin 32
+  pinMode(LED_BUILTIN, OUTPUT);
   digitalWrite(LED_BUILTIN, LOW);
   
-  PhyphoxBLE::start("Kraft2");
-    
+  PhyphoxBLE::start("Kraftsensor C");
+     // PhyphoxBLE::configHandler = &receivedData;
+  PhyphoxBLE::experimentEventHandler = &newExperimentEvent;
+  PhyphoxBLE::printXML(&Serial);
+
   PhyphoxBleExperiment kraft; 
   //
-  kraft.setTitle("Kraftsensor2");
+  kraft.setTitle("Kraftsensor");
   kraft.setCategory("Sensor-Boxen");
   
  //View
@@ -72,7 +73,7 @@ void setup() {
   //Value
   PhyphoxBleExperiment::Value force;         //Creates a value-box.
   force.setLabel("F");                  //Sets the label
-  force.setPrecision(4);                     //The amount of digits shown after the decimal point.
+  force.setPrecision(3);                     //The amount of digits shown after the decimal point.
   force.setUnit("N");                        //The physical unit associated with the displayed value.
   force.setColor("FFFFFF");                  //Sets font color. Uses a 6 digit hexadecimal value in "quotation marks".
   force.setChannel(2);
@@ -89,7 +90,7 @@ void setup() {
   //Value
   PhyphoxBleExperiment::Value force2;         //Creates a value-box.
   force2.setLabel("F_2");                  //Sets the label
-  force2.setPrecision(4);                     //The amount of digits shown after the decimal point.
+  force2.setPrecision(3);                     //The amount of digits shown after the decimal point.
   force2.setUnit("N");                        //The physical unit associated with the displayed value.
   force2.setColor("FFFFFF");                  //Sets font color. Uses a 6 digit hexadecimal value in "quotation marks".
   force2.setChannel(4);
@@ -121,16 +122,17 @@ void setup() {
    
   LoadCell.begin(); // start connection to HX711
   LoadCell.start(2000); // load cells gets 2000ms of time to stabilize
-  LoadCell.setCalFactor(1066.4); 
+  LoadCell.setCalFactor(calFactor); 
 
   LoadCell2.begin(); // start connection to HX711
   LoadCell2.start(2000); // load cells gets 2000ms of time to stabilize
-  LoadCell2.setCalFactor(1019.34); 
+  LoadCell2.setCalFactor(calFactor2); 
   
   
   Serial.begin(115200); 
   pinMode(BUTTON_PIN, INPUT_PULLUP);
 
+  
   if(!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) { // Address 0x3D for 128x64
     Serial.println(F("SSD1306 allocation failed"));
     for(;;);
@@ -151,37 +153,32 @@ void setup() {
 
 
 void loop() {
-  //Serial.print(touchValue);
-  currentState = digitalRead(BUTTON_PIN);
-   
-   //touchValue = touchRead(2);
-
-  //if(touchValue<20){
-  //  counter+=1;
- // }else{
- //   counter=0;
- // }
+   int buttonState = digitalRead(BUTTON_PIN);
 
   
-  if ((lastState == HIGH && currentState == LOW)||counter>5)
-    {LoadCell.tareNoDelay();
-    LoadCell2.tareNoDelay();}
-  else if (lastState == LOW && currentState == HIGH)
-  // save the the last state
-  lastState = currentState;
-  //Serial.print(counter);
-  float t = 0.001 * (float)millis();
-  LoadCell.update();
+  if(!buttonState){
+    Serial.println("press");
+    LoadCell.tareNoDelay();
+    LoadCell2.tareNoDelay();
+    while(tara == 0){
+      LoadCell.update();
+      tara = LoadCell.getTareStatus();
+    };
+    tara = 0;
+  }
+  static boolean newDataReady = 0;
+  if (LoadCell.update()) newDataReady = true;
   LoadCell2.update();
+
+  if (newDataReady && reset == false) {
+
+  float t = 0.001 * ((float)millis() - t_offset);
   float incDat = LoadCell.getData();
   float m = abs(incDat);
-  float f = -incDat *9.81/1000;
+  float f = incDat *9.81/1000;
   float incDat2 = LoadCell2.getData();
   float m2 = abs(incDat2);
   float f2 = -incDat2 *9.81/1000;
-  //Serial.print(t);
- // Serial.print(",");
-  //Serial.println(f);
   PhyphoxBLE::write(t,f,m,f2,m2);
 
   display.clearDisplay();
@@ -201,7 +198,18 @@ void loop() {
   Serial.print("m(g)");Serial.print(",");Serial.print(m,1);Serial.print(",");
   Serial.print("F2(N)");Serial.print(",");Serial.print(f2,3);Serial.print(",");
   Serial.print("m2(g)");Serial.print(",");Serial.println(m2,1);//Serial.print(touchValue);
-  
-  delay(200);
+  newDataReady = false;
+  }
 
+}
+
+void newExperimentEvent(){
+  if(PhyphoxBLE::eventType==1 && reset){
+    t_offset = (float)millis();
+    reset = false;
+  }
+  if(PhyphoxBLE::eventType == 2){
+    t_offset = (float)millis();
+    reset = true;
+  }
 }
