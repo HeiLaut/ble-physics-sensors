@@ -22,12 +22,12 @@ include<CASE/oled_case.scad>
 
 
 panel1 = 0;
-panel2 = 1;
+panel2 = 0;
 keystone = 0;
-oled = 1;
+oled = 0;
 bottom = 0;
 top = 0;
-loadcell_connector = 0;
+loadcell_connector = 1;
 lockscrew = 0;
 
 x = 45;
@@ -55,7 +55,7 @@ case([x,y,z],part = "plate",cutheight=cutheight,switchpos=[0,15],switch=1, jst=0
 
 module load_connector(){
     rotate([0,0,90])difference(){
-       left(18)cuboid([50,9,15]);
+       left(16.5)cuboid([47,9,15]);
         for(i=[[-20,0,0],[-35,0,0]]){
             translate(i)ycyl(h = 60, d = 4);   
         }
