@@ -21,8 +21,8 @@ include<CASE/oled_case.scad>
 
 
 
-panel1 = 1;
-panel2 = 0;
+panel1 = 0;
+panel2 = 1;
 keystone = 0;
 oled = 1;
 bottom = 0;
@@ -50,7 +50,7 @@ if(loadcell_connector)up(25)load_connector();
 left(100)if(lockscrew)lockscrew(l=10,cut = true);
 
 module plate2(){
-case([x,y,z],part = "plate",cutheight=cutheight,switchpos=[0,15],switch=1, jst=0,usb = 1,wall=wall);
+case([x,y,z],part = "plate",cutheight=cutheight,switchpos=[0,15],switch=1, jst=0,usbC = 1,wall=wall);
 }
 
 module load_connector(){

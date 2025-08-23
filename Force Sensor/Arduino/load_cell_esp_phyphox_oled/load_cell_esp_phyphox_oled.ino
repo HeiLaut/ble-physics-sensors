@@ -15,7 +15,7 @@ HX711_ADC LoadCell(4, 5); //LoadCell(DT,SCK)
 HX711_ADC LoadCell2(33,14);
 
 //calibration factor for primary load cell
-const float calFactor = 1066.4;
+const float calFactor = 746.48;
 
 //calibration factor for secondary load cell (connected via rj45)
 const float calFactor2 = 1019.34;
@@ -25,9 +25,9 @@ int reset = 0;
 float t_offset = 0;
 
 void setup() {
-  Wire.begin(32,33);//SDA SCL
+  Wire.begin(33,32);//SDA SCL
   //Turn on the internal LED on lolin 32
-  pinMode(LED_BUILTIN, OUTPUT);
+   pinMode(LED_BUILTIN, OUTPUT);  
   digitalWrite(LED_BUILTIN, LOW);
   
   PhyphoxBLE::start("Kraftsensor C");
