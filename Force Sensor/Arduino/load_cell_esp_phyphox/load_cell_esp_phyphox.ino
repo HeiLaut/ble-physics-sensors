@@ -2,12 +2,13 @@
 #include <phyphoxBle.h>
 
 #define BUTTON_PIN 2 
-
+#define SENSOR_NAME "Kraftsensor Test"
 HX711_ADC LoadCell(4, 5); //LoadCell(DT,SCK)
 HX711_ADC LoadCell2(33,14);
 
 //calibration factor for primary load cell
-const float calFactor = 981;
+//calFactor*shownMass/exactMass
+const float calFactor = 1071.03;
 
 //calibration factor for secondary load cell (connected via rj45)
 const float calFactor2 = 1019.34;
@@ -21,7 +22,7 @@ void setup() {
   pinMode(LED_BUILTIN, OUTPUT);  
   digitalWrite(LED_BUILTIN, LOW);
   
-  PhyphoxBLE::start("Kraftsensor B");
+  PhyphoxBLE::start(SENSOR_NAME);
      // PhyphoxBLE::configHandler = &receivedData;
   PhyphoxBLE::experimentEventHandler = &newExperimentEvent;
   PhyphoxBLE::printXML(&Serial);

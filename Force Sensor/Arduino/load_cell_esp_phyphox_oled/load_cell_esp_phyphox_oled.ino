@@ -30,7 +30,7 @@ void setup() {
    pinMode(LED_BUILTIN, OUTPUT);  
   digitalWrite(LED_BUILTIN, LOW);
   
-  PhyphoxBLE::start("Kraftsensor C");
+  PhyphoxBLE::start("Kraftsensor A");
      // PhyphoxBLE::configHandler = &receivedData;
   PhyphoxBLE::experimentEventHandler = &newExperimentEvent;
   PhyphoxBLE::printXML(&Serial);
@@ -184,12 +184,12 @@ void loop() {
   display.clearDisplay();
   display.setTextSize(2);
   display.setCursor(10,0);
-  display.print(f);
-  display.setCursor(80,0);
+  display.print(f,3);
+  display.setCursor(85,0);
   display.print('N');
   display.setCursor(10,15);
   display.print(m,1);
-  display.setCursor(80,15);
+  display.setCursor(85,15);
   display.print('g');
   display.display();
 
