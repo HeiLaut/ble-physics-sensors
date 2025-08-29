@@ -21,12 +21,12 @@ include<CASE/oled_case.scad>
 
 
 
-panel1 = 0;
-panel2 = 0;
+panel1 = 1;
+panel2 = 1;
 keystone = 0;
 oled = 0;
-bottom = 0;
-top = 0;
+bottom = 1;
+top = 1;
 loadcell_connector = 1;
 lockscrew = 0;
 
