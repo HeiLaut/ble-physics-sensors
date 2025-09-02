@@ -15,7 +15,7 @@ HX711_ADC LoadCell(4, 5); //LoadCell(DT,SCK)
 HX711_ADC LoadCell2(33,14);
 
 //calibration factor for primary load cell
-const float calFactor = 746.48;
+const float calFactor = 1674.1098;
 
 //calibration factor for secondary load cell (connected via rj45)
 const float calFactor2 = 1019.34;
@@ -30,7 +30,7 @@ void setup() {
    pinMode(LED_BUILTIN, OUTPUT);  
   digitalWrite(LED_BUILTIN, LOW);
   
-  PhyphoxBLE::start("Kraftsensor A");
+  PhyphoxBLE::start("Kraftsensor IS");
      // PhyphoxBLE::configHandler = &receivedData;
   PhyphoxBLE::experimentEventHandler = &newExperimentEvent;
   PhyphoxBLE::printXML(&Serial);
