@@ -2,13 +2,14 @@
 #include <phyphoxBle.h>
 
 #define BUTTON_PIN 2 
-#define SENSOR_NAME "Kraftsensor Test"
+#define SENSOR_NAME "Kraftsensor M"
 HX711_ADC LoadCell(4, 5); //LoadCell(DT,SCK)
 HX711_ADC LoadCell2(33,14);
 
 //calibration factor for primary load cell
 //calFactor*shownMass/exactMass
-const float calFactor = 1071.03;
+const float calFactor =  1674.1098;
+//const float calFactor = 1071.03;
 
 //calibration factor for secondary load cell (connected via rj45)
 const float calFactor2 = 1019.34;
