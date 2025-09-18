@@ -15,7 +15,7 @@ HX711_ADC LoadCell(4, 5); //LoadCell(DT,SCK)
 HX711_ADC LoadCell2(33,14);
 
 //calibration factor for primary load cell
-const float calFactor = 757.70;
+const float calFactor = 1674.1098;
 
 //calibration factor for secondary load cell (connected via rj45)
 const float calFactor2 = 1019.34;
