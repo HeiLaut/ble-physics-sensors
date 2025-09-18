@@ -1,36 +1,42 @@
 #include <HX711_ADC.h>
 #include <phyphoxBle.h>
-#include <Adafruit_GFX.h>
-#include <Adafruit_SSD1306.h>
+
+#include <GxEPD2_3C.h>
+#include <Fonts/FreeSansBold160pt7b.h>
+
+#define EPD_SS 25
+#define EPD_DC 33
+#define EPD_RST 32
+#define EPD_BUSY 35
+#define MAX_DISPLAY_BUFFER_SIZE 800
+#define MAX_HEIGHT(EPD) (EPD::HEIGHT <= (MAX_DISPLAY_BUFFER_SIZE / 2) / (EPD::WIDTH / 8) ? EPD::HEIGHT : (MAX_DISPLAY_BUFFER_SIZE / 2) /(EPD::WIDTH / 8))
+
+GxEPD2_3C<GxEPD2_290_C90c, MAX_HEIGHT(GxEPD2_290_C90c)>
+display(GxEPD2_290_C90c(EPD_SS, EPD_DC, EPD_RST, EPD_BUSY));
+
 
 #define BUTTON_PIN 2 
-#define SCREEN_WIDTH 128 // OLED display width, in pixels
-#define SCREEN_HEIGHT 32 // OLED display height, in pixels
+#define BUTTON_PIN_D 27 
 
-#define OLED_RESET     -1 // Reset pin # (or -1 if sharing Arduino reset pin)
-#define SCREEN_ADDRESS 0x3C ///< See datasheet for Address; 0x3D for 128x64, 0x3C for 128x32
-Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
-
+#define SENSOR_NAME "Kraftsensor M"
 HX711_ADC LoadCell(4, 5); //LoadCell(DT,SCK)
-HX711_ADC LoadCell2(33,14);
 
 //calibration factor for primary load cell
-const float calFactor = 757.70;
+//calFactor*shownMass/exactMass
+const float calFactor =  1674.1098;
 
-//calibration factor for secondary load cell (connected via rj45)
-const float calFactor2 = 1019.34;
+
 
 int tara = 0;
 int reset = 0;
 float t_offset = 0;
 
 void setup() {
-  Wire.begin(33,32);//SDA SCL
   //Turn on the internal LED on lolin 32
-   pinMode(LED_BUILTIN, OUTPUT);  
+  pinMode(LED_BUILTIN, OUTPUT);  
   digitalWrite(LED_BUILTIN, LOW);
   
-  PhyphoxBLE::start("Kraftsensor IS");
+  PhyphoxBLE::start(SENSOR_NAME);
      // PhyphoxBLE::configHandler = &receivedData;
   PhyphoxBLE::experimentEventHandler = &newExperimentEvent;
   PhyphoxBLE::printXML(&Serial);
@@ -47,9 +53,7 @@ void setup() {
   secondView.setLabel("Einfach"); //Create a "view"
   PhyphoxBleExperiment::View waage;
   waage.setLabel("Waage");
-  PhyphoxBleExperiment::View dual;
-  dual.setLabel("Zwei Sensoren");
-  
+ 
 
   //
   PhyphoxBleExperiment::Graph firstGraph;      //Create graph which will p lot random numbers over time     
@@ -87,36 +91,14 @@ void setup() {
   mass.setChannel(3);
   mass.setXMLAttribute("size=\"2\"");
 
-  //Value
-  PhyphoxBleExperiment::Value force2;         //Creates a value-box.
-  force2.setLabel("F_2");                  //Sets the label
-  force2.setPrecision(3);                     //The amount of digits shown after the decimal point.
-  force2.setUnit("N");                        //The physical unit associated with the displayed value.
-  force2.setColor("FFFFFF");                  //Sets font color. Uses a 6 digit hexadecimal value in "quotation marks".
-  force2.setChannel(4);
-  force2.setXMLAttribute("size=\"2\"");
-
-  PhyphoxBleExperiment::Value mass2;         //Creates a value-box.
-  mass2.setLabel("m_2");                  //Sets the label
-  mass2.setPrecision(1);                     //The amount of digits shown after the decimal point.
-  mass2.setUnit("g");                        //The physical unit associated with the displayed value.
-  mass2.setColor("FFFFFF");                  //Sets font color. Uses a 6 digit hexadecimal value in "quotation marks".
-  mass2.setChannel(5);
-  mass2.setXMLAttribute("size=\"2\"");
-
-
+ 
   firstView.addElement(force);
   firstView.addElement(firstGraph); 
   secondView.addElement(force);
   waage.addElement(mass);
-  dual.addElement(firstGraph);
-  dual.addElement(force);
-  dual.addElement(secondGraph);
-  dual.addElement(force2);
   kraft.addView(firstView);
   kraft.addView(secondView);
   kraft.addView(waage);
-  kraft.addView(dual);
   
   PhyphoxBLE::addExperiment(kraft);
    
@@ -124,51 +106,35 @@ void setup() {
   LoadCell.start(2000); // load cells gets 2000ms of time to stabilize
   LoadCell.setCalFactor(calFactor); 
 
-  LoadCell2.begin(); // start connection to HX711
-  LoadCell2.start(2000); // load cells gets 2000ms of time to stabilize
-  LoadCell2.setCalFactor(calFactor2); 
   
   
   Serial.begin(115200); 
   pinMode(BUTTON_PIN, INPUT_PULLUP);
+  pinMode(BUTTON_PIN_D, INPUT_PULLUP);
+  display.init();
 
-  
-  if(!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) { // Address 0x3D for 128x64
-    Serial.println(F("SSD1306 allocation failed"));
-    for(;;);
-  }
-  //delay(2000);
-  display.clearDisplay();
-  display.setRotation(2);
-  display.setTextSize(1);
-  display.setTextColor(WHITE);
-  display.setCursor(0, 10);
-  // Display static text
-  display.println("Start");
-  display.display(); 
-  delay(500);
 
 }
 
 
 
 void loop() {
-   int buttonState = digitalRead(BUTTON_PIN);
+  int buttonState = digitalRead(BUTTON_PIN);
+  int buttonState_D = digitalRead(BUTTON_PIN_D);
 
   
   if(!buttonState){
     Serial.println("press");
     LoadCell.tareNoDelay();
-    LoadCell2.tareNoDelay();
     while(tara == 0){
       LoadCell.update();
       tara = LoadCell.getTareStatus();
     };
     tara = 0;
   }
+   
   static boolean newDataReady = 0;
   if (LoadCell.update()) newDataReady = true;
-  LoadCell2.update();
 
   if (newDataReady && reset == false) {
 
@@ -176,28 +142,17 @@ void loop() {
   float incDat = LoadCell.getData();
   float m = abs(incDat);
   float f = incDat *9.81/1000;
-  float incDat2 = LoadCell2.getData();
-  float m2 = abs(incDat2);
-  float f2 = -incDat2 *9.81/1000;
-  PhyphoxBLE::write(t,f,m,f2,m2);
+  PhyphoxBLE::write(t,f,m);
 
-  display.clearDisplay();
-  display.setTextSize(2);
-  display.setCursor(10,0);
-  display.print(f,3);
-  display.setCursor(85,0);
-  display.print('N');
-  display.setCursor(10,15);
-  display.print(m,1);
-  display.setCursor(85,15);
-  display.print('g');
-  display.display();
+  if(!buttonState_D){
+        showNumber(abs(f));
+        Serial.println("pressD_Button");
+        delay(1000);
+    }
 
   Serial.print("t(s)");Serial.print(",");Serial.print(t);Serial.print(",");
-  Serial.print("F(N)");Serial.print(",");Serial.print(f,3);Serial.print(",");
-  Serial.print("m(g)");Serial.print(",");Serial.print(m,1);Serial.print(",");
-  Serial.print("F2(N)");Serial.print(",");Serial.print(f2,3);Serial.print(",");
-  Serial.print("m2(g)");Serial.print(",");Serial.println(m2,1);//Serial.print(touchValue);
+  Serial.print("F(N)");Serial.print(",");Serial.println(f,3);
+
   newDataReady = false;
   }
 
@@ -212,4 +167,25 @@ void newExperimentEvent(){
     t_offset = (float)millis();
     reset = true;
   }
+}
+
+void showNumber(float number)
+{  
+  char buf[8];
+  //sprintf(buf, "%d", number);
+  dtostrf(number, 2, 1, buf);
+  display.setRotation(3);
+  display.setFont(&FreeSansBold160pt7b);
+  display.setTextColor(GxEPD_BLACK);
+
+  display.setFullWindow();
+  display.firstPage();
+  do {
+    display.fillScreen(GxEPD_WHITE);
+    display.setCursor(20, 110);
+    display.print(buf);
+    display.setCursor(210, 110);
+    display.print("N");
+
+  } while (display.nextPage());
 }

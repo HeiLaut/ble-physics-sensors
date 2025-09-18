@@ -23,7 +23,11 @@ include<CASE/oled_case.scad>
 //"Version A" 1kg load cell 80x12.7 2x M4; 2x M5
 //"Version B" 1kg load cell 75x12.7 4x M4
 //"Version C" 100g load cell 47x12 4xM3
+<<<<<<< Updated upstream
 Load_Cell_Version = "Version C";
+=======
+Load_Cell_Version = "Version A";
+>>>>>>> Stashed changes
 
 panel1 = 1;
 panel2 = 1;
@@ -146,8 +150,14 @@ module bottom(){
         }
         }else{//Version C
                 for(k=[-1,1]){
+<<<<<<< Updated upstream
                 translate([x/2-8,20,3*k+25]){
                     #xcyl(d=3.2,h=10,chamfer2=-1,anchor=LEFT);
+=======
+                translate([14.5,20,3*k+25]){
+                    xcyl(d=3.2,h=20);
+                    xcyl(d=3.2,h=20,chamfer2=-1);
+>>>>>>> Stashed changes
                  }
                 
             }
