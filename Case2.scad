@@ -59,7 +59,9 @@ module case(
    switchpos = [0,5],//switch postion [y,z]
    switchrot = 0,//rotation of switch in degree
    embosstext = "",//embosstext on bottom part
-   embossheight = 0//embossheight means depth
+   embossrot = [90,0,90],
+   embossheight = 0.4,//embossheight means depth
+   embosspos = [x/2+2-0.2,0,-z/2]
    )
    {
    x = size[0];
@@ -106,7 +108,7 @@ module case(
                both();
                translate([0,0,cutheight])cuboid(x*y,anchor=TOP);
                if(button){
-                  translate([buttonpos[0],buttonpos[1],z/2+wall/2])cuboid([12.2,14.2,wall+0.1]);
+                  translate([buttonpos[0],buttonpos[1],z/2])rotate([180,0,90])buttonCase2("cutout",wall);
                   }
                //reset button
                if(reset){
@@ -138,7 +140,12 @@ module case(
                   }
                }//end for
             if(button){
-               translate([buttonpos[0],buttonpos[1],z/2+wall])buttoncase();
+               translate([buttonpos[0],buttonpos[1],z/2])rotate([180,0,90]){
+               buttonCase2("snap");
+               up(10)buttonCase2("cover");
+               down(5)buttonCase2("cap");
+
+               }
                }
             if(reset){
                 translate([-0.8,-y/2+3.5,z/2+1])cyl(d=3,h=z-lolinspace-2.6,anchor=TOP);
@@ -155,7 +162,7 @@ module case(
                   translate([0,0,-z/2])cuboid([13,13,15],rounding=2,except=[TOP,BOTTOM]);
                }//end if thread
                //embosstext
-               if(embosstext!="")translate([x/2+2-0.2,0,-z/2+embossheight])rotate([90,0,90])text3d(embosstext,size=6,h=0.4,anchor=CENTER);
+               #if(embosstext!="")translate(embosspos)rotate(embossrot)text3d(embosstext,size=6,h=embossheight,anchor=CENTER);
             }//end difference
             //snap connector female
             for(i=[-1,1]){
@@ -262,6 +269,88 @@ module rodmount(){
       }//end difference
 }//end rodmount
 
+
+
+module standscrew(l=10,d = 10, h = 50){
+   difference(){
+      union(){
+         threaded_rod(d=d-0.1, pitch = 2, l = l,orient=LEFT,anchor=TOP);
+         xcyl(d=10,h=h,anchor=RIGHT);
+      }//end union
+      translate([-(h+l)/2+l,0,-d+1.5])cuboid([h+l,d,d]);
+      }
+}//end standscrew
+
+module buttonCase2(PART = "cutout",w=2){
+    if(PART == "cutout")cutout();
+    if(PART == "snap")snap();
+    if(PART == "cover")cover();
+    if(PART == "cap")cap();
+    $fn = 60;
+    wall = w;
+    PARTS = 0;
+    CUT = 0;
+    FACE = FRONT;
+    tol = 0.2;
+    //OLED BOARD
+    boardSize = [12.2,12.5,7];
+    //OLED DISPLAY
+    disSize = [8,8];
+
+    
+
+
+    module cutout(){
+        union(){
+           cuboid([disSize[0],disSize[1],wall+1],rounding = 1, except=[TOP,BOTTOM],anchor=TOP);
+            
+            }
+            }
+    
+    
+    module snap(){       
+        difference(){
+            for(i=[-1,1]){
+            fwd(i*(boardSize[1]/2+1+tol)){
+                cuboid([boardSize[0],2,boardSize[2]],anchor=BOTTOM);
+                translate([0,-i/2,boardSize[2]-1])xcyl(d = 2,h = boardSize[0]);
+                }
+             
+                translate([-(boardSize[0]/2-wall/2)*i,0,0])color("blue")cuboid([wall,boardSize[1],3.2],anchor=BOTTOM);
+                
+            
+            }
+            for(k=[-1,1])for(i=[-1,1])translate([i*(boardSize[0]/2-2),k*4.1,3.2])cyl(d=1.5,h=0.75,anchor=TOP);
+            }
+    }
+
+    module cover(){
+        difference(){
+            cuboid([boardSize[0]+2*wall+tol*2,boardSize[1]+2*wall+4,boardSize[2]+tol*2+wall],anchor=BOTTOM,chamfer=1,edges=TOP);
+            cuboid([boardSize[0]+tol*3,boardSize[1]+2*wall+3*tol,boardSize[2]+tol*2],anchor=BOTTOM);
+            for(i=[-1,1]){
+                translate([0,-i*(boardSize[1]/2+1+tol+1/2),boardSize[2]-1-tol/2])xcyl(d = 2+tol,h = boardSize[0]);
+                translate([0,4.5*i,boardSize[2]])cyl(d=2,h=1.5,anchor=BOTTOM);
+                translate([6.8*i,0,boardSize[2]-1.5])cuboid([3,10,6],anchor=BOTTOM);
+              }
+                
+    }
+    }
+    
+    module cap(){
+    cuboid([disSize[0]-0.5,disSize[1]-0.5,wall],rounding = 1, except=[TOP,BOTTOM],anchor=TOP);
+
+    rotate([180,0,0])for(i=[1:90:279]){
+         rotate([0,0,i])translate([-4/2-0.75/2,0,0])union(){
+            down(0.5)cuboid([0.75,2.7,2.5]);
+            translate([-0.75,0,0.25])cuboid([1.2,1,3]);
+            translate([0.75/2,2.7/2,-3.5/2+0.7])rotate([90,90,0])linear_extrude(2.7)polygon([[0,0],[0.7,0.3],[0.7,0]]);
+         }//end union
+      }//end for
+      }
+
+}
+
 module buttoncase(cap = true){
    x = 14;
    y = 17;
@@ -285,20 +374,9 @@ module buttoncase(cap = true){
          rotate([0,0,i])translate([-4/2-0.75/2,0,0])union(){
             cuboid([0.75,2.7,3.5]);
             translate([-0.75,0,0.25])cuboid([1.5,1,3]);
-            translate([0.75/2,2.7/2,-3.5/2+0.7])rotate([90,90,0])linear_extrude(2.7)polygon([[0,0],[0.7,0.5],[0.7,0]]);
+            translate([0.75/2,2.7/2,-3.5/2+0.7])rotate([90,90,0])       linear_extrude(2.7)polygon([[0,0],[0.7,0.5],[0.7,0]]);
          }//end union
       }//end for
       }
      
 }
-
-module standscrew(l=10,d = 10, h = 50){
-   difference(){
-      union(){
-         threaded_rod(d=d-0.1, pitch = 2, l = l,orient=LEFT,anchor=TOP);
-         xcyl(d=10,h=h,anchor=RIGHT);
-      }//end union
-      translate([-(h+l)/2+l,0,-d+1.5])cuboid([h+l,d,d]);
-      }
-}//end standscrew
-
