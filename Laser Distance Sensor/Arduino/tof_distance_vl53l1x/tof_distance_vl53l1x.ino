@@ -260,7 +260,7 @@ void newExperimentEvent(){
   if(PhyphoxBLE::eventType==1){
     if(pressed){
       t_offset =  0.001 * (float)millis();
-      pressed = 0;1
+      pressed = 0;
     }
     Serial.println("Start");
     stopped = 0;

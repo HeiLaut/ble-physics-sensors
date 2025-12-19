@@ -168,10 +168,10 @@ void loop() {
          (d2 - d1) / (t2 - t1)) * 0.25f;
     }
 
-    Serial.print("t,"); Serial.print(t);
-    Serial.print("  s(cm),"); Serial.print(distance);
-    Serial.print("  v(cm/s),"); Serial.print(velocity);
-    Serial.print("  bat(V),"); Serial.println(batValue, 3);
+    Serial.print("t(s),"); Serial.print(t);
+    Serial.print(",s(cm),"); Serial.print(distance);
+    Serial.print(",v(cm/s),"); Serial.print(velocity);
+    Serial.print(",bat(V),"); Serial.println(batValue);
 
     PhyphoxBLE::write(t, distance, velocity, batValue);
 

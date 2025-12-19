@@ -1,5 +1,14 @@
 #include <phyphoxBle.h>
+#include <Adafruit_GFX.h>
+#include <Adafruit_SSD1306.h>
 #define SIGNAL_PIN 5
+
+#define SCREEN_WIDTH 128  // OLED width,  in pixels
+#define SCREEN_HEIGHT 64 
+
+
+Adafruit_SSD1306 oled(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
+
 
 int n = 0;
 int t1 = 0;
@@ -24,6 +33,12 @@ void isr1() {
 
 
 void setup() {
+  Wire.begin(14, 27);
+  if (!oled.begin(SSD1306_SWITCHCAPVCC, 0x3C)) {
+    Serial.println(F("failed to start SSD1306 OLED"));
+    while (1)
+      ;
+    }
   PhyphoxBLE::start("Einzel-Lichtschranke");
   PhyphoxBLE::setMTU(48); //6 float values 6*4 = 24 bytes
   // An extra task takes care of the experiment creation
@@ -71,14 +86,25 @@ if(t1!=timeArray[2]){
 float pendelF = 1/pendelT;
 
 if(n_puffer != n){
-float values[6] = {t,laufT,verdT,pendelT,pendelF,n};
-PhyphoxBLE::write(&values[0], 6);  
-Serial.print("t,");Serial.print(t,3);
-Serial.print(",Laufzeit,");Serial.print(laufT,3);
-Serial.print(",Verdunklungszeit,"); Serial.print(verdT,3);
-Serial.print(",Schwingungsdauer,");Serial.print(pendelT,3);
-Serial.print(",Frequenz,");Serial.print(pendelF,3);
-Serial.print(",n,");Serial.println(n);
+  float values[6] = {t,laufT,verdT,pendelT,pendelF,n};
+  PhyphoxBLE::write(&values[0], 6);  
+  Serial.print("t,");Serial.print(t,3);
+  Serial.print(",Laufzeit,");Serial.print(laufT,3);
+  Serial.print(",Verdunklungszeit,"); Serial.print(verdT,3);
+  Serial.print(",Schwingungsdauer,");Serial.print(pendelT,3);
+  Serial.print(",Frequenz,");Serial.print(pendelF,3);
+  Serial.print(",n,");Serial.println(n);
+
+  oled.clearDisplay();
+  oled.setTextSize(3);
+  oled.setTextColor(WHITE);                            // set text color
+  oled.setCursor(0, 0);
+  oled.print(laufT,2);oled.println(" s");
+  oled.setCursor(0, 32);
+  oled.print(verdT,3);oled.println(" s");  // set text
+  oled.display();                                      // display on OLED
+
+
 }
 n_puffer = n;
 }
