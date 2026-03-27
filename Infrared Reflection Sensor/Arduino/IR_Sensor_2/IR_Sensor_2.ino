@@ -1,13 +1,13 @@
 #include <phyphoxBle.h>
-#include <Adafruit_GFX.h>
-#include <Adafruit_SSD1306.h>
+//#include <Adafruit_GFX.h>
+//#include <Adafruit_SSD1306.h>
 #define SIGNAL_PIN 5
 
-#define SCREEN_WIDTH 128  // OLED width,  in pixels
-#define SCREEN_HEIGHT 64 
+//#define SCREEN_WIDTH 128  // OLED width,  in pixels
+//#define SCREEN_HEIGHT 64 
 
 
-Adafruit_SSD1306 oled(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
+//Adafruit_SSD1306 oled(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
 
 
 int n = 0;
@@ -15,12 +15,12 @@ int t1 = 0;
 int t2 = 0;
 int timeArray[3] = {0,0,0};
 int n_puffer = 0; //puffer to check, if a change happend.
-
+float t_offset = 0;
 float verdT = 0;
 float laufT = 0;
 float pendelT = 0;
 
-float radius = 0;
+bool cleared = 0;
 
 void isr1() {
   n++;
@@ -33,24 +33,17 @@ void isr1() {
 
 
 void setup() {
-  Wire.begin(14, 27);
-  if (!oled.begin(SSD1306_SWITCHCAPVCC, 0x3C)) {
-    Serial.println(F("failed to start SSD1306 OLED"));
-    while (1)
-      ;
-    }
-  PhyphoxBLE::start("Einzel-Lichtschranke");
-  PhyphoxBLE::setMTU(48); //6 float values 6*4 = 24 bytes
-  // An extra task takes care of the experiment creation
-  xTaskCreate(
-    generateExperiment,    // Function that should be called
-    "experimentTask",   // Name of the task (for debugging)
-    16000,            // Stack size (bytes)
-    NULL,            // Parameter to pass
-    1,               // Task priority
-    NULL             // Task handle
-  );
-
+  //Wire.begin(14, 27);
+//  if (!oled.begin(SSD1306_SWITCHCAPVCC, 0x3C)) {
+//    Serial.println(F("failed to start SSD1306 OLED"));
+//    while (1)
+//      ;
+//    }
+   pinMode(LED_BUILTIN, OUTPUT);
+  PhyphoxBLE::start("IR-Sensor");
+  PhyphoxBLE::experimentEventHandler = &newExperimentEvent; 
+  generateExperiment();
+  
   Serial.begin(115200);
   pinMode(SIGNAL_PIN, INPUT_PULLUP);
   attachInterrupt(digitalPinToInterrupt(SIGNAL_PIN), isr1, CHANGE);
@@ -60,7 +53,7 @@ void setup() {
 void loop() {
 
 // Gets the current runtime in seconds
-float t = 0.001 * (float)millis();
+  float t = 0.001 * (float)millis() - t_offset;
 
 //gets darkening Time of the sensor
 if(t2>t1){
@@ -83,40 +76,37 @@ if(t1!=timeArray[2]){
 //calculates the time every second pass of a body bewtween gate
 //useful for oscillations
 
-float pendelF = 1/pendelT;
+float freq = 1/laufT;
 
 if(n_puffer != n){
-  float values[6] = {t,laufT,verdT,pendelT,pendelF,n};
-  PhyphoxBLE::write(&values[0], 6);  
+  float n_f = n/2;
+  PhyphoxBLE::write(t,laufT,freq,n_f);  
   Serial.print("t,");Serial.print(t,3);
   Serial.print(",Laufzeit,");Serial.print(laufT,3);
-  Serial.print(",Verdunklungszeit,"); Serial.print(verdT,3);
-  Serial.print(",Schwingungsdauer,");Serial.print(pendelT,3);
-  Serial.print(",Frequenz,");Serial.print(pendelF,3);
+  Serial.print(",Frequenz,");Serial.print(freq,3);
   Serial.print(",n,");Serial.println(n);
 
-  oled.clearDisplay();
-  oled.setTextSize(3);
-  oled.setTextColor(WHITE);                            // set text color
-  oled.setCursor(0, 0);
-  oled.print(laufT,2);oled.println(" s");
-  oled.setCursor(0, 32);
-  oled.print(verdT,3);oled.println(" s");  // set text
-  oled.display();                                      // display on OLED
+//  oled.clearDisplay();
+//  oled.setTextSize(3);
+//  oled.setTextColor(WHITE);                            // set text color
+//  oled.setCursor(0, 0);
+//  oled.print(freq,3);oled.println(" Hz");
+//  oled.setCursor(0, 32);
+//  oled.print(verdT,3);oled.println(" s");  // set text
+//  oled.display();                                      // display on OLED
 
 
 }
-n_puffer = n;
+  n_puffer = n;
 }
 
-void generateExperiment(void * parameter) {
+void generateExperiment() {
   PhyphoxBleExperiment lightBarrier;
 
-
-  lightBarrier.setTitle("Einzel-Lichtschranke");
+  lightBarrier.setTitle("IR-Sensor");
   lightBarrier.setCategory("Sensor-Boxen");
   lightBarrier.numberOfChannels = 6;
-  lightBarrier.setDescription("Lichtschranke");
+  lightBarrier.setDescription("IR-Reflexion");
 
   PhyphoxBleExperiment::View graph;
   graph.setLabel("Vielfachmessung");
@@ -134,15 +124,7 @@ void generateExperiment(void * parameter) {
   nGraph.setLabelX("Zeit t");
   nGraph.setLabelY("");
   nGraph.setColor("FFCC5C");
-  nGraph.setChannel(1,6);
-
-  PhyphoxBleExperiment::Value verd;
-  verd.setLabel("Verdunklungszeit t =");
-  verd.setPrecision(3);
-  verd.setUnit("s");
-  verd.setColor("FFCC5C");
-  verd.setChannel(3);
-  verd.setXMLAttribute("size=\"2\"");
+  nGraph.setChannel(1,4);
 
   PhyphoxBleExperiment::Value laufz;
   laufz.setLabel("Signallaufzeit t =");
@@ -151,54 +133,62 @@ void generateExperiment(void * parameter) {
   laufz.setColor("FFCC5C");
   laufz.setChannel(2);
   laufz.setXMLAttribute("size=\"2\"");
-
-  PhyphoxBleExperiment::Value schwingd;
-  schwingd.setLabel("Schwingungsdauer T =");
-  schwingd.setPrecision(3);
-  schwingd.setUnit("s");
-  schwingd.setColor("FFCC5C");
-  schwingd.setChannel(4);
-  schwingd.setXMLAttribute("size=\"2\"");
-
+ 
   PhyphoxBleExperiment::Value freq;
   freq.setLabel("Frequenz f =");
-  freq.setPrecision(3);
+  freq.setPrecision(2);
   freq.setUnit("Hz");
   freq.setColor("FFCC5C");
-  freq.setChannel(5);
+  freq.setChannel(3);
   freq.setXMLAttribute("size=\"2\"");
+  
+  PhyphoxBleExperiment::Value n_;
+  n_.setLabel("Anzahl n =");
+  n_.setPrecision(0);
+  n_.setUnit("");
+  n_.setColor("FFCC5C");
+  n_.setChannel(4);
+  n_.setXMLAttribute("size=\"2\"");
 
   PhyphoxBleExperiment::Graph periodGraph; // Graph for period over 
-  periodGraph.setLabel("Schwingungsdauer");
+  periodGraph.setLabel("Laufzeiten");
   periodGraph.setUnitY("s");
   periodGraph.setUnitX("");
   periodGraph.setLabelX("n");
-  periodGraph.setLabelY("T");
+  periodGraph.setLabelY("t");
   periodGraph.setColor("76a5af");
-  periodGraph.setChannel(6, 4);
 
-  simple.addElement(verd);
+  periodGraph.setStyle(STYLE_VBARS);
+  periodGraph.setChannel(4, 2);
+
+  //simple.addElement(verd);
   simple.addElement(laufz);
 
   graph.addElement(nGraph);
+  graph.addElement(n_);
   
-  multi.addElement(schwingd);
-  multi.addElement(freq);
-  multi.addElement(periodGraph);
+  //multi.addElement(schwingd);
+  simple.addElement(freq);
+  simple.addElement(periodGraph);
 
   lightBarrier.addView(simple);
-  lightBarrier.addView(multi);
   lightBarrier.addView(graph);
 
   PhyphoxBLE::addExperiment(lightBarrier);
-
-  vTaskDelete(NULL);
 }
 
-void receivedData() {           // get data from PhyPhox app
-  float readInput;
-  PhyphoxBLE::read(readInput);
-   if(readInput>0){
-      radius = readInput;
+void newExperimentEvent(){
+  if(PhyphoxBLE::eventType==1){
+    Serial.println("Start");
+    if(cleared){
+     t_offset =  0.001 * (float)millis();
     }
+    cleared = 0;
+    }
+  
+  if(PhyphoxBLE::eventType==2){
+    Serial.println("Clear");
+    cleared = 1;
+    n = 0;
+  }
 }

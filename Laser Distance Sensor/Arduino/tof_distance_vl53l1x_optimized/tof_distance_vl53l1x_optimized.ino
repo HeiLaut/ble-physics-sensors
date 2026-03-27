@@ -3,8 +3,8 @@
 
 #define BUTTON_PIN 27
 #define READBAT_PIN 25
-#define SDA 16
-#define SCL 17
+#define SDA 6
+#define SCL 7
 
 Adafruit_VL53L1X vl53 = Adafruit_VL53L1X();
 
@@ -30,13 +30,13 @@ void setup() {
     while (1) {
       digitalWrite(LED_BUILTIN, LOW); delay(200);
       digitalWrite(LED_BUILTIN, HIGH); delay(200);
-    }
+   }
   }
 
   vl53.startRanging();
   vl53.setTimingBudget(50);
 
-  pinMode(LED_BUILTIN, OUTPUT);
+  //pinMode(LED_BUILTIN, OUTPUT);
   pinMode(BUTTON_PIN, INPUT_PULLUP);
 
   PhyphoxBLE::start("Laser-Distanz 0-400cm");
