@@ -1,70 +1,79 @@
-#include <phyphoxBle.h>
+/*
+zu ändern: Bei Knopfdruck wird immer der Orstoffset gesetzt;Zeitoffset wird nur dann auf 0 gesetzt, wenn in Phyphox der Mülleimer gedrückt wird
+*/
+//Version 0.4
+
 #include "Adafruit_VL53L1X.h"
+#include <phyphoxBle.h>
 
-#define BUTTON_PIN 27
-#define READBAT_PIN 25
-#define SDA 16//15//16
-#define SCL 17//13// 17
+#define BUTTON_PIN 27 //PIN for Offset-Button
+#define SDA 16 //PIN for I2C SDA
+#define SCL 17 //PIN for I2C SCL
 
-float d1, d2, d3, d4, d5, t1, t2, t3, t4, t5;
-float duration, distance, d_old, velocity, offset, t_offset,readDist;
-//float intervall = 20;
-int stopped = 1;
-int pressed = 0;
-int synced = 0;
+#define BLENAME "Laser-Distanz 0-400cm"
+
 Adafruit_VL53L1X vl53 = Adafruit_VL53L1X();
 
+float d_prev, t_prev,d_curr,t_curr;
+float distance, velocity, offset, t_offset, t, readDist;
+bool stopped = 0;
+bool cleared = 0;
+bool synced = 0;
+
+#define EMA_ALPHA_DIST 0.4f
+#define EMA_ALPHA_VEL  0.5f
+
+float emaDistance = 0.0f;
+float emaVelocity = 0.0f;
+bool emaInitialized = false;
 
 void setup() {
   //needed to select the scl and sda port for the lolin lite board Wire.begin(I2C_SDA, I2C_SCL)
   Wire.begin(SDA, SCL);
-
+  //enable internal LED c:\Users\Heinrich\Nextcloud\Physik\DIY\Physics-Arduino-Sensors\Force Sensor\Arduino\load_cell_esp_phyphox\load_cell_esp_phyphox.ino
+ 
   Serial.begin(115200);
-
-  if (!vl53.begin(0x29, &Wire)) {
-    Serial.print(F("Error on init of VL sensor: "));
-    Serial.println(vl53.vl_status);
-    while (1){
-    digitalWrite(LED_BUILTIN, LOW);
-    delay(200);
-    digitalWrite(LED_BUILTIN, HIGH);
-    delay(200);
-    }
-     delay(10);
+   // wait until serial port opens for native USB devices
+  while (!Serial) {
+    delay(1);
   }
-  Serial.println(F("VL53L1X sensor OK!"));
+  delay(2000);
 
-  Serial.print(F("Sensor ID: 0x"));
-  Serial.println(vl53.sensorID(), HEX);
+  Serial.println("-----------------------------");
+  Serial.println("Vl53l1X-Sensor Version 0.4");
+  Serial.println("-----------------------------");
 
-  if (!vl53.startRanging()) {
-    Serial.print(F("Couldn't start ranging: "));
-    Serial.println(vl53.vl_status);
-    while (1){
-    digitalWrite(LED_BUILTIN, LOW);
-    delay(200);
-    digitalWrite(LED_BUILTIN, HIGH);
-    delay(200);
-    }
-    delay(10);
-  }
-  Serial.println(F("Ranging started"));
-  offset = 0;
-  t_offset = 0;
-  // Valid timing budgets: 15, 20, 33, 50, 100, 200 and 500ms!
-  vl53.setTimingBudget(50);
-  //Serial.print(F("Timing budget (ms): "));
-  //Serial.println(vl53.getTimingBudget());
-
+  delay(1000);
+ 
   pinMode(LED_BUILTIN, OUTPUT);
   digitalWrite(LED_BUILTIN, LOW);
 
+
+  //Serial.println("Adafruit VL53L0X test");
+  if (!vl53.begin(0x29, &Wire)) {
+    Serial.println(F("Failed to boot VL53L1X"));
+    while (1){
+    digitalWrite(LED_BUILTIN, LOW);
+    delay(200);
+    digitalWrite(LED_BUILTIN, HIGH);
+    delay(200);
+    }
+  }
+  vl53.startRanging();
+  vl53.setTimingBudget(50);
+  offset = 0;
+  t_offset = 0;
+
+  pinMode(BUTTON_PIN, INPUT_PULLUP);
+
+  
+  
   //phyphox setup
 
-  PhyphoxBLE::start("Laser-Distanz");
+  PhyphoxBLE::start(BLENAME);
   // PhyphoxBLE::configHandler = &receivedData;
-  PhyphoxBLE::experimentEventHandler = &newExperimentEvent;
-  PhyphoxBLE::printXML(&Serial);
+  PhyphoxBLE::experimentEventHandler = &newExperimentEvent; // declare which function should be called after receiving an experiment event 
+  //PhyphoxBLE::printXML(&Serial);
   //Experiment
   PhyphoxBleExperiment entfernung;  //generate experiment on Arduino which plot random values
 
@@ -89,6 +98,7 @@ void setup() {
   firstGraph.setUnitY("cm");
   firstGraph.setLabelX("Zeit");
   firstGraph.setLabelY("Entfernung");
+  //firstGraph.setStyle(STYLE_DOTS);
 
 
   firstGraph.setChannel(1, 2);
@@ -99,17 +109,15 @@ void setup() {
   secondGraph.setUnitY("cm/s");
   secondGraph.setLabelX("Zeit");
   secondGraph.setLabelY("Geschwindigkeit");
-  secondGraph.setColor("4a8bad");
-
-
-  // secondGraph.setStyle("dots");
-
+  secondGraph.setColor("308ead");
+ // secondGraph.setStyle(STYLE_DOTS);
+  //secondGraph.setStyle("dots");
 
   secondGraph.setChannel(1, 3);
 
   PhyphoxBleExperiment::Value dist;  //Creates a value-box.
   dist.setLabel("s");                //Sets the label
-  dist.setPrecision(2);              //The amount of digits shown after the decimal point.
+  dist.setPrecision(1);              //The amount of digits shown after the decimal point.
   dist.setUnit("cm");                //The physical unit associated with the displayed value.
   dist.setColor("FFFFFF");           //Sets font color. Uses a 6 digit hexadecimal value in "quotation marks".
   dist.setChannel(2);
@@ -119,32 +127,10 @@ void setup() {
   vel.setLabel("v");                //Sets the label
   vel.setPrecision(0);              //The amount of digits shown after the decimal point.
   vel.setUnit("cm/s");              //The physical unit associated with the displayed value.
-  vel.setColor("FFFFFF");           //Sets font color. Uses a 6 digit hexadecimal value in "quotation marks".
+  vel.setColor("308ead");           //Sets font color. Uses a 6 digit hexadecimal value in "quotation marks".
   vel.setChannel(3);
   vel.setXMLAttribute("size=\"2\"");
 
-  PhyphoxBleExperiment::Value bat;  //Creates a value-box.
-  bat.setLabel("Batterie");         //Sets the label
-  bat.setPrecision(0);              //The amount of digits shown after the decimal point.
-  bat.setUnit("");                  //The physical unit associated with the displayed value.
-  bat.setColor("FFFFFF");           //Sets font color. Uses a 6 digit hexadecimal value in "quotation marks".
-  bat.setChannel(4);
-  bat.setXMLAttribute("size=\"1\"");
-
-  //Edit
-  // PhyphoxBleExperiment::Edit myEdit;
-  // myEdit.setLabel("Abtastrate");
-  // myEdit.setUnit("ms");
-  // myEdit.setSigned(false);
-  // myEdit.setDecimal(false);
-  // myEdit.setChannel(1);
-  // myEdit.setXMLAttribute("min=\"20\"");
-
-  /* Assign Channels, so which data is plotted on x or y axis 
-   *  first parameter represents x-axis, second y-axis
-   *  Channel 0 means a timestamp is created after the BLE package arrives in phyphox
-   *  Channel 1 to N corresponding to the N-parameter which is written in server.write()
-   */
   //Export
   PhyphoxBleExperiment::ExportSet mySet;  //Provides exporting the data to excel etc.
   mySet.setLabel("Distanz");
@@ -165,10 +151,10 @@ void setup() {
   firstView.addElement(dist);
   firstView.addElement(firstGraph);  //attach graph to view
   //firstView.addElement(myEdit);
-  firstView.addElement(bat);
 
   secondView.addElement(dist);
-
+  
+  thirdView.addElement(dist);
   thirdView.addElement(firstGraph);
   thirdView.addElement(vel);
   thirdView.addElement(secondGraph);  //attach second graph to view
@@ -184,99 +170,124 @@ void setup() {
 
   PhyphoxBLE::addExperiment(entfernung);  //Attach experiment to server
 
-
-  offset = 0;
-  t_offset = 0;
-  pinMode(BUTTON_PIN, INPUT_PULLUP);
 }
 
 
 void loop() {
-  int buttonState = digitalRead(BUTTON_PIN);
-
-  if (!buttonState && stopped) {
-    Serial.println("press");
-    //t = 0.001 * (float)millis();
-    //t_offset =  0.001 * (float)millis();
-    offset = vl53.distance() / 10.00;
-    pressed = 1;
-    delay(200);
+int buttonState = digitalRead(BUTTON_PIN);
+if (!buttonState) {
+  Serial.println("press");
+  delay(200);
+  while (!vl53.dataReady()) {
+    delay(1);
   }
-  float batValue = analogRead(READBAT_PIN);
+  offset = vl53.distance() * 0.1;
+  if (stopped) {
+    cleared = 1;
+  }
+  // EMA bei neuem Offset zurücksetzen
+  emaInitialized = false;
+  Serial.println(offset);
+}
 
   if (vl53.dataReady() && (!stopped || !synced)) {
-    //digitalWrite(LED_BUILTIN, LOW);
-    distance = vl53.distance() / 10.00 - offset;
-    float t = 0.001 * (float)millis() - t_offset;
+  readDist = vl53.distance() * 0.1;
+  distance = readDist - offset;
 
-    // if (!buttonState) {
-    //   Serial.println("press");
-    //   distance = vl53.distance() / 10.00;
+  float t = 0.001f * (float)millis() - t_offset;
 
-    //   t = 0.001 * (float)millis();
-    //   t_offset = t;
-    //   offset = distance;
-    // }
+  // Rohe Distanz per EMA filtern
+  if (!emaInitialized) {
+    emaDistance = distance;
+  } else {
+    emaDistance = EMA_ALPHA_DIST * distance + (1.0f - EMA_ALPHA_DIST) * emaDistance;
+  }
 
-    d1 = d2;
-    d2 = d3;
-    d3 = d4;
-    d4 = d5;
-    t1 = t2;
-    t2 = t3;
-    t3 = t4;
-    t4 = t5;
-    d5 = distance;
-    t5 = t;
+  // Verschiebe Ringpuffer (auf gefilterter Distanz)
+  d_prev = d_curr;
+  t_prev = t_curr;
+  d_curr = emaDistance;
+  t_curr = t;
 
+  // Rohe Geschwindigkeit aus geglätteten Distanzen
+  float rawVelocity = (d_curr - d_prev) / (t_curr - t_prev);
+  // Geschwindigkeit per EMA filtern
+  if (!emaInitialized) {
+    emaVelocity = 0.0f;
+    emaInitialized = true;
+  } else {
+    emaVelocity = EMA_ALPHA_VEL * rawVelocity + (1.0f - EMA_ALPHA_VEL) * emaVelocity;
+  }
 
-    velocity = ((d5 - d4) / (t5 - t4) + (d4 - d3) / (t4 - t3) + (d3 - d2) / (t3 - t2) + (d2 - d1) / (t2 - t1)) / 4;
+  velocity = (t < 0.15f) ? 0.0f : emaVelocity;
+  distance = emaDistance;  // gefilterter Wert für weitere Verwendung
 
-    Serial.print("t(s)");
-    Serial.print(",");
-    Serial.print(t);
-    Serial.print(",");
-    Serial.print("s(cm)");
-    Serial.print(",");
-    Serial.print(distance);
-    Serial.print(",");
-    Serial.print("v(cm/s)");
-    Serial.print(",");
-    Serial.print(velocity);
-    Serial.print(",");
-    Serial.print("battery");
-    Serial.print(",");
-    Serial.println(batValue,0);
+  if (distance > 120) {
+    distance = 120;
+  }
 
-    PhyphoxBLE::write(t, distance, velocity,batValue);
+  if (velocity > 500) {
+    velocity = 500;
+  }
+  if (velocity < -500) {
+    velocity = -500;
+  }
+  //serial Outputs for the web-serial-plotter https://github.com/HeiLaut/web-serial-plotter
+  if(synced==0){
+  Serial.print("t(s)");
+  Serial.print(",");
+  Serial.print(t);
+  Serial.print(",");
+  Serial.print("s(cm)");
+  Serial.print(",");
+  Serial.print(distance);
+  Serial.print(",");
+  Serial.print("v(cm/s)");
+  Serial.print(",");
+  Serial.println(velocity);
+  }
 
-    //delay(intervall);
-    vl53.clearInterrupt();
-  }else{ 
-    //digitalWrite(LED_BUILTIN, HIGH);
-    }
+  PhyphoxBLE::write(t, distance, velocity);
+
+   vl53.clearInterrupt();
+  }
 }
 void newExperimentEvent(){
-  if(PhyphoxBLE::eventType==1){
-    if(pressed){
-      t_offset =  0.001 * (float)millis();
-      pressed = 0;
-    }
-    Serial.println("Start");
-    stopped = 0;
-
-  }
-  if(PhyphoxBLE::eventType == 0 || PhyphoxBLE::eventType == 2){
-    stopped = 1;
+  Serial.println(PhyphoxBLE::eventType);
+  if(PhyphoxBLE::eventType==0){
     Serial.println("Pause");
+    stopped = 1;
   }
-  if(PhyphoxBLE::eventType==255){
+  
+  if(PhyphoxBLE::eventType==1){
+    Serial.println("Start");
+    if(cleared){
+      t_offset = 0.001f * (float)millis();
+      d_prev = d_curr = t_prev = t_curr = 0;
+      emaDistance = emaVelocity = velocity = 0.0f;
+      emaInitialized = false;
+    }
+    stopped = 0;
+    cleared = 0;
+  }
+
+  if(PhyphoxBLE::eventType==2){
+    Serial.println("Clear");
+    stopped = 1;
     synced  = 1;
+    cleared = 1;
+  }
+
+  if(PhyphoxBLE::eventType==255){
+    stopped = 1;
+    synced  = 1;
+    cleared = 1;
+    Serial.println("synced");
   }
 }
 
-// void receivedData() {  // get data from PhyPhox app
-//   float readInput;
-//   PhyphoxBLE::read(readInput);
-//   intervall = readInput;
-// }
+//void receivedData() {           // get data from PhyPhox app
+//  float readInput;
+//  PhyphoxBLE::read(readInput);
+//  intervall = readInput;
+//}

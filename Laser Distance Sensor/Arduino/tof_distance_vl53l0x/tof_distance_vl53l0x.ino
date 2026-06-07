@@ -1,7 +1,7 @@
 /*
 zu ändern: Bei Knopfdruck wird immer der Orstoffset gesetzt;Zeitoffset wird nur dann auf 0 gesetzt, wenn in Phyphox der Mülleimer gedrückt wird
 */
-//Version 0.31
+//Version 0.4
 
 #include <Adafruit_VL53L0X.h>
 #include <phyphoxBle.h>
@@ -10,16 +10,22 @@ zu ändern: Bei Knopfdruck wird immer der Orstoffset gesetzt;Zeitoffset wird nur
 #define SDA 14 //PIN for I2C SDA
 #define SCL 12 //PIN for I2C SCL
 
-#define BLENAME "Laser-Distanz_#1"
+#define BLENAME "Laser-Distanz_#6"
 
 Adafruit_VL53L0X lox = Adafruit_VL53L0X();
 
-float d1, d2, d3, d4, d5, t1, t2, t3, t4, t5;
-float duration, distance, d_old, velocity, offset, t_offset, t, readDist;
+float d_prev, t_prev,d_curr,t_curr;
+float distance, velocity, offset, t_offset, t, readDist;
 bool stopped = 0;
 bool cleared = 0;
 bool synced = 0;
 
+#define EMA_ALPHA_DIST 0.4f
+#define EMA_ALPHA_VEL  0.5f
+
+float emaDistance = 0.0f;
+float emaVelocity = 0.0f;
+bool emaInitialized = false;
 
 void setup() {
   //needed to select the scl and sda port for the lolin lite board Wire.begin(I2C_SDA, I2C_SCL)
@@ -34,7 +40,7 @@ void setup() {
   delay(2000);
 
   Serial.println("-----------------------------");
-  Serial.println("Vl53l0X-Sensor Version 0.31");
+  Serial.println("Vl53l0X-Sensor Version 0.4");
   Serial.println("-----------------------------");
 
   delay(1000);
@@ -167,36 +173,54 @@ void setup() {
 
 
 void loop() {
-  int buttonState = digitalRead(BUTTON_PIN);
-
-  if (!buttonState) {
-    Serial.println("press");
-    delay(200);
-  // muss noch geändert werden while(!lox.isRangeComplete()){}...
-    while(!lox.isRangeComplete()){
-       delay(1);
-    }
-    offset = lox.readRange() * 0.1;
-    if(stopped){
-      cleared = 1;
-    }
-    Serial.println(offset);
+int buttonState = digitalRead(BUTTON_PIN);
+if (!buttonState) {
+  Serial.println("press");
+  delay(200);
+  while (!lox.isRangeComplete()) {
+    delay(1);
   }
+  offset = lox.readRange() * 0.1;
+  if (stopped) {
+    cleared = 1;
+  }
+  // EMA bei neuem Offset zurücksetzen
+  emaInitialized = false;
+  Serial.println(offset);
+}
 
   if (lox.isRangeComplete() && (!stopped || !synced)) {
   readDist = lox.readRange() * 0.1;
   distance = readDist - offset;
-   
-  float t = 0.001 * (float)millis() - t_offset;
 
-  //save multiple values to calculate velocity
-  d1 = d2;  d2 = d3;  d3 = d4; d4 = d5; 
-  t1 = t2; t2 = t3; t3 = t4; t4 = t5;
-  d5 = distance;
-  t5 = t;
+  float t = 0.001f * (float)millis() - t_offset;
 
-  velocity = ((d5 - d4) / (t5 - t4) + (d4 - d3) / (t4 - t3) + (d3 - d2) / (t3 - t2) + (d2 - d1) / (t2 - t1)) / 4;
-  if(t<0.15)velocity=0;
+  // Rohe Distanz per EMA filtern
+  if (!emaInitialized) {
+    emaDistance = distance;
+  } else {
+    emaDistance = EMA_ALPHA_DIST * distance + (1.0f - EMA_ALPHA_DIST) * emaDistance;
+  }
+
+  // Verschiebe Ringpuffer (auf gefilterter Distanz)
+  d_prev = d_curr;
+  t_prev = t_curr;
+  d_curr = emaDistance;
+  t_curr = t;
+
+  // Rohe Geschwindigkeit aus geglätteten Distanzen
+  float rawVelocity = (d_curr - d_prev) / (t_curr - t_prev);
+  // Geschwindigkeit per EMA filtern
+  if (!emaInitialized) {
+    emaVelocity = 0.0f;
+    emaInitialized = true;
+  } else {
+    emaVelocity = EMA_ALPHA_VEL * rawVelocity + (1.0f - EMA_ALPHA_VEL) * emaVelocity;
+  }
+
+  velocity = (t < 0.15f) ? 0.0f : emaVelocity;
+  distance = emaDistance;  // gefilterter Wert für weitere Verwendung
+
   if (distance > 120) {
     distance = 120;
   }
@@ -225,9 +249,7 @@ void loop() {
   PhyphoxBLE::write(t, distance, velocity);
   }
 }
-
 void newExperimentEvent(){
-  //0 pause, 1 start, 2 clear, 255 sync
   Serial.println(PhyphoxBLE::eventType);
   if(PhyphoxBLE::eventType==0){
     Serial.println("Pause");
@@ -237,13 +259,15 @@ void newExperimentEvent(){
   if(PhyphoxBLE::eventType==1){
     Serial.println("Start");
     if(cleared){
-     t_offset =  0.001 * (float)millis();
-     d1 = d2 = d3 = d4 = d5 = t1 = t2 = t3 = t4 = t5 = velocity = 0;
+      t_offset = 0.001f * (float)millis();
+      d_prev = d_curr = t_prev = t_curr = 0;
+      emaDistance = emaVelocity = velocity = 0.0f;
+      emaInitialized = false;
     }
     stopped = 0;
     cleared = 0;
-      
   }
+
   if(PhyphoxBLE::eventType==2){
     Serial.println("Clear");
     stopped = 1;
@@ -255,7 +279,6 @@ void newExperimentEvent(){
     stopped = 1;
     synced  = 1;
     cleared = 1;
-
     Serial.println("synced");
   }
 }
