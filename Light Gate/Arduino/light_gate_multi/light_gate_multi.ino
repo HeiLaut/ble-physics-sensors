@@ -3,10 +3,10 @@
 #include <phyphoxBle.h>
 
 // Define pin numbers for the incoming signals and the detection pin
-#define SIGNAL_A_PIN 17//22// 17 //pin for incoming signal A 
-#define SIGNAL_B_PIN 16// 21// 16 //pin for incoming signal B
-#define DETECT_PIN 26 //pin for detect second light gate
-#define LED_PIN 13 //pin for indication LED
+#define SIGNAL_A_PIN 8//22// 17 //pin for incoming signal A 
+#define SIGNAL_B_PIN 9// 21// 16 //pin for incoming signal B
+#define DETECT_PIN 5 //pin for detect second light gate
+#define LED_PIN 4 //pin for indication LED
 
 #define BLENAME "Lichtschranke #1"
 // Structure to represent a signal with its associated pin and timing information

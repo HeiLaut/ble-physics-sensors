@@ -48,10 +48,11 @@ void loop() {
 float t = 0.001 * (float)millis();
 
 //gets darkening Time of the sensor
-if(t2>t1){
-  verdT = (t2-t1)*0.001;
+if(t1>t2){
+  verdT = (t1-t2)*0.001;
 }
- 
+
+
 // Measures the time between t1 and the last two rising timestamps
 if(t1!=timeArray[2]){
   // Shift the timeArray to make room for the new timestamp
