@@ -1,14 +1,12 @@
 #include <phyphoxBle.h> 
 #include <NewPing.h>
 #include <Button.h>
-#include <QuickStats.h>
 #define TRIGGER_PIN 17
 #define ECHO_PIN 16
 #define MAX_DISTANCE 200
 float readings[5]={0,0,0,0,0};
 float times[5]={0,0,0,0,0};
 int numreadings = 5;
-QuickStats stats; //initialize an instance of this class
 float duration, distance, d_old, velocity, offset,t_offset;
 Button offset_button(2);
 float intervall = 20;
@@ -164,11 +162,9 @@ void loop()
        
   readings[4]=distance;
   times[4]=t;
-  velocity = stats.slope(times,readings,numreadings);
   
   Serial.print("t(2)");Serial.print(",");Serial.print(t); Serial.print(",");
   Serial.print("s(cm)");Serial.print(",");Serial.print(distance);Serial.print(",");
-  Serial.print("v(cm/s)");Serial.print(",");Serial.println(velocity);
   
    PhyphoxBLE::write(t, distance, velocity);   
    

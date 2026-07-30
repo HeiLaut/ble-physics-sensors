@@ -222,8 +222,7 @@ if (!buttonState) {
   velocity = (t < 0.15f) ? 0.0f : emaVelocity;
   distance = emaDistance;  // gefilterter Wert für weitere Verwendung
 
-  if (distance > 120) {
-    distance = 120;
+  if (distance > 400) {
   }
 
   if (velocity > 500) {
