@@ -6,22 +6,29 @@ y = 100;
 z = 40;
 wall = 2;
 
-TOP_PLATE = 0;
-BOTTOM_PLATE = 1;
-FRONT_COVER= 1;
-BACK_COVER = 0;
-SENDER_TOP = 1;
+BOTTOM_PLATE = 1; //EMITTER AND RECVEIVER
+FRONT_COVER= 1; //EMMITTER AND RECEIVER
+
+RECEIVER_BACK_COVER = 1;
+EMITTER_BACK_COVER = 0;
+OLED = 0;
+
+RECEIVER_TOP = 1;
+EMITTER_TOP = 0;
+
+
 
 
 explode = 10;
+
 //up(9)rotate([180,0,0])sender_module();
 if(FRONT_COVER)up(z+explode)front();
-if(BACK_COVER)backp();
-if(TOP_PLATE)fwd(y/2+explode)up(z/4+wall)frontplate();
+if(RECEIVER_BACK_COVER)backp();
+if(RECEIVER_TOP)fwd(y/2+explode)up(z/4+wall)frontplate();
 if(BOTTOM_PLATE)back(y/2+explode)up(z/4+wall)bottom();
 
-if(SENDER_TOP)fwd(y/2+explode)up(z/4+wall)frontplate(0);
-backp2();
+if(EMITTER_TOP)fwd(y/2+explode)up(z/4+wall)frontplate(0);
+if(EMITTER_BACK_COVER)backp2();
 
 
 module sender_top(){
@@ -72,21 +79,21 @@ module front(){
         }
 }
 
-module backp(etext= "IR Empfänger"){
+module backp(etext= "IR Receiver"){
     difference(){
         union(){
             case([x,y,z],part = "bottom",embosstext = etext,button = 1,buttonpos = [0,40],embosspos=[0,-10]);
-            back(20)oledCase("snap");
-            up(10)back(20)oledCase("cover");
+            if(OLED)back(20)oledCase("snap");
+            if(OLED)up(10)back(20)oledCase("cover");
 
             }
-            back(20)oledCase("cutout");
+            if(OLED)back(20)oledCase("cutout");
 
             }
 
 }
 
-module backp2(etext= "IR Sender"){
+module backp2(etext= "IR Emitter"){
             case([x,y,z],part = "bottom",lolin32lite = 0,embosstext = etext,button = 0,buttonpos = [0,40],embosspos=[0,-10]);
          
 }
