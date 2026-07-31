@@ -1,6 +1,8 @@
 /*
   Universal Electronic Case
   
+  Version: 0.41 //July 2026
+  
   Created by: Heinrich Lauterbach
   License: CC-BY-SA
   This file is licensed under the Creative Commons Attribution-ShareAlike 4.0 International License.
@@ -20,16 +22,18 @@ include<BOSL2/threading.scad>
 
 
 $fn = 50;
-
-//test();
-
+/*intersection(){
+    test();
+    translate([0,-30,-10])cuboid([30,20,20]);
+    }
+*/
 module test(){
 lolinspace = 5;
 z = 30;
 x=80;
-y=52;
-*case([x,y,z],part="bottom",explode = 25,rd=2,lolinspace = lolinspace,button = true,reset = 1, thread = true,clearance = 0.2);
-case([x,y,z],part="top",explode = 50,rd=2,lolinspace = lolinspace,button = 1,reset = 0, thread = true,usbC = 1, wall=2,jst = 1,switch=1,charge_view = 1,
+y=70;
+case([x,y,z],part="bottom",explode = 25,rd=2,lolinspace = lolinspace,button = 0,reset = 0, thread = 0,clearance = 0.2,embosstext = "TEST");
+*case([x,y,z],part="top",explode = 50,rd=2,lolinspace = lolinspace,button = 1,reset = 0, thread = true,usbC = 1, wall=2,jst = 1,switch=1,charge_view = 1,
    power_view = 1);
 *color("red")translate([-11.5,16.5,lolinspace-12])rotate([180,0,-90])import("lolin32_lite.stl");
 }
@@ -45,6 +49,7 @@ module case(
    explode = 0, //show parts seperate
    lolin32lite = true, //lolin32lite mount
    lolinspace = 7.4, //spacing of lolin32lite aboce bottom part
+   lolinsnap = 1,
    thread = false, //add thread on bottom part for rod
    button = false,//add buttonhole on top part
    reset = false, //add reset button
@@ -61,12 +66,14 @@ module case(
    embosstext = "",//embosstext on bottom part
    embossrot = [90,0,90],
    embossheight = 0.4,//embossheight means depth
-   embosspos = [x/2+2-0.2,0,-z/2]
+   embosspos = [0,-5]
    )
    {
    x = size[0];
    y = size[1];
    z = size[2];
+   embosspos = [x/2+2-0.2,embosspos[0],embosspos[1]];
+
 
    ox = x+2*wall;
    oy = y+4*wall;
@@ -158,11 +165,14 @@ module case(
             difference(){
                both();
                translate([0,0,cutheight])cuboid(x*y,anchor=BOTTOM);
+               if(button){
+                  #translate([buttonpos[0],buttonpos[1],-z/2])rotate([0,0,90])buttonCase2("cutout",wall);
+                  }
                if(thread){
                   translate([0,0,-z/2])cuboid([13,13,15],rounding=2,except=[TOP,BOTTOM]);
                }//end if thread
                //embosstext
-               #if(embosstext!="")translate(embosspos)rotate(embossrot)text3d(embosstext,size=6,h=embossheight,anchor=CENTER);
+               if(embosstext!="")translate(embosspos)rotate(embossrot)text3d(embosstext,size=6,h=embossheight,anchor=CENTER);
             }//end difference
             //snap connector female
             for(i=[-1,1]){
@@ -172,11 +182,23 @@ module case(
                   translate([i*(x/2-clearance/2),0,cutheight])cuboid([clearance,y,d1*4/2],anchor = BOTTOM);
                   }//end difference
                }//end for
+               if(button){
+               translate([buttonpos[0],buttonpos[1],-z/2])rotate([0,0,90]){
+               buttonCase2("snap");
+               up(10)buttonCase2("cover");
+               down(5)buttonCase2("cap");
+
+               }
+               }
               if(lolin32lite){
                   translate([lolinx,-(y-52)/2,0])difference(){
                      union(){
-                        translate([0,-23,-z/2])cuboid([26,7.3,lolinspace],anchor = BOTTOM+FRONT);
+                        translate([0,-23,-z/2])cuboid([25,7.3,lolinspace],anchor = BOTTOM+FRONT);
                         translate([0,24,-z/2])cuboid([26,5.5,lolinspace],anchor = BOTTOM+BACK);
+                        if(lolinsnap){
+                            for(i=[-1,1])translate([i*13.3,-24.5,-z/2])cuboid([1.2,10,lolinspace+1.7],anchor =BOTTOM+FRONT)
+                                attach(TOP)ycyl(d=2,h=10 );
+                        }//end if lolinsnap
                      }//end union
                   translate([10.8,-17.6,-z/2])cyl(d=2,h=lolinspace+1,anchor = BOTTOM);
                   translate([-10.3,21,-z/2])cyl(d=2,h=lolinspace+1,anchor = BOTTOM);
@@ -264,8 +286,8 @@ module switchcase(hole = false){
 
 module rodmount(){
       difference(){
-      cuboid([15,15,8],rounding=2,except=[TOP,BOTTOM],anchor=BOTTOM);
-      threaded_rod(d=10, pitch = 2, $slop=0.2,internal=true,l = 30,orient=TOP,anchor=BOTTOM);
+      translate([0,0,0])cuboid([15,15,8],rounding=2,except=[TOP,BOTTOM],anchor=BOTTOM);
+      threaded_rod(d=10, pitch = 2, $slop=0.2,internal=true,l = 8,orient=TOP,anchor=BOTTOM);
       }//end difference
 }//end rodmount
 
