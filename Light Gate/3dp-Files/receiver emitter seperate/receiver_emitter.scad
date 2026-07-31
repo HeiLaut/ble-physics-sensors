@@ -6,17 +6,22 @@ y = 100;
 z = 40;
 wall = 2;
 
+
+//choose between OLED- or NON-OLED-Version
+OLED = 1;
+
+
 BOTTOM_PLATE = 1; //EMITTER AND RECVEIVER
 FRONT_COVER= 1; //EMMITTER AND RECEIVER
 
 RECEIVER_BACK_COVER = 1;
 EMITTER_BACK_COVER = 0;
-OLED = 0;
+
 
 RECEIVER_TOP = 1;
 EMITTER_TOP = 0;
 
-
+button = OLED ? true : false;
 
 
 explode = 10;
@@ -70,7 +75,7 @@ module sender_snap(hole  = 0){
 module front(){
     difference(){
         union(){
-            case([x,y,z],part = "top");
+            case([x,y,z],part = "top", wall = wall);
             back(-y/2+20)up(wall)rotate([180,0,-90])sender_snap();
             }
 
@@ -82,7 +87,7 @@ module front(){
 module backp(etext= "IR Receiver"){
     difference(){
         union(){
-            case([x,y,z],part = "bottom",embosstext = etext,button = 1,buttonpos = [0,40],embosspos=[0,-10]);
+            case([x,y,z],part = "bottom",embosstext = etext,button = button,buttonpos = [0,40],embosspos=[0,-10],wall = wall);
             if(OLED)back(20)oledCase("snap");
             if(OLED)up(10)back(20)oledCase("cover");
 
@@ -94,14 +99,14 @@ module backp(etext= "IR Receiver"){
 }
 
 module backp2(etext= "IR Emitter"){
-            case([x,y,z],part = "bottom",lolin32lite = 0,embosstext = etext,button = 0,buttonpos = [0,40],embosspos=[0,-10]);
+            case([x,y,z],part = "bottom",lolin32lite = 0,embosstext = etext,button = 0,buttonpos = [0,40],embosspos=[0,-10],wall = wall);
          
 }
 
 module frontplate(receiver = true){
    difference(){
     union(){
-        case([x,y,z],part = "plate", usbC = receiver, switch = 1,switchpos = [10,5]);
+        case([x,y,z],part = "plate", usbC = receiver, switch = 1,switchpos = [10,5], wall = wall);
         translate([-12,wall,12])ycyl(d = 7, h = 4,anchor=FRONT);
         }
         translate([-12,-0.1,12])ycyl(d = 5, h = 8,anchor=FRONT);
@@ -123,10 +128,10 @@ module frontplate(receiver = true){
 
 module bottom(){
     difference(){
-        case([x,y,z],part = "plate");
-        up(z/4-wall)back(1)ycyl(d=15,h=3);
+        case([x,y,z],part = "plate",wall=wall);
+        up(z/4-wall)back(wall)ycyl(d=15,h=wall,anchor=BACK);
         }
-    up(z/4-wall)back(2)rotate([90,0,0])rodmount();
+    up(z/4-wall)back(wall)rotate([90,0,0])rodmount();
 
 }
 /*
