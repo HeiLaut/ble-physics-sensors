@@ -12,6 +12,8 @@
 // ---- OLED ----
 #define SCREEN_WIDTH 128
 #define SCREEN_HEIGHT 32
+#define NAME "Einzel-Lichtschranke A"
+
 Adafruit_SSD1306 oled(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
 
 int n = 0;
@@ -46,7 +48,7 @@ void isr1() {
 }
 
 void setup() {
-  PhyphoxBLE::start("Einzel-Lichtschranke");
+  PhyphoxBLE::start(NAME);
   PhyphoxBLE::setMTU(48); //6 float values 6*4 = 24 bytes
   
   xTaskCreate(
