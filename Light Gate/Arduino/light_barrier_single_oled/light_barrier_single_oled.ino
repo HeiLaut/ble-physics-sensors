@@ -19,7 +19,7 @@ int t1 = 0;
 int t2 = 0;
 int timeArray[3] = {0,0,0};
 int n_puffer = 0; // puffer to check, if a change happend.
-
+float t_offset;
 float verdT = 0;
 float laufT = 0;
 float pendelT = 0;
@@ -27,8 +27,13 @@ float pendelF = 0;
 
 float radius = 0;
 
+
+bool stopped = 0;
+bool cleared = 0;
+bool synced = 0;
 // ---- Mode/Taster ----
-// 0 = Laufzeit, 1 = Verdunklung, 2 = Pendel  (Mehrfachmessung/mode 3 entfernt)
+// 0 = Laufzeit, 1 = Verdunklung, 2 = Pendel
+
 int mode = 0;
 
 void isr1() {
@@ -43,7 +48,7 @@ void isr1() {
 void setup() {
   PhyphoxBLE::start("Einzel-Lichtschranke");
   PhyphoxBLE::setMTU(48); //6 float values 6*4 = 24 bytes
-  // An extra task takes care of the experiment creation
+  
   xTaskCreate(
     generateExperiment,
     "experimentTask",
@@ -52,6 +57,8 @@ void setup() {
     1,
     NULL
   );
+
+  PhyphoxBLE::experimentEventHandler = &newExperimentEvent;
 
   Serial.begin(115200);
 
@@ -64,23 +71,30 @@ void setup() {
   pinMode(SIGNAL_PIN, INPUT_PULLUP);
   pinMode(BUTTON_PIN, INPUT_PULLUP);
   attachInterrupt(digitalPinToInterrupt(SIGNAL_PIN), isr1, CHANGE);
+
+  t_offset = 0;
+
 }
 
 void loop() {
 
-  // ---- Taster: Moduswechsel ----
+  // ---- Taster: Moduswechsel (für OLED) ----
   if(!digitalRead(BUTTON_PIN)){
     mode++;
     mode %= 4;
-    delay(100); // einfaches Entprellen, wie in Sketch 2
+    delay(100); 
   }
 
+  pinMode(LED_BUILTIN, OUTPUT);
+  digitalWrite(LED_BUILTIN, LOW);
+
   // Gets the current runtime in seconds
-  float t = 0.001 * (float)millis();
+  float t = 0.001f * (float)millis() - t_offset;
 
   // gets darkening Time of the sensor
-  verdT = abs((float)t1 - (float)t2) * 0.001;
-
+  if(digitalRead(SIGNAL_PIN)){
+    verdT = abs((float)t1 - (float)t2) * 0.001;
+  }
   // Measures the time between t1 and the last two rising timestamps
   if(t1!=timeArray[2]){
     for(int i = 0; i<2 ;i++){
@@ -94,15 +108,15 @@ void loop() {
   // calculates the frequency of a full pendulum swing
   pendelF = 1/pendelT;
 
-  if(n_puffer != n){
-    float values[6] = {t,laufT,verdT,pendelT,pendelF,(float)n};
+  if(n_puffer != n &&   digitalRead(SIGNAL_PIN)){
+    float values[6] = {t,laufT,verdT,pendelT,pendelF,(float)floor(n/2)};
     PhyphoxBLE::write(&values[0], 6);
     Serial.print("t,");Serial.print(t,3);
     Serial.print(",Laufzeit,");Serial.print(laufT,3);
     Serial.print(",Verdunklungszeit,"); Serial.print(verdT,3);
     Serial.print(",Schwingungsdauer,");Serial.print(pendelT,3);
     Serial.print(",Frequenz,");Serial.print(pendelF,3);
-    Serial.print(",n,");Serial.println(n);
+    Serial.print(",n,");Serial.println(floor(n/2));
   }
   n_puffer = n;
 
@@ -170,15 +184,25 @@ void generateExperiment(void * parameter) {
   nGraph.setChannel(1,6);
 
   PhyphoxBleExperiment::Value verd;
-  verd.setLabel("Verdunklungszeit t =");
+  verd.setLabel("Verd.zeit t =");
   verd.setPrecision(3);
   verd.setUnit("s");
   verd.setColor("FFCC5C");
   verd.setChannel(3);
   verd.setXMLAttribute("size=\"2\"");
 
+  PhyphoxBleExperiment::Graph verdGraph;
+  verdGraph.setLabel("Verd.zeit");
+  verdGraph.setUnitY("s");
+  verdGraph.setUnitX("s");
+  verdGraph.setLabelX("t");
+  verdGraph.setLabelY("dT");
+  verdGraph.setStyle(STYLE_DOTS);
+  verdGraph.setColor("76a5af");
+  verdGraph.setChannel(1,3);
+
   PhyphoxBleExperiment::Value laufz;
-  laufz.setLabel("Signallaufzeit t =");
+  laufz.setLabel("Laufzeit t =");
   laufz.setPrecision(3);
   laufz.setUnit("s");
   laufz.setColor("FFCC5C");
@@ -186,7 +210,7 @@ void generateExperiment(void * parameter) {
   laufz.setXMLAttribute("size=\"2\"");
 
   PhyphoxBleExperiment::Value schwingd;
-  schwingd.setLabel("Schwingungsdauer T =");
+  schwingd.setLabel("Schw.dauer T =");
   schwingd.setPrecision(3);
   schwingd.setUnit("s");
   schwingd.setColor("FFCC5C");
@@ -207,12 +231,14 @@ void generateExperiment(void * parameter) {
   periodGraph.setUnitX("");
   periodGraph.setLabelX("n");
   periodGraph.setLabelY("T");
+  periodGraph.setStyle( STYLE_DOTS);
   periodGraph.setColor("76a5af");
   periodGraph.setChannel(6, 4);
 
   simple.addElement(verd);
   simple.addElement(laufz);
 
+  graph.addElement(verdGraph);
   graph.addElement(nGraph);
 
   multi.addElement(schwingd);
@@ -234,4 +260,32 @@ void receivedData() {           // get data from PhyPhox app
    if(readInput>0){
       radius = readInput;
     }
+}
+
+void newExperimentEvent(){
+ 
+  if(PhyphoxBLE::eventType==1){
+    Serial.println("Start");
+    if(cleared){
+      t_offset = 0.001f * (float)millis();
+      n = 0;
+      n_puffer = 0;
+    }
+    stopped = 0;
+    cleared = 0;
+  }
+
+  if(PhyphoxBLE::eventType==2){
+    Serial.println("Clear");
+    stopped = 1;
+    synced  = 1;
+    cleared = 1;
+  }
+
+  if(PhyphoxBLE::eventType==255){
+    stopped = 1;
+    synced  = 1;
+    cleared = 1;
+    Serial.println("synced");
+  }
 }
