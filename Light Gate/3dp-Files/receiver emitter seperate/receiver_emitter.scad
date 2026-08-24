@@ -25,6 +25,7 @@ EMITTER_TOP = 0;
 
 button = OLED ? true : false;
 
+gap_width = 7.7; //6.5
 
 explode = 10;
 
@@ -92,10 +93,10 @@ module front(versionA = false){
 
         }
         else{
-        l = y-25;
+        l = y-20;
      difference(){
             case([x,y,z],part = "top", wall = wall);
-            up(wall/2)cuboid([6.5,l,wall*2]);
+            up(wall/2)cuboid([gap_width,l,wall*2]);
             for(i=[-3:3])translate([0,i*10,wall])cuboid([20,1,0.2],anchor=TOP);
         }
       difference(){
@@ -113,6 +114,7 @@ module front(versionA = false){
 
 module slider(){
     l = 20;
+  
     color("green")difference(){
         union(){
             cuboid([13.5,l,4.5],chamfer=1.75,edges=[LEFT+BOTTOM,RIGHT+BOTTOM],anchor=TOP)attach(BOTTOM){
@@ -128,7 +130,7 @@ module slider(){
    //"nut" starts here
    module flat_nut(){
     difference(){
-        cuboid([6.3,9,wall],anchor=TOP)attach(TOP){
+        cuboid([gap_width-0.2,9,wall],anchor=TOP)attach(TOP){
         cuboid([10,9,wall],anchor=BOTTOM);
         }
         cyl(d = 4, h = 10);
@@ -136,14 +138,14 @@ module slider(){
     }
     module round_nut(){
         difference(){
-            cyl(d=6.3,h=wall,anchor=TOP)attach(TOP)cyl(d=9,h=7.5,anchor=BOTTOM);
+            cyl(d=gap_width-0.2,h=wall,anchor=TOP)attach(TOP)cyl(d=9,h=7.5,anchor=BOTTOM);
             up(wall-1)cyl(d=5.4, h = 7.5,anchor=BOTTOM,chamfer1=1);
-            #up(wall)cyl(d=3.4, h = wall*2,anchor=TOP);
+            up(wall)cyl(d=3.4, h = wall*2,anchor=TOP);
 
             }
     }
     //translate([0,-5,9.75])flat_nut();
-    !translate([0,-5,9.75])round_nut();
+    translate([0,-5,9.75])round_nut();
     
 }
 
