@@ -1,14 +1,13 @@
-//Version 0.8
 
 #include <phyphoxBle.h>
 
 // Define pin numbers for the incoming signals and the detection pin
-#define SIGNAL_A_PIN 8//22// 17 //pin for incoming signal A 
-#define SIGNAL_B_PIN 9// 21// 16 //pin for incoming signal B
-#define DETECT_PIN 5 //pin for detect second light gate
+#define SIGNAL_A_PIN 17//22// 17 //pin for incoming signal A 
+#define SIGNAL_B_PIN 16// 21// 16 //pin for incoming signal B
+#define DETECT_PIN 25 //pin for detect second light gate
 #define LED_PIN 4 //pin for indication LED
 
-#define BLENAME "Lichtschranke #1"
+#define BLENAME "Lichtschranke #2"
 // Structure to represent a signal with its associated pin and timing information
 struct Signal{
     const int pin; // Pin number associated with the signal
@@ -19,8 +18,11 @@ struct Signal{
 };
 // Flag to recognize if it's a single light gate or a magnet on RJ45 input
 bool single = 0;
-
+bool stopped = 0;
+bool cleared = 0;
+bool synced = 0;
 float t_offset = 0;
+float darkeningA;
 // Initialize signalA and signalB with their respective pins and initial states
 Signal signalA = {SIGNAL_A_PIN,0,0};
 Signal signalB = {SIGNAL_B_PIN,0,0};
@@ -73,14 +75,17 @@ void setup() {
   delay(2000);
 
   Serial.println("-----------------------------");
-  Serial.println("Lightgate Version 0.8");
+  Serial.println("Lightgate Version 0.9");
   Serial.println("-----------------------------");
 
   delay(1000);
+  t_offset = 0;
 
   // Check if the second light gate or magnet is connected via RJ45
   single = digitalRead(DETECT_PIN);
-  
+  Serial.println(single);
+
+
   // Set up interrupt routines for the light gates
     attachInterrupt(SIGNAL_A_PIN, ISR1, CHANGE); // Interrupt for light gate A on any change (rising or falling)
 
@@ -111,8 +116,9 @@ void single_loop(){
   // Calculate the current time in seconds since the program started
   t = 0.001 * (float)millis() - t_offset; 
   // Calculate the darkening time, which is the time the light gate is blocked
-  float darkeningA = abs((float)signalA.t1 - (float)signalA.t2)*0.001;
-
+  if(!digitalRead(SIGNAL_A_PIN)){
+    darkeningA = abs((float)signalA.t1 - (float)signalA.t2)*0.001;
+  }
   // Check if a new event has occurred since the last loop iteration
   if(puffer1 != signalA.t1){
     // Calculate the runtime between two consecutive rising edges of signal A
@@ -135,10 +141,8 @@ void single_loop(){
   }else{
     digitalWrite(LED_PIN, HIGH);
   }
-  if(n_puffer != n){
+  if(n_puffer != n &&   !digitalRead(SIGNAL_A_PIN)){
   // Send the calculated values to the phyphox app via BLE
-  
-
   PhyphoxBLE::write(t, runtime_A_A, darkeningA, T, dist);  
   // Output the calculated values to the serial monitor for debugging
   Serial.print(t,3);Serial.print(",");
@@ -244,6 +248,15 @@ void single_phyphox(){
   distGraph.setColor("FFCC5C");
   distGraph.setChannel(1, 5);
 
+  PhyphoxBleExperiment::Graph verdGraph;
+  verdGraph.setLabel("Verd.zeit");
+  verdGraph.setUnitY("s");
+  verdGraph.setUnitX("s");
+  verdGraph.setLabelX("t");
+  verdGraph.setLabelY("dT");
+  verdGraph.setStyle(STYLE_DOTS);
+  verdGraph.setColor("76a5af");
+  verdGraph.setChannel(1,3);
   // PhyphoxBleExperiment::Edit distance0;
   // distance0.setLabel("StartStrecke");
   // distance0.setUnit("cm");
@@ -253,6 +266,7 @@ void single_phyphox(){
   // Add the defined values to their respective views
   mtimes.addElement(runtime);
   mtimes.addElement(darktime);
+  mtimes.addElement(verdGraph);
 
   pendulum.addElement(period);
   pendulum.addElement(periodGraph);
@@ -290,7 +304,7 @@ void dual_phyphox(){
 
   // Define the values to be displayed in the phyphox app for dual light gates
   PhyphoxBleExperiment::Value runtime; // Runtime value between light gates A and B
-  runtime.setLabel("Signallaufzeit A B  t =");
+  runtime.setLabel("A-B t=");
   runtime.setPrecision(3);
   runtime.setUnit("s");
   runtime.setColor("FFCC5C");
@@ -298,7 +312,7 @@ void dual_phyphox(){
   runtime.setXMLAttribute("size=\"2\"");
 
   PhyphoxBleExperiment::Value darktimeA; // Darkening time value for light gate A
-  darktimeA.setLabel("Verdunklungszeit A  t =");
+  darktimeA.setLabel("A dt=");
   darktimeA.setPrecision(3);
   darktimeA.setUnit("s");
   darktimeA.setColor("FFCC5C");
@@ -306,7 +320,7 @@ void dual_phyphox(){
   darktimeA.setXMLAttribute("size=\"2\"");
 
   PhyphoxBleExperiment::Value darktimeB; // Darkening time value for light gate B
-  darktimeB.setLabel("Verdunklungszeit B  t =");
+  darktimeB.setLabel("B dt=");
   darktimeB.setPrecision(3);
   darktimeB.setUnit("s");
   darktimeB.setColor("FFCC5C");
@@ -326,9 +340,30 @@ void dual_phyphox(){
 }
 
 void newExperimentEvent(){
-  if(PhyphoxBLE::eventType == 1 || PhyphoxBLE::eventType == 2){
-    n = 0;
-    t_offset = 0.001 * (float)millis();     
+ 
+  if(PhyphoxBLE::eventType==1){
+    Serial.println("Start");
+    if(cleared){
+      t_offset = 0.001f * (float)millis();
+      n = 0;
+      n_puffer = 0;
+    }
+    stopped = 0;
+    cleared = 0;
+  }
+
+  if(PhyphoxBLE::eventType==2){
+    Serial.println("Clear");
+    stopped = 1;
+    synced  = 1;
+    cleared = 1;
+  }
+
+  if(PhyphoxBLE::eventType==255){
+    stopped = 1;
+    synced  = 1;
+    cleared = 1;
+    Serial.println("synced");
   }
 }
 // void receiveData(){
