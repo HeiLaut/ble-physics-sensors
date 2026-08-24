@@ -4,9 +4,9 @@
 #include <Adafruit_SSD1306.h>
 
 // ---- Pin-Konfiguration ----
-#define SIGNAL_PIN 26   // aus Sketch 2 übernommen (Sketch 1 nutzte Pin 5)
+#define SIGNAL_PIN 26  
 #define BUTTON_PIN 27
-#define SDA_PIN 16      // umbenannt, da SDA/SCL im ESP32-Core bereits belegt sind
+#define SDA_PIN 16   
 #define SCL_PIN 17
 
 // ---- OLED ----
