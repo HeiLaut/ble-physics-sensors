@@ -1,5 +1,5 @@
 #include <phyphoxBle.h>
-#define SIGNAL_PIN 5
+#define SIGNAL_PIN 27
 
 int n = 0;
 int t1 = 0;
