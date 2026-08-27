@@ -41,9 +41,9 @@ int mode = 0;
 void isr1() {
   n++;
   if(digitalRead(SIGNAL_PIN)){
-    t1=(int)millis();
+    t1=(int)micros();
   }else{
-    t2=(int)millis();
+    t2=(int)micros();
   }
 }
 
@@ -91,11 +91,10 @@ void loop() {
   digitalWrite(LED_BUILTIN, LOW);
 
   // Gets the current runtime in seconds
-  float t = 0.001f * (float)millis() - t_offset;
-
+  float t = 0.000001f * (float)micros() - t_offset;
   // gets darkening Time of the sensor
   if(digitalRead(SIGNAL_PIN)){
-    verdT = abs((float)t1 - (float)t2) * 0.001;
+    verdT = abs((float)t1 - (float)t2) * 0.000001f;
   }
   // Measures the time between t1 and the last two rising timestamps
   if(t1!=timeArray[2]){
@@ -103,8 +102,8 @@ void loop() {
       timeArray[i] = timeArray[i+1];
     }
     timeArray[2]=t1;
-    laufT = (timeArray[2]-timeArray[1])*0.001;
-    pendelT = (timeArray[2]-timeArray[0])*0.001;
+    laufT = (timeArray[2]-timeArray[1])*0.000001f;
+    pendelT = (timeArray[2]-timeArray[0])*0.000001f;
   }
 
   // calculates the frequency of a full pendulum swing
@@ -115,7 +114,7 @@ void loop() {
     PhyphoxBLE::write(&values[0], 6);
     Serial.print("t,");Serial.print(t,3);
     Serial.print(",Laufzeit,");Serial.print(laufT,3);
-    Serial.print(",Verdunklungszeit,"); Serial.print(verdT,3);
+    Serial.print(",Verdunklungszeit,"); Serial.print(verdT,4);
     Serial.print(",Schwingungsdauer,");Serial.print(pendelT,3);
     Serial.print(",Frequenz,");Serial.print(pendelF,3);
     Serial.print(",n,");Serial.println(floor(n/2));
@@ -136,7 +135,7 @@ void loop() {
     oled.setTextSize(1);
     oled.setCursor(5,0);  oled.print("Verdunklung");
     oled.setTextSize(2);
-    oled.setCursor(5,10); oled.print(verdT,3); oled.print(" s");
+    oled.setCursor(5,10); oled.print(verdT,4); oled.print(" s");
   }
   if(mode == 2){
     oled.setTextSize(1);
@@ -187,7 +186,7 @@ void generateExperiment(void * parameter) {
 
   PhyphoxBleExperiment::Value verd;
   verd.setLabel("Verd.zeit t =");
-  verd.setPrecision(3);
+  verd.setPrecision(4);
   verd.setUnit("s");
   verd.setColor("FFCC5C");
   verd.setChannel(3);
@@ -269,7 +268,7 @@ void newExperimentEvent(){
   if(PhyphoxBLE::eventType==1){
     Serial.println("Start");
     if(cleared){
-      t_offset = 0.001f * (float)millis();
+      0.000001f * (float)micros();
       n = 0;
       n_puffer = 0;
     }
