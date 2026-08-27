@@ -32,7 +32,7 @@ explode = 10;
 //up(9)rotate([180,0,0])sender_module();
 intersection(){
     union(){
-        up(39.8+2.5)slider();
+        up(39.8+1.5)slider();
         if(FRONT_COVER)up(z+explode)front();
         }
         *up(39.8+2.5)cuboid([30,50,50]);
@@ -82,7 +82,7 @@ module sender_snap(hole  = 0){
 }
 
 module front(versionA = false){
-    module_height = 7.5;
+    module_height = 8.5;
     if(versionA)difference(){
         union(){
             case([x,y,z],part = "top", wall = wall);
@@ -138,14 +138,15 @@ module slider(){
     }
     module round_nut(){
         difference(){
-            cyl(d=gap_width-0.2,h=wall,anchor=TOP)attach(TOP)cyl(d=9,h=7.5,anchor=BOTTOM);
+            cyl(d=gap_width-0.2,h=wall,anchor=TOP)attach(TOP)cyl(d=10,h=7.5,anchor=BOTTOM,chamfer2=1);
+            for(i=[0:45:360])rotate([0,0,i])left(10/2+0.5)cyl(d=2,h=20);
             up(wall-1)cyl(d=5.4, h = 7.5,anchor=BOTTOM,chamfer1=1);
             up(wall)cyl(d=3.4, h = wall*2,anchor=TOP);
 
             }
     }
     //translate([0,-5,9.75])flat_nut();
-    translate([0,-5,9.75])round_nut();
+    translate([0,-5,10.75])round_nut();
     
 }
 
