@@ -268,7 +268,7 @@ void newExperimentEvent(){
   if(PhyphoxBLE::eventType==1){
     Serial.println("Start");
     if(cleared){
-      0.000001f * (float)micros();
+      t_offset = 0.000001f * (float)micros();
       n = 0;
       n_puffer = 0;
     }
