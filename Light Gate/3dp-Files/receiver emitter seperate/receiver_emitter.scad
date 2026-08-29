@@ -13,15 +13,18 @@ wall = 2;
 //choose between OLED- or NON-OLED-Version
 OLED = 1;
 
-BOTTOM_PLATE = 0; //EMITTER AND RECVEIVER
+BOTTOM_PLATE = 1; //EMITTER AND RECVEIVER
 FRONT_COVER= 1; //EMMITTER AND RECEIVER
 
-RECEIVER_BACK_COVER = 0;
+
 EMITTER_BACK_COVER = 0;
-
-
-RECEIVER_TOP = 0;
 EMITTER_TOP = 0;
+
+RECEIVER_BACK_COVER = 1;
+
+RECEIVER_TOP = 1;
+
+BLENDE = 1;
 
 button = OLED ? true : false;
 
@@ -43,11 +46,30 @@ if(BOTTOM_PLATE)back(y/2+explode)up(z/4+wall)bottom();
 
 if(EMITTER_TOP)fwd(y/2+explode)up(z/4+wall)frontplate(0);
 if(EMITTER_BACK_COVER)backp2();
+if(BLENDE)translate([0,10,52])blende2();
 
 
 module sender_top(){
     case([x,y,z],part = "plate",switch = true);
 
+}
+
+
+module blende(){
+    difference(){
+        cuboid([15,20,1]);
+        back(4.5)cyl(d = 2, h = 10);
+        fwd(4)cyl(d=9.1,h=10);
+        }
+        
+}
+
+module blende2(){
+    difference(){
+        cyl(d=7,h=6,anchor=BOTTOM,rounding2=-2)attach(TOP)cyl(d=11,h=1,anchor=BOTTOM);
+        cyl(d=4.95,h=5,anchor=BOTTOM);
+        cyl(d=2,h=10,anchor=BOTTOM);
+        }
 }
 
 module sender_module(){

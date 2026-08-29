@@ -16,23 +16,22 @@
 
 Adafruit_SSD1306 oled(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
 
-int n = 0;
-int t1 = 0;
-int t2 = 0;
-int timeArray[3] = {0,0,0};
-int n_puffer = 0; // puffer to check, if a change happend.
-float t_offset;
-float verdT = 0;
-float laufT = 0;
-float pendelT = 0;
-float pendelF = 0;
-
+volatile int n = 0;
+volatile int t1 = 0;
+volatile int t2 = 0;
+volatile int timeArray[3] = {0, 0, 0};
+volatile float laufT = 0;
+volatile float pendelT = 0;
+volatile float pendelF = 0;
 float radius = 0;
-
-
+float verdT = 0;
+int n_puffer = 0;
 bool stopped = 0;
 bool cleared = 0;
 bool synced = 0;
+
+volatile float t = 0;
+volatile float t_offset = 0;
 // ---- Mode/Taster ----
 // 0 = Laufzeit, 1 = Verdunklung, 2 = Pendel
 
@@ -40,10 +39,18 @@ int mode = 0;
 
 void isr1() {
   n++;
-  if(digitalRead(SIGNAL_PIN)){
-    t1=(int)micros();
-  }else{
-    t2=(int)micros();
+  if (digitalRead(SIGNAL_PIN)) {
+    t1 = (int)micros();
+    t  = 0.000001f * (float)t1 - t_offset;
+    timeArray[0] = timeArray[1];
+    timeArray[1] = timeArray[2];
+    timeArray[2] = t1;
+
+    laufT   = (timeArray[2] - timeArray[1]) * 0.000001f;
+    pendelT = (timeArray[2] - timeArray[0]) * 0.000001f;
+    pendelF = 1.0f / pendelT;
+  } else {
+    t2 = (int)micros();
   }
 }
 
@@ -91,23 +98,13 @@ void loop() {
   digitalWrite(LED_BUILTIN, LOW);
 
   // Gets the current runtime in seconds
-  float t = 0.000001f * (float)micros() - t_offset;
+  //float t = 0.000001f * (float)micros() - t_offset;
   // gets darkening Time of the sensor
   if(digitalRead(SIGNAL_PIN)){
     verdT = abs((float)t1 - (float)t2) * 0.000001f;
   }
   // Measures the time between t1 and the last two rising timestamps
-  if(t1!=timeArray[2]){
-    for(int i = 0; i<2 ;i++){
-      timeArray[i] = timeArray[i+1];
-    }
-    timeArray[2]=t1;
-    laufT = (timeArray[2]-timeArray[1])*0.000001f;
-    pendelT = (timeArray[2]-timeArray[0])*0.000001f;
-  }
-
-  // calculates the frequency of a full pendulum swing
-  pendelF = 1/pendelT;
+ 
 
   if(n_puffer != n &&   digitalRead(SIGNAL_PIN)){
     float values[6] = {t,laufT,verdT,pendelT,pendelF,(float)floor(n/2)};
