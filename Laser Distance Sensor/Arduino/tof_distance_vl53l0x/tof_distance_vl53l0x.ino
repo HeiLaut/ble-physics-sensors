@@ -10,7 +10,7 @@ zu ändern: Bei Knopfdruck wird immer der Orstoffset gesetzt;Zeitoffset wird nur
 #define SDA 14 //PIN for I2C SDA
 #define SCL 12 //PIN for I2C SCL
 
-#define BLENAME "Laser-Distanz_#6"
+#define BLENAME "Laser-Distanz_#5"
 
 Adafruit_VL53L0X lox = Adafruit_VL53L0X();
 
@@ -21,7 +21,7 @@ bool cleared = 0;
 bool synced = 0;
 
 #define EMA_ALPHA_DIST 0.4f
-#define EMA_ALPHA_VEL  0.5f
+#define EMA_ALPHA_VEL  0.4f
 
 float emaDistance = 0.0f;
 float emaVelocity = 0.0f;
@@ -189,37 +189,37 @@ if (!buttonState) {
   Serial.println(offset);
 }
 
-  if (lox.isRangeComplete() && (!stopped || !synced)) {
-  readDist = lox.readRange() * 0.1;
-  distance = readDist - offset;
+    if (lox.isRangeComplete() && (!stopped || !synced)) {
+    readDist = lox.readRange() * 0.1;
+    distance = readDist - offset;
 
-  float t = 0.001f * (float)millis() - t_offset;
+    float t = 0.001f * (float)millis() - t_offset;
 
-  // Rohe Distanz per EMA filtern
-  if (!emaInitialized) {
-    emaDistance = distance;
-  } else {
-    emaDistance = EMA_ALPHA_DIST * distance + (1.0f - EMA_ALPHA_DIST) * emaDistance;
-  }
+    // Rohe Distanz per EMA filtern
+    if (!emaInitialized) {
+      emaDistance = distance;
+    } else {
+      emaDistance = EMA_ALPHA_DIST * distance + (1.0f - EMA_ALPHA_DIST) * emaDistance;
+    }
 
-  // Verschiebe Ringpuffer (auf gefilterter Distanz)
-  d_prev = d_curr;
-  t_prev = t_curr;
-  d_curr = emaDistance;
-  t_curr = t;
+    // Verschiebe Ringpuffer (auf gefilterter Distanz)
+    d_prev = d_curr;
+    t_prev = t_curr;
+    d_curr = emaDistance;
+    t_curr = t;
 
-  // Rohe Geschwindigkeit aus geglätteten Distanzen
-  float rawVelocity = (d_curr - d_prev) / (t_curr - t_prev);
-  // Geschwindigkeit per EMA filtern
-  if (!emaInitialized) {
-    emaVelocity = 0.0f;
-    emaInitialized = true;
-  } else {
-    emaVelocity = EMA_ALPHA_VEL * rawVelocity + (1.0f - EMA_ALPHA_VEL) * emaVelocity;
-  }
+    // Rohe Geschwindigkeit aus geglätteten Distanzen
+    float rawVelocity = (d_curr - d_prev) / (t_curr - t_prev);
+    // Geschwindigkeit per EMA filtern
+    if (!emaInitialized) {
+      emaVelocity = 0.0f;
+      emaInitialized = true;
+    } else {
+      emaVelocity = EMA_ALPHA_VEL * rawVelocity + (1.0f - EMA_ALPHA_VEL) * emaVelocity;
+    }
 
-  velocity = (t < 0.15f) ? 0.0f : emaVelocity;
-  distance = emaDistance;  // gefilterter Wert für weitere Verwendung
+    velocity = (t < 0.15f) ? 0.0f : emaVelocity;
+    distance = emaDistance;  // gefilterter Wert für weitere Verwendung
 
   if (distance > 120) {
     distance = 120;
