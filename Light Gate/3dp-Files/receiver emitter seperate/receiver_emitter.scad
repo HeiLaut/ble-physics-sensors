@@ -46,7 +46,7 @@ if(BOTTOM_PLATE)back(y/2+explode)up(z/4+wall)bottom();
 
 if(EMITTER_TOP)fwd(y/2+explode)up(z/4+wall)frontplate(0);
 if(EMITTER_BACK_COVER)backp2();
-!if(BLENDE)translate([0,10,52])blende2();
+if(BLENDE)translate([0,10,52])blende2();
 
 
 module sender_top(){
@@ -66,7 +66,7 @@ module blende(){
 
 module blende2(){
     difference(){
-        cyl(d=7,h=6,anchor=BOTTOM,rounding2=-2)attach(TOP)cyl(d=11,h=1,anchor=BOTTOM);
+        cyl(d=7,h=6,anchor=BOTTOM,rounding2=-1.5)attach(TOP)cyl(d=10,h=1,anchor=BOTTOM);
         cyl(d=4.95,h=5,anchor=BOTTOM);
         cyl(d=2,h=10,anchor=BOTTOM);
         }

@@ -1,5 +1,5 @@
 #include <phyphoxBle.h>
-#define SIGNAL_PIN 26
+#define SIGNAL_PIN 21
 #define NAME "Einzel-Lichtschranke C"
 
 
