@@ -46,7 +46,7 @@ if(BOTTOM_PLATE)back(y/2+explode)up(z/4+wall)bottom();
 
 if(EMITTER_TOP)fwd(y/2+explode)up(z/4+wall)frontplate(0);
 if(EMITTER_BACK_COVER)backp2();
-if(BLENDE)translate([0,10,52])blende2();
+!if(BLENDE)translate([0,10,52])blende2();
 
 
 module sender_top(){
