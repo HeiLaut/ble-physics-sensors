@@ -23,7 +23,10 @@ volatile int timeArray[3] = {0, 0, 0};
 volatile float laufT = 0;
 volatile float pendelT = 0;
 volatile float pendelF = 0;
-float radius = 0;
+volatile bool newEvent = false;
+volatile unsigned long lastRise = 0;
+const unsigned long DEBOUNCE_US = 2000; // Startwert, ggf. anpassen
+
 float verdT = 0;
 int n_puffer = 0;
 bool stopped = 0;
@@ -37,18 +40,17 @@ volatile float t_offset = 0;
 
 int mode = 0;
 
-void isr1() {
+void IRAM_ATTR isr1() {
   n++;
   if (digitalRead(SIGNAL_PIN)) {
-    t1 = (int)micros();
-    t  = 0.000001f * (float)t1 - t_offset;
+    unsigned long now = micros();
+    if (now - lastRise < DEBOUNCE_US) return;  // Prellen ignorieren, timeArray NICHT verschieben
+    lastRise = now;
+    t1 = (int)now;
     timeArray[0] = timeArray[1];
     timeArray[1] = timeArray[2];
     timeArray[2] = t1;
-
-    laufT   = (timeArray[2] - timeArray[1]) * 0.000001f;
-    pendelT = (timeArray[2] - timeArray[0]) * 0.000001f;
-    pendelF = 1.0f / pendelT;
+    newEvent = true;
   } else {
     t2 = (int)micros();
   }
@@ -83,6 +85,9 @@ void setup() {
 
   t_offset = 0;
 
+  pinMode(LED_BUILTIN, OUTPUT);
+  digitalWrite(LED_BUILTIN, LOW);
+
 }
 
 void loop() {
@@ -94,8 +99,7 @@ void loop() {
     delay(100); 
   }
 
-  pinMode(LED_BUILTIN, OUTPUT);
-  digitalWrite(LED_BUILTIN, LOW);
+  
 
   // Gets the current runtime in seconds
   //float t = 0.000001f * (float)micros() - t_offset;
@@ -106,7 +110,13 @@ void loop() {
   // Measures the time between t1 and the last two rising timestamps
  
 
-  if(n_puffer != n &&   digitalRead(SIGNAL_PIN)){
+ if (newEvent) {
+    newEvent = false;
+    t  = 0.000001f * (float)t1 - t_offset;
+    laufT   = (timeArray[2] - timeArray[1]) * 0.000001f;
+    pendelT = (timeArray[2] - timeArray[0]) * 0.000001f;
+    pendelF = 1.0f / pendelT;
+
     float values[6] = {t,laufT,verdT,pendelT,pendelF,(float)floor(n/2)};
     PhyphoxBLE::write(&values[0], 6);
     Serial.print("t,");Serial.print(t,3);
@@ -114,7 +124,7 @@ void loop() {
     Serial.print(",Verdunklungszeit,"); Serial.print(verdT,4);
     Serial.print(",Schwingungsdauer,");Serial.print(pendelT,3);
     Serial.print(",Frequenz,");Serial.print(pendelF,3);
-    Serial.print(",n,");Serial.println(floor(n/2));
+    Serial.print(",n,");Serial.println(floor(n/2),0);
   }
   n_puffer = n;
 
@@ -152,7 +162,7 @@ void loop() {
   oled.print(mode);
   oled.display();
 
-  delay(50);
+  //delay(50);
 }
 
 void generateExperiment(void * parameter) {
@@ -252,13 +262,6 @@ void generateExperiment(void * parameter) {
   vTaskDelete(NULL);
 }
 
-void receivedData() {           // get data from PhyPhox app
-  float readInput;
-  PhyphoxBLE::read(readInput);
-   if(readInput>0){
-      radius = readInput;
-    }
-}
 
 void newExperimentEvent(){
  
