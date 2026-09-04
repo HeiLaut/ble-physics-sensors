@@ -1,0 +1,161 @@
+<phyphox xmlns="https://phyphox.org/xml" xmlns:editor="https://phyphox.org/xml/editor" version="1.19">
+  <title>Lichtschranke</title>
+  <category>Sensor-Boxen</category>
+  <color>red</color>
+  <description>ESP32 Lichtschranke</description>
+  <data-containers>
+    <container size="0">time</container>
+    <container>t1</container>
+    <container>t2</container>
+    <container>t3</container>
+    <container>t4</container>
+    <container>t5</container>
+    <container size="5">dt</container>
+    <container>dt1</container>
+    <container>dt2</container>
+    <container>dt3</container>
+    <container>dt4</container>
+    <container>dt5</container>
+    <container size="0">sd</container>
+    <container size="5">lt</container>
+    <container>f</container>
+    <container size="5">tlist</container>
+  </data-containers>
+  <input>
+    <bluetooth uuid="12345678-1234-1234-1234-123456789abc" mtu="0" mode="notification">
+      <output char="abcdef01-1234-1234-1234-123456789abc" conversion="string">time</output>
+      <output char="abcdef02-1234-1234-1234-123456789abc" conversion="string">lt</output>
+      <output char="abcdef03-1234-1234-1234-123456789abc" conversion="string">dt</output>
+      <output char="abcdef04-1234-1234-1234-123456789abc" conversion="string">sd</output>
+    </bluetooth>
+  </input>
+  <analysis>
+    <divide>
+      <input type="value">1</input>
+      <input keep="true">sd</input>
+      <output>f</output>
+    </divide>
+    <append>
+      <input keep="true">time</input>
+      <output>tlist</output>
+    </append>
+    <subrange>
+      <input as="from" type="value">0</input>
+      <input as="length" type="value">1</input>
+      <input as="in" keep="true">tlist</input>
+      <output as="out" append="true">t1</output>
+    </subrange>
+    <subrange>
+      <input as="from" type="value">1</input>
+      <input as="length" type="value">1</input>
+      <input as="in" keep="true">tlist</input>
+      <output as="out" append="true">t2</output>
+    </subrange>
+    <subrange>
+      <input as="from" type="value">2</input>
+      <input as="length" type="value">1</input>
+      <input as="in" keep="true">tlist</input>
+      <output as="out" append="true">t3</output>
+    </subrange>
+    <subrange>
+      <input as="from" type="value">3</input>
+      <input as="length" type="value">1</input>
+      <input as="in" keep="true">tlist</input>
+      <output as="out" append="true">t4</output>
+    </subrange>
+    <subrange>
+      <input as="from" type="value">4</input>
+      <input as="length" type="value">1</input>
+      <input as="in" keep="true">tlist</input>
+      <output as="out" append="true">t5</output>
+    </subrange>
+    <subrange>
+      <input as="from" type="value">0</input>
+      <input as="length" type="value">1</input>
+      <input as="in" keep="true">dt</input>
+      <output as="out" append="true">dt1</output>
+    </subrange>
+    <subrange>
+      <input as="from" type="value">1</input>
+      <input as="length" type="value">1</input>
+      <input as="in" keep="true">dt</input>
+      <output as="out" append="true">dt2</output>
+    </subrange>
+    <subrange>
+      <input as="from" type="value">2</input>
+      <input as="length" type="value">1</input>
+      <input as="in" keep="true">dt</input>
+      <output as="out" append="true">dt3</output>
+    </subrange>
+    <subrange>
+      <input as="from" type="value">3</input>
+      <input as="length" type="value">1</input>
+      <input as="in" keep="true">dt</input>
+      <output as="out" append="true">dt4</output>
+    </subrange>
+    <subrange>
+      <input as="from" type="value">4</input>
+      <input as="length" type="value">1</input>
+      <input as="in" keep="true">dt</input>
+      <output as="out" append="true">dt5</output>
+    </subrange>
+  </analysis>
+  <views>
+    <view label="Laufzeiten">
+      <value label="Verd-Zeit" precision="4">
+        <input>dt</input>
+      </value>
+      <value label="Laufzeit" precision="4">
+        <input>lt</input>
+      </value>
+    </view>
+    <view label="Pendel">
+      <value label="Schwingungsdauer" precision="4">
+        <input>sd</input>
+      </value>
+      <value label="Frequenz" precision="4">
+        <input>f</input>
+      </value>
+      <graph label="Schwingungsdauer" style="dots" labelX="t" labelY="T" unitX="s" unitY="s">
+        <input axis="x">time</input>
+        <input axis="y">sd</input>
+      </graph>
+    </view>
+    <view label="Mehfachmessung">
+      <value label="Zeit 1" precision="4">
+        <input>t1</input>
+      </value>
+      <value label="Verd-Zeit 1" precision="4">
+        <input>dt1</input>
+      </value>
+      <separator color="red"/>
+      <value label="Zeit 2" precision="4">
+        <input>t2</input>
+      </value>
+      <value label="Verd-Zeit 2" precision="4">
+        <input>dt2</input>
+      </value>
+      <separator color="red"/>
+      <value label="Zeit 3" precision="4">
+        <input>t3</input>
+      </value>
+      <value label="Verd-Zeit 3" precision="4">
+        <input>dt3</input>
+      </value>
+      <separator color="red"/>
+      <value label="Zeit 4" precision="4">
+        <input>t4</input>
+      </value>
+      <value label="Verd-Zeit 4" precision="4">
+        <input>dt4</input>
+      </value>
+      <separator color="red"/>
+      <value label="Zeit 5" precision="4">
+        <input>t5</input>
+      </value>
+      <value label="Verd-Zeit 5" precision="4">
+        <input>dt5</input>
+      </value>
+    </view>
+  </views>
+</phyphox>
