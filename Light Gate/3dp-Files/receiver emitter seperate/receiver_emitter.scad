@@ -9,22 +9,20 @@ y = 100;
 z = 40;
 wall = 2;
 
+screw_shape = "hex";// ("hex" or "cylinder")
 
 //choose between OLED- or NON-OLED-Version
 OLED = 1;
-
 BOTTOM_PLATE = 1; //EMITTER AND RECVEIVER
 FRONT_COVER= 1; //EMMITTER AND RECEIVER
-
-
 EMITTER_BACK_COVER = 0;
 EMITTER_TOP = 0;
-
 RECEIVER_BACK_COVER = 1;
-
 RECEIVER_TOP = 1;
-
 BLENDE = 1;
+SLIDER = 1;
+
+plate_clearance = 0.5;
 
 button = OLED ? true : false;
 
@@ -32,20 +30,25 @@ gap_width = 7.7; //6.5
 
 explode = 10;
 
+
+
 //up(9)rotate([180,0,0])sender_module();
 intersection(){
     union(){
-        up(39.8+1.5)slider();
-        if(FRONT_COVER)up(z+explode)front();
+        if(SLIDER)up(39.8+1.5)slider();
+        intersection(){
+            if(FRONT_COVER)up(z+explode)front_cover(0);
+            //fwd(35)up(z+explode)cuboid(30,rounding=4,except=[TOP,BOTTOM]);
+            }
         }
         *up(39.8+2.5)cuboid([30,50,50]);
         }
 if(RECEIVER_BACK_COVER)backp();
-if(RECEIVER_TOP)fwd(y/2+explode)up(z/4+wall)frontplate();
-if(BOTTOM_PLATE)back(y/2+explode)up(z/4+wall)bottom();
+if(RECEIVER_TOP)fwd(y/2+explode)up(z/4+wall)top_plate();
+if(BOTTOM_PLATE)back(y/2+explode)up(z/4+wall)bottom_plate();
 
-if(EMITTER_TOP)fwd(y/2+explode)up(z/4+wall)frontplate(0);
-if(EMITTER_BACK_COVER)backp2();
+if(EMITTER_TOP)fwd(y/2+explode)up(z/4+wall)top_plate(0);
+if(EMITTER_BACK_COVER)back_cover();
 if(BLENDE)translate([0,10,52])blende2();
 
 
@@ -66,7 +69,7 @@ module blende(){
 
 module blende2(){
     difference(){
-        cyl(d=7,h=6,anchor=BOTTOM,rounding2=-1.5)attach(TOP)cyl(d=10,h=1,anchor=BOTTOM);
+        cyl(d=7,h=5,anchor=BOTTOM,rounding2=-0.75)attach(TOP)cyl(d=9,h=2,anchor=BOTTOM);
         cyl(d=4.95,h=5,anchor=BOTTOM);
         cyl(d=2,h=10,anchor=BOTTOM);
         }
@@ -83,27 +86,36 @@ module sender_module(){
 }
 
 
-module sender_snap(hole  = 0){
+module sender_snap(
+        hole  = 0,
+        wall = wall
+        ){
+        vrs = "ali";
+        d_hole = (vrs == "ali") ? 8 :6.2;
+        hole_dist = (vrs == "ali") ? (9.5) : (10);
+        right(-5){
     if(!hole)difference(){
         cuboid([25,20,wall],anchor=BOTTOM, rounding =2, except = [TOP,BOTTOM])
             attach(TOP){
-                translate([18/2-12,0,0])
-                    {
+                
                     cyl(d = 3,h = 8,anchor=BOTTOM);
-                    for(i=[-1,1])translate([2,i*(5.5+0.6),0])cuboid([10,1.2,7.8],anchor=BOTTOM)
-                    attach(TOP)xcyl(d=2,h=10);
+                    for(i=[-1,1]){
+                        rounding = (i==-1) ? [BOTTOM+FRONT]:[BOTTOM+BACK];
+                        translate([2,i*(5.5+0.6),0])cuboid([10,1.2,7.8],anchor=BOTTOM,rounding=-2,edges=rounding)attach(TOP)xcyl(d=2,h=10);
+;
+                        }
                     
-                    }
+                    
 
                     
                 }
         
         }
-        if(hole)down(0.1)right(-18/2+14)cyl(d = 6.2, h  = 3,anchor= BOTTOM);
-    
+        if(hole)down(0.1)right(hole_dist)cyl(d = d_hole, h  = wall*2,anchor= BOTTOM);
+    }
 }
 
-module front(versionA = false){
+module front_cover(versionA = false){
     module_height = 8.5;
     if(versionA)difference(){
         union(){
@@ -150,7 +162,7 @@ module slider(){
    }//end difference
    
    //"nut" starts here
-   module flat_nut(){
+   module washer(){
     difference(){
         cuboid([gap_width-0.2,9,wall],anchor=TOP)attach(TOP){
         cuboid([10,9,wall],anchor=BOTTOM);
@@ -158,17 +170,24 @@ module slider(){
         cyl(d = 4, h = 10);
     }
     }
-    module round_nut(){
+    module screw_head(shape = "cylinder"){
         difference(){
-            cyl(d=gap_width-0.2,h=wall,anchor=TOP)attach(TOP)cyl(d=10,h=7.5,anchor=BOTTOM,chamfer2=1);
+            cyl(d=gap_width-0.2,h=wall,anchor=TOP)attach(TOP)cyl(d=10,h=7.5,anchor=BOTTOM,chamfer2=0.5);
             for(i=[0:45:360])rotate([0,0,i])left(10/2+0.5)cyl(d=2,h=20);
-            up(wall-1)cyl(d=5.4, h = 7.5,anchor=BOTTOM,chamfer1=1);
-            up(wall)cyl(d=3.4, h = wall*2,anchor=TOP);
+            if(shape == "cylinder"){
+                up(wall-1)cyl(d=5.4, h = 7.5,anchor=BOTTOM,chamfer1=1);
+                up(wall)cyl(d=3.4, h = wall*2,anchor=TOP);
+                }
+            if(shape == "hex"){
+                up(wall-1)cyl(d=6.8, h = 7.5,anchor=BOTTOM,chamfer1=1,$fn = 6);
+                up(wall)cyl(d=3.2, h = wall*2,anchor=TOP);
+            }
 
             }
     }
-    //translate([0,-5,9.75])flat_nut();
-    translate([0,-5,10.75])round_nut();
+    
+    //translate([0,-5,9.75])washer();
+    translate([0,-5,10.75])screw_head(shape = screw_shape);
     
 }
 
@@ -186,15 +205,15 @@ module backp(etext= "IR Receiver"){
 
 }
 
-module backp2(etext= "IR Emitter"){
+module back_cover(etext= "IR Emitter"){
             case([x,y,z],part = "bottom",lolin32lite = 0,embosstext = etext,button = 0,buttonpos = [0,40],embosspos=[0,-10],wall = wall);
          
 }
 
-module frontplate(receiver = true){
+module top_plate(receiver = true){
    difference(){
     union(){
-        case([x,y,z],part = "plate", usbC = receiver, switch = 1,switchpos = [10,5], wall = wall);
+        case([x,y,z],part = "plate", usbC = receiver, switch = 1,switchpos = [10,5], wall = wall,plate_clearance = plate_clearance);
         translate([-12,wall,12])ycyl(d = 7, h = 4,anchor=FRONT);
         }
         translate([-12,-0.1,12])ycyl(d = 5, h = 8,anchor=FRONT);
@@ -214,16 +233,11 @@ module frontplate(receiver = true){
     }
     }
 
-module bottom(){
+module bottom_plate(){
     difference(){
-        case([x,y,z],part = "plate",wall=wall);
+        case([x,y,z],part = "plate",wall=wall,plate_clearance = plate_clearance);
         up(z/4-wall)back(wall)ycyl(d=15,h=wall,anchor=BACK);
         }
     up(z/4-wall)back(wall)rotate([90,0,0])rodmount();
 
 }
-/*
-case([x,y,z],part = "plate",wall = wall,usbC = 1);
-case([x,y,z],part = "bottom",wall = wall);
-up(z+10)case([x,y,z],part = "top",wall = wall);
-*/
