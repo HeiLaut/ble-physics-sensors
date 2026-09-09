@@ -31,7 +31,6 @@ volatile unsigned long lastRise = 0;
 const unsigned long DEBOUNCE_US = 2000; // Startwert, ggf. anpassen
 
 float verdT = 0;
-int n_puffer = 0;
 bool stopped = 0;
 bool cleared = 0;
 bool synced = 0;
@@ -44,12 +43,13 @@ volatile float t_offset = 0;
 int mode = 0;
 
 #define SERVICE_UUID   "12345678-1234-1234-1234-123456789abc"
-#define CHAR_UUID_T    "abcdef01-1234-1234-1234-123456789abc"  // Zeit
-#define CHAR_UUID_LT   "abcdef02-1234-1234-1234-123456789abc"  // Wert 1
-#define CHAR_UUID_DT   "abcdef03-1234-1234-1234-123456789abc"  // Wert 2
-#define CHAR_UUID_SD   "abcdef04-1234-1234-1234-123456789abc"  // Wert 2
+#define CHAR_UUID_T    "abcdef01-1234-1234-1234-123456789abc"  // time
+#define CHAR_UUID_LT   "abcdef02-1234-1234-1234-123456789abc"  // signal time
+#define CHAR_UUID_DT   "abcdef03-1234-1234-1234-123456789abc"  // shadowing time
+#define CHAR_UUID_SD   "abcdef04-1234-1234-1234-123456789abc"  // period
+#define CHAR_UUID_N    "abcdef05-1234-1234-1234-123456789abc"  // count
 
-BLECharacteristic *pCharT, *pCharLT, *pCharDT, *pCharSD;
+BLECharacteristic *pCharT, *pCharLT, *pCharDT, *pCharSD, *pCharN;
 bool deviceConnected = false;
 
 class MyServerCallbacks : public BLEServerCallbacks {
@@ -90,11 +90,12 @@ void setup() {
   BLEServer *pServer = BLEDevice::createServer();
   pServer->setCallbacks(new MyServerCallbacks());
 
-  BLEService *pService = pServer->createService(SERVICE_UUID);
+  BLEService *pService = pServer->createService(BLEUUID(SERVICE_UUID), 30);
   pCharT  = createChar(pService, CHAR_UUID_T);
   pCharLT = createChar(pService, CHAR_UUID_LT);
   pCharDT = createChar(pService, CHAR_UUID_DT);
   pCharSD = createChar(pService, CHAR_UUID_SD);
+  pCharN = createChar(pService, CHAR_UUID_N);
 
 
   pService->start();
@@ -137,13 +138,15 @@ void loop() {
     laufT   = (timeArray[2] - timeArray[1]) * 0.000001f;
     pendelT = (timeArray[2] - timeArray[0]) * 0.000001f;
     pendelF = 1.0f / pendelT;
-    Serial.println(String(t) + " | " + String(laufT) + " | " + String(verdT) + " | " +String(pendelT));
+    Serial.println(String(t) + " | " + String(laufT) + " | " + String(verdT) + " | " +String(pendelT) + "|" + String(n/2));
      if (deviceConnected) {
     String sT       = String(t,4);
     String sLaufT   = String(laufT,4);
     String sVerdT   = String(verdT,4);
-    String sPendelT = String(pendelT,4);
+    String sPendelT = String(pendelT,4);//pendelT
+    String sN = String(n/2);
 
+    pCharN->setValue(sN.c_str()); pCharN->notify();
     pCharT->setValue(sT.c_str());       pCharT->notify();
     pCharLT->setValue(sLaufT.c_str());  pCharLT->notify();
     pCharDT->setValue(sVerdT.c_str());  pCharDT->notify();
@@ -153,7 +156,6 @@ void loop() {
     //delay(500);
   }
   }
-  n_puffer = n;
 
 
  

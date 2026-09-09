@@ -17,9 +17,10 @@
     <container>dt4</container>
     <container>dt5</container>
     <container size="0">sd</container>
-    <container size="5">lt</container>
+    <container size="0">lt</container>
     <container>f</container>
     <container size="5">tlist</container>
+    <container size="0">i</container>
   </data-containers>
   <input>
     <bluetooth uuid="12345678-1234-1234-1234-123456789abc" mtu="0" mode="notification">
@@ -27,6 +28,7 @@
       <output char="abcdef02-1234-1234-1234-123456789abc" conversion="string">lt</output>
       <output char="abcdef03-1234-1234-1234-123456789abc" conversion="string">dt</output>
       <output char="abcdef04-1234-1234-1234-123456789abc" conversion="string">sd</output>
+      <output char="abcdef05-1234-1234-1234-123456789abc" conversion="string">i</output>
     </bluetooth>
   </input>
   <analysis>
@@ -102,60 +104,73 @@
   </analysis>
   <views>
     <view label="Laufzeiten">
-      <value label="Verd-Zeit" precision="4">
+      <value label="Verd-Zeit t=" size="2" precision="4" unit="s">
         <input>dt</input>
       </value>
-      <value label="Laufzeit" precision="4">
+      <value label="Laufzeit dt=" size="2" precision="4" unit="s">
         <input>lt</input>
       </value>
     </view>
     <view label="Pendel">
-      <value label="Schwingungsdauer" precision="4">
+      <value label="Schwingungsdauer T=" size="2" precision="4" unit="s">
         <input>sd</input>
       </value>
-      <value label="Frequenz" precision="4">
+      <value label="Frequenz f=" size="2" precision="4" unit="Hz">
         <input>f</input>
       </value>
-      <graph label="Schwingungsdauer" style="dots" labelX="t" labelY="T" unitX="s" unitY="s">
+      <graph label="Schwingungsdauer" style="dots" labelX="t" labelY="T" unitX="s" unitY="s" lineWidth="2">
         <input axis="x">time</input>
         <input axis="y">sd</input>
       </graph>
     </view>
     <view label="Mehfachmessung">
-      <value label="Zeit 1" precision="4">
+      <value label="Zeit 1" precision="4" unit="s">
         <input>t1</input>
       </value>
-      <value label="Verd-Zeit 1" precision="4">
+      <value label="Verd-Zeit 1" precision="4" unit="s">
         <input>dt1</input>
       </value>
       <separator color="red"/>
-      <value label="Zeit 2" precision="4">
+      <value label="Zeit 2" precision="4" unit="s">
         <input>t2</input>
       </value>
-      <value label="Verd-Zeit 2" precision="4">
+      <value label="Verd-Zeit 2" precision="4" unit="s">
         <input>dt2</input>
       </value>
       <separator color="red"/>
-      <value label="Zeit 3" precision="4">
+      <value label="Zeit 3" precision="4" unit="s">
         <input>t3</input>
       </value>
-      <value label="Verd-Zeit 3" precision="4">
+      <value label="Verd-Zeit 3" precision="4" unit="s">
         <input>dt3</input>
       </value>
       <separator color="red"/>
-      <value label="Zeit 4" precision="4">
+      <value label="Zeit 4" precision="4" unit="s">
         <input>t4</input>
       </value>
-      <value label="Verd-Zeit 4" precision="4">
+      <value label="Verd-Zeit 4" precision="4" unit="s">
         <input>dt4</input>
       </value>
       <separator color="red"/>
-      <value label="Zeit 5" precision="4">
+      <value label="Zeit 5" precision="4" unit="s">
         <input>t5</input>
       </value>
-      <value label="Verd-Zeit 5" precision="4">
+      <value label="Verd-Zeit 5" precision="4" unit="s">
         <input>dt5</input>
       </value>
+      <graph label="Laufzeit" style="dots" labelX="t" labelY="dt" unitX="s" unitY="s" lineWidth="2">
+        <input axis="x">time</input>
+        <input axis="y">lt</input>
+      </graph>
+    </view>
+    <view label="Ereignisse">
+      <value label="n" precision="0">
+        <input>i</input>
+      </value>
+      <graph label="Ereignisse" style="dots" labelX="t" labelY="n" unitX="s" yPrecision="0" lineWidth="2">
+        <input style="dots" lineWidth="2" axis="x">time</input>
+        <input style="dots" lineWidth="2" axis="y">i</input>
+      </graph>
     </view>
   </views>
 </phyphox>
