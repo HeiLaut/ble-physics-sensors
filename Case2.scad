@@ -40,7 +40,8 @@ case([x,y,z],part="bottom",explode = 25,rd=2,lolinspace = lolinspace,button = 0,
 ////must be larger than 1.5 mm
 module case(
    size = [15,15,15], //size [x,y,z]
-   clearance = 0.15, //overall clearance
+   clearance = 0.15, //overall clearance,
+   plate_clearance = 0,//makes the plate smaller, if the print of the large parts gets a bit loose, while printing
    wall = 2, //wall thickness
    rd = 2, //chamfer radius
    cutheight = 2, //offset of cutheight
@@ -218,20 +219,17 @@ module case(
          
          
    }//end body
-   module frontplate(){   
-      cuboid([x+2*overlap,wall,z+2*overlap],chamfer = rd,except=[FRONT,BACK]);
+   module frontplate(plate_clearance=plate_clearance){
+      cuboid([x+2*overlap-plate_clearance,wall,z+2*overlap-plate_clearance],chamfer = rd,except=[FRONT,BACK]);
       }//end frontplate
-      
-      
-   module backplate(){   
-      translate([0,-1*(-y/2-wall/2),0])cuboid([x+2*overlap,wall,z+2*overlap],chamfer = rd,except=[FRONT,BACK]);
-      }//end backplate
+
+
 
    if(part == "all"){
       body(explode,"upper");
       body(explode,"lower");
       fwd(explode+y/2+wall/2)frontplate();
-      back(explode)backplate();
+      back(explode)translate([0,-1*(-y/2-wall/2),0])frontaplate();
       }
    if(part == "top"){
       down(z/2)body(explode,"upper");
