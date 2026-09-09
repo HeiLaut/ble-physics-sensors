@@ -206,6 +206,7 @@ void generateExperiment(void * parameter) {
   verdGraph.setLabelX("t");
   verdGraph.setLabelY("dT");
   verdGraph.setStyle(STYLE_DOTS);
+  verdGraph.setLinewidth(2);
   verdGraph.setColor("76a5af");
   verdGraph.setChannel(1,3);
 
@@ -239,7 +240,8 @@ void generateExperiment(void * parameter) {
   periodGraph.setUnitX("");
   periodGraph.setLabelX("n");
   periodGraph.setLabelY("T");
-  periodGraph.setStyle( STYLE_DOTS);
+  periodGraph.setStyle(STYLE_DOTS);
+  periodGraph.setLinewidth(2);
   periodGraph.setColor("76a5af");
   periodGraph.setChannel(6, 4);
 
