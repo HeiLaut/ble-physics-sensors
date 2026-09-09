@@ -18,12 +18,14 @@ include<BOSL2/std.scad>
 include<BOSL2/threading.scad>
 
 
-TOPCASE = true;
-BOTTOMCASE = true;
-LEFTPANEL = true;
-RIGHTPANEL = true;
-LOCKSCREW = true;
-STANDSCREW = true;
+TOPCASE = 1;
+BOTTOMCASE = 1;
+LEFTPANEL = 1;
+RIGHTPANEL = 1;
+LOCKSCREW = 1;
+STANDSCREW = 1;
+
+led_only=1; //set  to 0 if using the aliexpress break_beam_sensor
 
 RJ45 = true;
 USBC = true;
@@ -223,7 +225,8 @@ module Top(oled=1,led=1){
     zcyl(h=xi*3+2,d=dLED);
     }
     for(i=[-1,1]){
-      translate([i*(xi/2+wall-d1/5),ya-(yi-clearance*2)/2-wall,cutheight+d1*0.6])ycyl(h=yi,d=d1);
+      snap_offset = (led_only == 1) ? 0 : 30;
+      translate([i*(xi/2+wall-d1/5),ya-(yi-clearance*2)/2-wall-snap_offset/2,cutheight+d1*0.6])ycyl(h=yi-snap_offset,d=d1);
       
       translate([i*(xa/2-(widthx/2-3*wall)/2-wall*1.5-clearance/2),ya-wall+0.01+d1/5,cutheight+d1*0.6])xcyl(h=widthx/2-3*wall,d=d1);
 
@@ -258,6 +261,29 @@ module switchcase(hole = false){
 }
 
 module Bottom(){
+    module sender_connect(
+        hole  = 0,
+        d_hole = 8.5,      //6.2
+        wall = 6,
+        wdt = 10,
+        hole_dist = -3+10.5
+        ){
+    difference(){
+        right(3)cuboid([25,12,wall],anchor=BOTTOM, chamfer =-6, edges = [BOTTOM+FRONT]);
+        
+        translate([18/2-12,0,0])cyl(d = 2.9,h = 8,anchor=BOTTOM);
+        down(0.1)right(hole_dist)cyl(d = d_hole, h  = wall*2,anchor= BOTTOM);
+    }
+    }
+    if(led_only == 0)for(i = [-1,1]){
+    flip = (i==1) ? 0 : 1;
+    mirror([flip,0,0])
+    translate([(xi/2+wall),ya-21.5,0])rotate([90,0,90]){
+        sender_connect();
+        }
+        
+    }
+
   difference(){
         union(){
          Body();
@@ -267,7 +293,8 @@ module Bottom(){
          translate([0,8,-5])cuboid([16,16,z/2],chamfer=1,except=[TOP,BOTTOM]);
          }//end if
          //led mount (IRR and IRE)
-         for(i=[-1,1]){
+         if(led_only == 1){
+            for(i=[-1,1]){
             difference(){
                translate([i*(xi/2+2*wall+2),ya-10,-z/2])cuboid([9,8,z/2+cutheight],anchor=BOTTOM+BACK);
                translate([0,ya-10-4,0])xcyl(h=xi*3+2,d=dLED);
@@ -275,7 +302,12 @@ module Bottom(){
             //translate([i*(xi/2+2*wall),ya-6,-z/2])cuboid([5,8,z/2+cutheight],anchor=BOTTOM+BACK);
 
          }//end for
+         }
+         else{
+            //translate([1*(xi/2+wall),ya-19,0])rotate([90,0,90])sender_snap();
+         }//end else
          }//end union
+
           if(rod){
          //hole for rod
            translate([0,12,0])cyl(d=11,h=z);
@@ -286,14 +318,17 @@ module Bottom(){
         
         //hole for LEDs
         translate([0,ya-10-4,0])xcyl(h=xi*3+2,d=3);
+        //mid markings
         for(i=[-1,1]){
          translate([i*(xi/2+wall/6),ya-10,0])cuboid([wall/3,10,1],anchor=FRONT);
          }//end for
     }//end difference
     
     //female snaps
+    side_length = (led_only == 1) ? yi/1.5:yi/1.5-12;
+    side_offset = (led_only == 1) ? 0 : 7;
     for(i=[-1,1]){
-            translate([i*(-xi/2-wall+0.01),widthy-2*wall,d1-d1/4+cutheight-1])SnapFemale(l =yi/1.5,angy=i*90,m=-1+i);
+            translate([i*(-xi/2-wall+0.01),widthy-2*wall-side_offset,d1-d1/4+cutheight-1])SnapFemale(l =side_length,angy=i*90,m=-1+i);
             translate([i*(xa/2-(widthx/2-3*wall)/2-wall*1.5),ya-wall+0.01,d1-d1/4+cutheight-1])SnapFemale(l = widthx/2-3*wall,angy=90,angz = 90);
             }//end for
     translate([0,wall-0.01,d1-d1/4+cutheight-1])SnapFemale(l = xa-3*wall,angy=-90,angz = 90,m=1);
