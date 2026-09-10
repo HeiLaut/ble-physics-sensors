@@ -39,6 +39,8 @@ volatile float t_offset = 0;
 // 0 = Laufzeit, 1 = Verdunklung, 2 = Pendel
 
 int mode = 0;
+bool lastButtonState = HIGH;   
+
 
 void IRAM_ATTR isr1() {
   n++;
@@ -91,15 +93,15 @@ void setup() {
 }
 
 void loop() {
+  bool reading = digitalRead(BUTTON_PIN);
 
-  // ---- Taster: Moduswechsel (für OLED) ----
-  if(!digitalRead(BUTTON_PIN)){
+  if (reading == LOW && lastButtonState == HIGH) {
     mode++;
     mode %= 4;
-    delay(100); 
-  }
+    delay(50);
+   }
 
-  
+  lastButtonState = reading;
 
   // Gets the current runtime in seconds
   //float t = 0.000001f * (float)micros() - t_offset;
@@ -156,6 +158,7 @@ void loop() {
     oled.setTextSize(2);
     oled.setCursor(5,10); oled.print(pendelF,3); oled.print(" Hz");
   }
+
 
   oled.setTextSize(1);
   oled.setCursor(120,0);
