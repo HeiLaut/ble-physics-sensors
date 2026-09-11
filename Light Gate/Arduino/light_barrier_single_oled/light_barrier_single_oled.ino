@@ -1,3 +1,19 @@
+/*
+ * Title: Einzellichtschranke
+ * Version: 1.0
+ * Author: Heinrich Lauterbach
+ * GitHub: https://github.com/HeiLaut/ble-physics-sensors
+ *
+ * License (own code): CC BY-SA 4.0
+ * https://creativecommons.org/licenses/by-sa/4.0/deed.en
+ *
+ * Libraries used:
+ * - phyphoxBLE (LGPL 3.0) - https://github.com/phyphox/phyphox-arduino
+ * - Adafruit_GFX (BSD License) - https://github.com/adafruit/Adafruit-GFX-Library
+ * - Adafruit_SSD1306 (BSD License) - https://github.com/adafruit/Adafruit_SSD1306
+ */
+
+
 #include <phyphoxBle.h>
 #include <Wire.h>
 #include <Adafruit_GFX.h>
@@ -103,9 +119,7 @@ void loop() {
 
   lastButtonState = reading;
 
-  // Gets the current runtime in seconds
-  //float t = 0.000001f * (float)micros() - t_offset;
-  // gets darkening Time of the sensor
+
   if(digitalRead(SIGNAL_PIN)){
     verdT = abs((float)t1 - (float)t2) * 0.000001f;
   }
