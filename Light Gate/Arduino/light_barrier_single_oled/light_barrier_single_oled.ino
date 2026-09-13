@@ -39,7 +39,7 @@
 #define BUTTON_PIN 27
 #define SDA_PIN 16   
 #define SCL_PIN 17
-
+#define LED_PIN 32
 // ---- OLED ----
 #define SCREEN_WIDTH 128
 #define SCREEN_HEIGHT 32
@@ -84,9 +84,12 @@ void IRAM_ATTR isr1() {
     timeArray[1] = timeArray[2];
     timeArray[2] = t1;
     newEvent = true;
+
   } else {
     t2 = (int)micros();
+
   }
+
 }
 
 void setup() {
@@ -114,6 +117,7 @@ void setup() {
 
   pinMode(SIGNAL_PIN, INPUT_PULLUP);
   pinMode(BUTTON_PIN, INPUT_PULLUP);
+  pinMode(LED_PIN, OUTPUT);
   attachInterrupt(digitalPinToInterrupt(SIGNAL_PIN), isr1, CHANGE);
 
   t_offset = 0;
@@ -124,12 +128,19 @@ void setup() {
 }
 
 void loop() {
+  if (digitalRead(SIGNAL_PIN)) {
+    digitalWrite(LED_PIN, LOW);  
+  }else{
+    digitalWrite(LED_PIN,HIGH);
+
+  }
   bool reading = digitalRead(BUTTON_PIN);
 
   if (reading == LOW && lastButtonState == HIGH) {
     mode++;
     mode %= 4;
     delay(50);
+    //Serial.println("press");
    }
 
   lastButtonState = reading;
@@ -142,6 +153,7 @@ void loop() {
  
 
  if (newEvent) {
+
     newEvent = false;
     t  = 0.000001f * (float)t1 - t_offset;
     laufT   = (timeArray[2] - timeArray[1]) * 0.000001f;
