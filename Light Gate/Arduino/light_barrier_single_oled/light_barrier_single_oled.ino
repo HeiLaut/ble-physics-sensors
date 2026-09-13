@@ -1,6 +1,6 @@
 /*
  * Title: Einzellichtschranke
- * Version: 1.0
+ * Version: 1.01
  * Author: Heinrich Lauterbach
  * GitHub: https://github.com/HeiLaut/ble-physics-sensors
  *
