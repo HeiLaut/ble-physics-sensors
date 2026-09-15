@@ -20,25 +20,47 @@
     <container size="0">lt</container>
     <container>f</container>
     <container size="5">tlist</container>
-    <container size="0">i</container>
+    <container size="0">n</container>
+    <container>timeOffset</container>
+    <container size="0">timeView</container>
+    <container size="0">nOffset</container>
+    <container size="0">nView</container>
+    <container size="0">dtView</container>
   </data-containers>
   <input>
     <bluetooth uuid="12345678-1234-1234-1234-123456789abc" mtu="0" mode="notification">
       <output char="abcdef01-1234-1234-1234-123456789abc" conversion="string">time</output>
       <output char="abcdef02-1234-1234-1234-123456789abc" conversion="string">lt</output>
       <output char="abcdef03-1234-1234-1234-123456789abc" conversion="string">dt</output>
+      <output char="abcdef03-1234-1234-1234-123456789abc" conversion="string">dtView</output>
       <output char="abcdef04-1234-1234-1234-123456789abc" conversion="string">sd</output>
-      <output char="abcdef05-1234-1234-1234-123456789abc" conversion="string">i</output>
+      <output char="abcdef05-1234-1234-1234-123456789abc" conversion="string">n</output>
     </bluetooth>
   </input>
   <analysis>
+    <first>
+      <input as="value" keep="true">time</input>
+      <output as="first">timeOffset</output>
+      <input as="value" keep="true">n</input>
+      <output as="first">nOffset</output>
+    </first>
+    <subtract>
+      <input keep="true">time</input>
+      <input keep="true">timeOffset</input>
+      <output>timeView</output>
+    </subtract>
+    <subtract>
+      <input keep="true">n</input>
+      <input keep="true">nOffset</input>
+      <output>nView</output>
+    </subtract>
     <divide>
       <input type="value">1</input>
       <input keep="true">sd</input>
       <output>f</output>
     </divide>
     <append>
-      <input keep="true">time</input>
+      <input keep="true">timeView</input>
       <output>tlist</output>
     </append>
     <subrange>
@@ -119,7 +141,7 @@
         <input>f</input>
       </value>
       <graph label="Schwingungsdauer" style="dots" labelX="t" labelY="T" unitX="s" unitY="s" lineWidth="2">
-        <input axis="x">time</input>
+        <input axis="x">timeView</input>
         <input axis="y">sd</input>
       </graph>
     </view>
@@ -158,18 +180,25 @@
       <value label="Verd-Zeit 5" precision="4" unit="s">
         <input>dt5</input>
       </value>
+    </view>
+    <view label="Vielfachmessung">
       <graph label="Laufzeit" style="dots" labelX="t" labelY="dt" unitX="s" unitY="s" lineWidth="2">
-        <input axis="x">time</input>
+        <input axis="x">timeView</input>
         <input axis="y">lt</input>
       </graph>
-    </view>
-    <view label="Ereignisse">
       <value label="n" precision="0">
-        <input>i</input>
+        <input>nView</input>
       </value>
-      <graph label="Ereignisse" style="dots" labelX="t" labelY="n" unitX="s" yPrecision="0" lineWidth="2">
-        <input style="dots" lineWidth="2" axis="x">time</input>
-        <input style="dots" lineWidth="2" axis="y">i</input>
+      <graph label="Ereignisse" style="dots" labelX="t" labelY="n" unitX="s" yPrecision="0" suppressScientificNotation="true" lineWidth="2">
+        <input style="dots" lineWidth="2" axis="x">timeView</input>
+        <input style="dots" lineWidth="2" axis="y">nView</input>
+      </graph>
+      <value label="New Value">
+        <input>dtView</input>
+      </value>
+      <graph label="Verdunklungszeit" style="dots" labelX="t" labelY="dt" unitX="s" unitY="s" lineWidth="2">
+        <input axis="x">timeView</input>
+        <input axis="y">dtView</input>
       </graph>
     </view>
   </views>
