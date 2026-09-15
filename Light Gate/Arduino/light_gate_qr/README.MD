@@ -1,1 +1,0 @@
-If you load this sketch to the light gate (single one with optional OLED) you need to add the experiment manually to phyphox using the provided qr code or .phyphox file which can be found in the PhyPhox-Files folder
