@@ -16,7 +16,8 @@
 */
 include<BOSL2/std.scad>
 include<BOSL2/threading.scad>
-
+include<CASE/oled_case.scad>
+include<CASE/Case2.scad>
 
 TOPCASE = 1;
 BOTTOMCASE = 1;
@@ -24,15 +25,16 @@ LEFTPANEL = 1;
 RIGHTPANEL = 1;
 LOCKSCREW = 1;
 STANDSCREW = 1;
+NAME = "LS 4568";
 
 led_only=1; //set  to 0 if using the aliexpress break_beam_sensor
 
-RJ45 = true;
+RJ45 = 0;
 USBC = true;
 SWITCH = true;
 
 
-
+OLED = false;
 
 
 z = 28;
@@ -214,8 +216,12 @@ module Top(oled=1,led=1){
            translate([0,12,0])cyl(d=11,h=z);
            }
         translate([0,-0.01,cutheight])cuboid([xa+1,ya+1,z],anchor = FRONT+TOP);
-        if(oled){
-         translate([0,17,z/2-wall])cuboid([26.5+2.4,27.5+2.4,wall*2],anchor=BOTTOM);
+        if(OLED){
+            translate([-40,20,12])rotate([0,180,90])oledCase(PART = "cutout","0.96");
+        }
+        if(OLED){
+            #translate([-53,50,12])rotate([180,0,0])buttonCase2(PART = "cutout");
+
         }
         //status LED
         if(led)translate([xa/2-widthx/4,ya-20,0])zcyl(h=xi*3+2,d=dLED);
@@ -233,9 +239,18 @@ module Top(oled=1,led=1){
       }//end for
             translate([0,wall-d1/5,cutheight+d1*0.6])xcyl(h=xa-3*wall,d=d1);
             translate([0,widthy/2-wall+d1/5,cutheight+d1*0.6])xcyl(h=xi-3*wall,d=d1);
-     if(oled){
-      color("green")translate([0,17,z/2-0.8])oled_bezel();       
-}
+     if(OLED){
+            translate([-40,20,12])rotate([0,180,90])oledCase(PART = "snap","0.96");
+            translate([-40,20,0])rotate([0,180,-90])oledCase(PART = "cover","0.96");
+
+        }
+     if(OLED){
+        translate([-53,50,12])rotate([180,0,0])buttonCase2(PART = "snap");
+        translate([-53,50,12])rotate([180,0,0])buttonCase2(PART = "cap");
+        translate([-53,50,0])rotate([180,0,0])buttonCase2(PART = "cover");
+
+
+     }
 
  }
 module switchcase(hole = false){
@@ -308,6 +323,8 @@ module Bottom(){
          }//end else
          }//end union
 
+         //text
+         #translate([0,38.9,-8])rotate([90,0,180])text3d(NAME,0.2,7,anchor=CENTER);
           if(rod){
          //hole for rod
            translate([0,12,0])cyl(d=11,h=z);
@@ -316,8 +333,8 @@ module Bottom(){
             }//end if
         translate([0,-0.01,cutheight])cuboid([xa+1,ya+1,z],anchor = FRONT+BOTTOM);
         
-        //hole for LEDs
-        translate([0,ya-10-4,0])xcyl(h=xi*3+2,d=3);
+        //hole for LEDs aperture // Blende!
+        translate([0,ya-10-4,0])xcyl(h=xi*3+2,d=2);
         //mid markings
         for(i=[-1,1]){
          translate([i*(xi/2+wall/6),ya-10,0])cuboid([wall/3,10,1],anchor=FRONT);
@@ -345,7 +362,7 @@ module Bottom(){
            translate([-10.3,21,-z/2])cyl(d=2,h=lolinspace+1,anchor = BOTTOM);
     }//end difference //end lolin mount
     //RJ45 mount
-    for(i=[0,28])translate([(-xi/2-14.5),5.5+i,-z/2+5-1])difference(){
+    if(RJ45)for(i=[0,28])translate([(-xi/2-14.5),5.5+i,-z/2+5-1])difference(){
       cuboid([20,7.5,5]);
       for(k=[-1,1])translate([k*5.5+1.4,0,0.01])cyl(d=2.5,h=5);
     }//end difference //end rj45 mount
