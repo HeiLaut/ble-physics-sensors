@@ -11,6 +11,7 @@
 #define BUTTON_PIN 27
 #define SDA_PIN 16   
 #define SCL_PIN 17
+#define LED_PIN 32
 
 // ---- OLED ----
 #define SCREEN_WIDTH 128
@@ -41,6 +42,8 @@ volatile float t_offset = 0;
 // 0 = Laufzeit, 1 = Verdunklung, 2 = Pendel
 
 int mode = 0;
+bool lastButtonState = HIGH;   
+
 
 #define SERVICE_UUID   "12345678-1234-1234-1234-123456789abc"
 #define CHAR_UUID_T    "abcdef01-1234-1234-1234-123456789abc"  // time
@@ -112,6 +115,8 @@ void setup() {
 
   pinMode(SIGNAL_PIN, INPUT_PULLUP);
   pinMode(BUTTON_PIN, INPUT_PULLUP);
+  pinMode(LED_PIN, OUTPUT);
+
   attachInterrupt(digitalPinToInterrupt(SIGNAL_PIN), isr1, CHANGE);
 
   t_offset = 0;
@@ -121,11 +126,23 @@ void setup() {
 }
 
 void loop() {
-  if(!digitalRead(BUTTON_PIN)){
+   if (digitalRead(SIGNAL_PIN)) {
+    digitalWrite(LED_PIN, LOW);  
+  }else{
+    digitalWrite(LED_PIN,HIGH);
+
+  }
+
+  bool reading = digitalRead(BUTTON_PIN);
+
+  if (reading == LOW && lastButtonState == HIGH) {
     mode++;
     mode %= 4;
-    delay(100); 
+    delay(50);
+    //Serial.println("press");
   }
+
+  lastButtonState = reading;
 
    if(digitalRead(SIGNAL_PIN)){
     verdT = abs((float)t1 - (float)t2) * 0.000001f;
