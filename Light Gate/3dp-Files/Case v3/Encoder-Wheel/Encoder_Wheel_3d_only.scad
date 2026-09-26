@@ -37,7 +37,9 @@ module rod(internal=false,l=20){
 }
 module wheel(expld = 0){
    a = 360/20;
-   d = 55;
+   d_eff = 50;
+   d = d_eff + 2;
+   
 difference(){
    union(){
       xcyl(d =d,h=4)attach(RIGHT)cyl(d= 15, h =3,anchor=BOTTOM)attach(TOP)cyl(d1 = 15, h =5, d2 = 0.5,anchor=BOTTOM);

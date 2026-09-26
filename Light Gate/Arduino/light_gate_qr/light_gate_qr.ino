@@ -1,3 +1,5 @@
+
+
 #include <BLEDevice.h>
 #include <BLEServer.h>
 #include <BLEUtils.h>
@@ -6,8 +8,9 @@
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
 
-// ---- Pin-Konfiguration ----
-#define SIGNAL_PIN 26  
+// ---- Pin-Configuration ----
+// LS4568 SIGNAL: 22, LED: 33 /LED Output must be disabled (Signal PIN22)
+#define SIGNAL_PIN 26
 #define BUTTON_PIN 27
 #define SDA_PIN 16   
 #define SCL_PIN 17
@@ -15,8 +18,8 @@
 
 // ---- OLED ----
 #define SCREEN_WIDTH 128
-#define SCREEN_HEIGHT 32
-#define NAME "Einzel-Lichtschranke A"
+#define SCREEN_HEIGHT 64//32
+#define NAME "LS 4568"//"Einzel-Lichtschranke A"
 
 Adafruit_SSD1306 oled(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
 
@@ -70,26 +73,26 @@ BLECharacteristic* createChar(BLEService* svc, const char* uuid) {
 }
 
 void IRAM_ATTR isr1() {
+if (digitalRead(SIGNAL_PIN)) {
+  unsigned long now = micros();
+  if (now - lastRise < DEBOUNCE_US) return; 
   n++;
-  if (digitalRead(SIGNAL_PIN)) {
-    unsigned long now = micros();
-    if (now - lastRise < DEBOUNCE_US) return;  // Prellen ignorieren, timeArray NICHT verschieben
-    lastRise = now;
-    t1 = (int)now;
-    timeArray[0] = timeArray[1];
-    timeArray[1] = timeArray[2];
-    timeArray[2] = t1;
-    newEvent = true;
-  } else {
-    t2 = (int)micros();
-  }
+  lastRise = now;
+  t1 = (int)now;
+  timeArray[0] = timeArray[1];
+  timeArray[1] = timeArray[2];
+  timeArray[2] = t1;
+  newEvent = true;
+} else {
+  t2 = (int)micros();
+}
 }
 
 
 void setup() {
   Serial.begin(115200);
 
-  BLEDevice::init("Lichtschranke 1");
+  BLEDevice::init(NAME);
   BLEServer *pServer = BLEDevice::createServer();
   pServer->setCallbacks(new MyServerCallbacks());
 
@@ -127,9 +130,9 @@ void setup() {
 
 void loop() {
    if (digitalRead(SIGNAL_PIN)) {
-    digitalWrite(LED_PIN, LOW);  
+    digitalWrite(LED_PIN, HIGH);  
   }else{
-    digitalWrite(LED_PIN,HIGH);
+    digitalWrite(LED_PIN,LOW);
 
   }
 
@@ -155,13 +158,13 @@ void loop() {
     laufT   = (timeArray[2] - timeArray[1]) * 0.000001f;
     pendelT = (timeArray[2] - timeArray[0]) * 0.000001f;
     pendelF = 1.0f / pendelT;
-    Serial.println(String(t) + " | " + String(laufT) + " | " + String(verdT) + " | " +String(pendelT) + "|" + String(n/2));
+    Serial.println(String(t) + " | " + String(laufT) + " | " + String(verdT) + " | " +String(pendelT) + "|" + String(n));
      if (deviceConnected) {
     String sT       = String(t,4);
     String sLaufT   = String(laufT,4);
     String sVerdT   = String(verdT,4);
     String sPendelT = String(pendelT,4);//pendelT
-    String sN = String(n/2);
+    String sN = String(n);
 
     pCharN->setValue(sN.c_str()); pCharN->notify();
     pCharT->setValue(sT.c_str());       pCharT->notify();

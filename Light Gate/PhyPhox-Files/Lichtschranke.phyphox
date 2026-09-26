@@ -1,4 +1,4 @@
-<phyphox xmlns="https://phyphox.org/xml" xmlns:editor="https://phyphox.org/xml/editor" version="1.19">
+<phyphox xmlns="https://phyphox.org/xml" xmlns:editor="https://phyphox.org/xml/editor" version="1.20" locale="de">
   <title>Lichtschranke</title>
   <category>Sensor-Boxen</category>
   <color>red</color>
@@ -26,6 +26,12 @@
     <container size="0">nOffset</container>
     <container size="0">nView</container>
     <container size="0">dtView</container>
+    <container init="50">diameter</container>
+    <container init="20">spokes</container>
+    <container size="0">distance</container>
+    <container>circum</container>
+    <container size="0">velocity</container>
+    <container size="0">spokes_per_cm</container>
   </data-containers>
   <input>
     <bluetooth uuid="12345678-1234-1234-1234-123456789abc" mtu="0" mode="notification">
@@ -123,6 +129,27 @@
       <input as="in" keep="true">dt</input>
       <output as="out" append="true">dt5</output>
     </subrange>
+    <multiply>
+      <input type="value">3.1416</input>
+      <input keep="true">diameter</input>
+      <output>circum</output>
+    </multiply>
+    <divide>
+      <input keep="true">circum</input>
+      <input keep="true">spokes</input>
+      <input type="value">10</input>
+      <output>spokes_per_cm</output>
+    </divide>
+    <multiply>
+      <input keep="true">spokes_per_cm</input>
+      <input keep="true">nView</input>
+      <output>distance</output>
+    </multiply>
+    <divide>
+      <input keep="true">spokes_per_cm</input>
+      <input keep="true">lt</input>
+      <output>velocity</output>
+    </divide>
   </analysis>
   <views>
     <view label="Laufzeiten">
@@ -200,6 +227,30 @@
         <input axis="x">timeView</input>
         <input axis="y">dtView</input>
       </graph>
+    </view>
+    <view label="Speichenrad">
+      <edit label="Durchmesser" decimal="false" min="1" unit="mm">
+        <output>diameter</output>
+      </edit>
+      <edit label="Anzahl Speichen" decimal="false" min="1">
+        <output>spokes</output>
+      </edit>
+      <separator height="1"/>
+      <graph label="Strecke" labelX="t" labelY="s" unitX="s" unitY="cm" lineWidth="2">
+        <input axis="x">timeView</input>
+        <input axis="y">distance</input>
+      </graph>
+      <value label="Strecke">
+        <input>distance</input>
+      </value>
+      <separator height="1"/>
+      <graph label="Geschwindigkeit" labelX="t" labelY="v" unitX="s" unitY="cm/s" lineWidth="2" color="red">
+        <input axis="x">timeView</input>
+        <input axis="y">velocity</input>
+      </graph>
+      <value label="Geschwindigkeit" unit="cm/s">
+        <input>velocity</input>
+      </value>
     </view>
   </views>
 </phyphox>
