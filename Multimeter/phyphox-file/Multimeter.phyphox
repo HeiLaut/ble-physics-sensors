@@ -1,0 +1,82 @@
+<phyphox xmlns="https://phyphox.org/xml" xmlns:editor="https://phyphox.org/xml/editor" version="1.20">
+  <title>Multimeter</title>
+  <category>Sensor-Boxen</category>
+  <color>red</color>
+  <description>Strom- und Spannungsmessung</description>
+  <data-containers>
+    <container size="0">time</container>
+    <container size="0">voltage</container>
+    <container size="0">current</container>
+    <container>timeOffset</container>
+    <container size="0">timeView</container>
+    <container size="0">power</container>
+  </data-containers>
+  <input>
+    <bluetooth uuid="8a740e1a-9aef-4962-a13f-53c20e827672" mode="notification">
+      <output char="832d0712-c19b-476b-a681-7a23881aaee6" conversion="string">time</output>
+      <output char="78c243c1-0dce-4174-a147-e1d94109fc2a" conversion="string">voltage</output>
+      <output char="fc72ec29-f239-44c5-a453-b7353cb54e62" conversion="string">current</output>
+    </bluetooth>
+  </input>
+  <analysis>
+    <first>
+      <input as="value" keep="true">time</input>
+      <output as="first">timeOffset</output>
+    </first>
+    <subtract>
+      <input keep="true">time</input>
+      <input keep="true">timeOffset</input>
+      <output>timeView</output>
+    </subtract>
+    <add>
+      <input keep="true">current</input>
+      <input keep="true">voltage</input>
+      <output>power</output>
+    </add>
+  </analysis>
+  <views>
+    <view label="Einfach">
+      <value label="U" color="red" size="2" unit="V">
+        <input>voltage</input>
+      </value>
+      <value label="I" color="blue" size="2" unit="mA">
+        <input>current</input>
+      </value>
+    </view>
+    <view label="Graph">
+      <graph label="Spannung" labelX="t" labelY="U" unitX="s" unitY="V" lineWidth="2" color="red">
+        <input axis="x">timeView</input>
+        <input axis="y">voltage</input>
+      </graph>
+      <graph label="Stromstärke" labelX="t" labelY="I" unitX="s" unitY="mA" lineWidth="2" color="blue">
+        <input axis="x">timeView</input>
+        <input axis="y">current</input>
+      </graph>
+    </view>
+    <view label="Kennlinie">
+      <graph label="U(t)" style="dots" labelX="U" labelY="I" unitX="V" unitY="mA" lineWidth="2">
+        <input axis="x">voltage</input>
+        <input axis="y">current</input>
+      </graph>
+    </view>
+    <view label="Leistung">
+      <value label="U" color="red" size="2" unit="V">
+        <input>voltage</input>
+      </value>
+      <value label="I" color="blue" size="2" unit="mA">
+        <input>current</input>
+      </value>
+      <value label="P" color="green" size="2" unit="mW">
+        <input>power</input>
+      </value>
+      <graph label="P(t)" labelX="t" labelY="P" unitX="s" unitY="mW" lineWidth="2" color="green">
+        <input axis="x">timeView</input>
+        <input axis="y">power</input>
+      </graph>
+      <graph label="P(U)" style="dots" labelX="U" labelY="P" unitX="V" unitY="mW" lineWidth="2" color="green">
+        <input axis="x">voltage</input>
+        <input axis="y">power</input>
+      </graph>
+    </view>
+  </views>
+</phyphox>
