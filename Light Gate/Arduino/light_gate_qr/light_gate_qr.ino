@@ -18,8 +18,8 @@
 
 // ---- OLED ----
 #define SCREEN_WIDTH 128
-#define SCREEN_HEIGHT 64//32
-#define NAME "LS 4568"//"Einzel-Lichtschranke A"
+#define SCREEN_HEIGHT 32//32
+#define NAME "LS 1"//"Einzel-Lichtschranke A"
 
 Adafruit_SSD1306 oled(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
 
