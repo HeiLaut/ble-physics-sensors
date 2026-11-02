@@ -1,14 +1,20 @@
 #include <HX711_ADC.h>
 #include <phyphoxBle.h>
+#include <Preferences.h>
 
 #define BUTTON_PIN 2 
-#define SENSOR_NAME "Kraftsensor M"
+#define SENSOR_NAME "Kraftsensor 1N"
 HX711_ADC LoadCell(4, 5); //LoadCell(DT,SCK)
 HX711_ADC LoadCell2(33,14);
 
+Preferences prefs;
+
 //calibration factor for primary load cell
 //calFactor*shownMass/exactMass
-const float calFactor =  1674.1098;
+float calFactor =  1674.1098;
+volatile float calLoad = 0;
+volatile bool  doCal   = false;
+volatile bool  doTare  = false;
 //const float calFactor = 1071.03;
 
 //calibration factor for secondary load cell (connected via rj45)
@@ -19,7 +25,13 @@ int reset = 0;
 float t_offset = 0;
 
 void setup() {
+  Serial.begin(115200); 
+
+  prefs.begin("kraftsensor", false);
+  calFactor = prefs.getFloat("calFactor", calFactor);
   //Turn on the internal LED on lolin 32
+  
+
   pinMode(LED_BUILTIN, OUTPUT);  
   digitalWrite(LED_BUILTIN, LOW);
   
@@ -33,6 +45,17 @@ void setup() {
   kraft.setTitle("Kraftsensor");
   kraft.setCategory("Sensor-Boxen");
   
+  PhyphoxBleExperiment::Button calBtn("Kalibrieren", 5);
+  PhyphoxBleExperiment::Edit   calEdit("Referenzkraft", 6);
+  PhyphoxBleExperiment::Button tareBtn("Tarieren", 4);
+
+  calEdit.setUnit("g");           // statt "N"
+  calEdit.setLabel("Referenzmasse");   // optional
+  calEdit.setDecimal(true);
+  calEdit.submitWith(calBtn);   // Button-Kanal ist durch den Konstruktor schon gesetzt
+  calEdit.onChange([](float v) { calLoad = v; doCal = true; });
+  
+  tareBtn.onPress([]() { doTare = true; });
  //View
   PhyphoxBleExperiment::View firstView;
   firstView.setLabel("Graph"); //Create a "view"
@@ -42,6 +65,8 @@ void setup() {
   waage.setLabel("Waage");
   PhyphoxBleExperiment::View dual;
   dual.setLabel("Zwei Sensoren");
+  PhyphoxBleExperiment::View calib;
+  calib.setLabel("Kalibrieren");
   
 
   //
@@ -100,16 +125,24 @@ void setup() {
 
   firstView.addElement(force);
   firstView.addElement(firstGraph); 
+  firstView.addElement(tareBtn);
+
   secondView.addElement(force);
   waage.addElement(mass);
   dual.addElement(firstGraph);
   dual.addElement(force);
   dual.addElement(secondGraph);
   dual.addElement(force2);
+
+  calib.addElement(calEdit);
+  calib.addElement(calBtn);
+
   kraft.addView(firstView);
   kraft.addView(secondView);
   kraft.addView(waage);
   kraft.addView(dual);
+  kraft.addView(calib);
+
   
   PhyphoxBLE::addExperiment(kraft);
    
@@ -122,7 +155,6 @@ void setup() {
   LoadCell2.setCalFactor(calFactor2); 
   
   
-  Serial.begin(115200); 
   pinMode(BUTTON_PIN, INPUT_PULLUP);
 
 }
@@ -133,7 +165,8 @@ void loop() {
    int buttonState = digitalRead(BUTTON_PIN);
 
   
-  if(!buttonState){
+  if(!buttonState || doTare){
+    doTare = false;
     Serial.println("press");
     LoadCell.tareNoDelay();
     LoadCell2.tareNoDelay();
@@ -141,8 +174,12 @@ void loop() {
       LoadCell.update();
       tara = LoadCell.getTareStatus();
     };
+    Serial.println("Tariert");
+
     tara = 0;
   }
+ 
+
   static boolean newDataReady = 0;
   if (LoadCell.update()) newDataReady = true;
   LoadCell2.update();
@@ -163,9 +200,21 @@ void loop() {
   Serial.print("m(g)");Serial.print(",");Serial.print(m,1);Serial.print(",");
   Serial.print("F2(N)");Serial.print(",");Serial.print(f2,3);Serial.print(",");
   Serial.print("m2(g)");Serial.print(",");Serial.println(m2,1);//Serial.print(touchValue);
+
+  if (doCal) {
+  doCal = false;
+  float incDat = LoadCell.getData();
+  if (calLoad > 0 && incDat > 5) {
+  calFactor = calFactor * (incDat / calLoad);   // beides in g
+  prefs.putFloat("calFactor", calFactor);
+  LoadCell.setCalFactor(calFactor);
+  Serial.println("Kalibriert");
+  }
+}
+  
   newDataReady = false;
   }
-
+ 
 }
 
 void newExperimentEvent(){
@@ -178,3 +227,4 @@ void newExperimentEvent(){
     reset = true;
   }
 }
+

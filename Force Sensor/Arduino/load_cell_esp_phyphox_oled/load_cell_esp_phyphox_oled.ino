@@ -1,9 +1,11 @@
 #include <HX711_ADC.h>
 #include <phyphoxBle.h>
+#include <Preferences.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
 
 #define BUTTON_PIN 2 
+#define SENSOR_NAME "Kraftsensor OLED"
 #define SCREEN_WIDTH 128 // OLED display width, in pixels
 #define SCREEN_HEIGHT 32 // OLED display height, in pixels
 
@@ -12,25 +14,32 @@
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
 HX711_ADC LoadCell(4, 5); //LoadCell(DT,SCK)
-HX711_ADC LoadCell2(33,14);
 
-//calibration factor for primary load cell
-const float calFactor = 757.70;
+Preferences prefs;
 
-//calibration factor for secondary load cell (connected via rj45)
-const float calFactor2 = 1019.34;
+//calibration factor (Default, wird durch gespeicherten Wert überschrieben)
+//calFactor*shownMass/exactMass
+float calFactor = 757.70;
+volatile float calLoad = 0;
+volatile bool  doCal   = false;
+volatile bool  doTare  = false;
 
 int tara = 0;
 int reset = 0;
 float t_offset = 0;
 
 void setup() {
+  Serial.begin(115200);
+
+  prefs.begin("kraftsensor", false);
+  calFactor = prefs.getFloat("calFactor", calFactor);
+
   Wire.begin(33,32);//SDA SCL
   //Turn on the internal LED on lolin 32
-   pinMode(LED_BUILTIN, OUTPUT);  
+  pinMode(LED_BUILTIN, OUTPUT);  
   digitalWrite(LED_BUILTIN, LOW);
   
-  PhyphoxBLE::start("Kraftsensor IS");
+  PhyphoxBLE::start(SENSOR_NAME);
      // PhyphoxBLE::configHandler = &receivedData;
   PhyphoxBLE::experimentEventHandler = &newExperimentEvent;
   PhyphoxBLE::printXML(&Serial);
@@ -39,6 +48,17 @@ void setup() {
   //
   kraft.setTitle("Kraftsensor");
   kraft.setCategory("Sensor-Boxen");
+
+  PhyphoxBleExperiment::Button calBtn("Kalibrieren", 5);
+  PhyphoxBleExperiment::Edit   calEdit("Referenzmasse", 6);
+  PhyphoxBleExperiment::Button tareBtn("Tarieren", 4);
+
+  calEdit.setUnit("g");
+  calEdit.setDecimal(true);
+  //calEdit.submitWith(calBtn);   // Button-Kanal ist durch den Konstruktor schon gesetzt
+  calEdit.onChange([](float v) { calLoad = v; doCal = true; });
+
+  tareBtn.onPress([]() { doTare = true; });
   
  //View
   PhyphoxBleExperiment::View firstView;
@@ -47,8 +67,8 @@ void setup() {
   secondView.setLabel("Einfach"); //Create a "view"
   PhyphoxBleExperiment::View waage;
   waage.setLabel("Waage");
-  PhyphoxBleExperiment::View dual;
-  dual.setLabel("Zwei Sensoren");
+  PhyphoxBleExperiment::View calib;
+  calib.setLabel("Kalibrieren");
   
 
   //
@@ -60,15 +80,6 @@ void setup() {
   firstGraph.setLabelY("Kraft F");
 
   firstGraph.setChannel(1,2);
-
-  PhyphoxBleExperiment::Graph secondGraph;      //Create graph which will p lot random numbers over time     
-  secondGraph.setLabel("Kraft");
-  secondGraph.setUnitX("s");
-  secondGraph.setUnitY("N");
-  secondGraph.setLabelX("Zeit t");
-  secondGraph.setLabelY("Kraft F_2");
-
-  secondGraph.setChannel(1,4);
 
   //Value
   PhyphoxBleExperiment::Value force;         //Creates a value-box.
@@ -87,49 +98,28 @@ void setup() {
   mass.setChannel(3);
   mass.setXMLAttribute("size=\"2\"");
 
-  //Value
-  PhyphoxBleExperiment::Value force2;         //Creates a value-box.
-  force2.setLabel("F_2");                  //Sets the label
-  force2.setPrecision(3);                     //The amount of digits shown after the decimal point.
-  force2.setUnit("N");                        //The physical unit associated with the displayed value.
-  force2.setColor("FFFFFF");                  //Sets font color. Uses a 6 digit hexadecimal value in "quotation marks".
-  force2.setChannel(4);
-  force2.setXMLAttribute("size=\"2\"");
-
-  PhyphoxBleExperiment::Value mass2;         //Creates a value-box.
-  mass2.setLabel("m_2");                  //Sets the label
-  mass2.setPrecision(1);                     //The amount of digits shown after the decimal point.
-  mass2.setUnit("g");                        //The physical unit associated with the displayed value.
-  mass2.setColor("FFFFFF");                  //Sets font color. Uses a 6 digit hexadecimal value in "quotation marks".
-  mass2.setChannel(5);
-  mass2.setXMLAttribute("size=\"2\"");
-
 
   firstView.addElement(force);
   firstView.addElement(firstGraph); 
+  firstView.addElement(tareBtn);
+
   secondView.addElement(force);
   waage.addElement(mass);
-  dual.addElement(firstGraph);
-  dual.addElement(force);
-  dual.addElement(secondGraph);
-  dual.addElement(force2);
+
+  calib.addElement(calEdit);
+  calib.addElement(calBtn);
+
   kraft.addView(firstView);
   kraft.addView(secondView);
   kraft.addView(waage);
-  kraft.addView(dual);
+  kraft.addView(calib);
   
   PhyphoxBLE::addExperiment(kraft);
    
   LoadCell.begin(); // start connection to HX711
   LoadCell.start(2000); // load cells gets 2000ms of time to stabilize
   LoadCell.setCalFactor(calFactor); 
-
-  LoadCell2.begin(); // start connection to HX711
-  LoadCell2.start(2000); // load cells gets 2000ms of time to stabilize
-  LoadCell2.setCalFactor(calFactor2); 
   
-  
-  Serial.begin(115200); 
   pinMode(BUTTON_PIN, INPUT_PULLUP);
 
   
@@ -153,22 +143,21 @@ void setup() {
 
 
 void loop() {
-   int buttonState = digitalRead(BUTTON_PIN);
+  int buttonState = digitalRead(BUTTON_PIN);
 
-  
-  if(!buttonState){
+  if(!buttonState || doTare){
+    doTare = false;
     Serial.println("press");
     LoadCell.tareNoDelay();
-    LoadCell2.tareNoDelay();
     while(tara == 0){
       LoadCell.update();
       tara = LoadCell.getTareStatus();
     };
+    Serial.println("Tariert");
     tara = 0;
   }
   static boolean newDataReady = 0;
   if (LoadCell.update()) newDataReady = true;
-  LoadCell2.update();
 
   if (newDataReady && reset == false) {
 
@@ -176,10 +165,7 @@ void loop() {
   float incDat = LoadCell.getData();
   float m = abs(incDat);
   float f = incDat *9.81/1000;
-  float incDat2 = LoadCell2.getData();
-  float m2 = abs(incDat2);
-  float f2 = -incDat2 *9.81/1000;
-  PhyphoxBLE::write(t,f,m,f2,m2);
+  PhyphoxBLE::write(t,f,m);
 
   display.clearDisplay();
   display.setTextSize(2);
@@ -195,9 +181,18 @@ void loop() {
 
   Serial.print("t(s)");Serial.print(",");Serial.print(t);Serial.print(",");
   Serial.print("F(N)");Serial.print(",");Serial.print(f,3);Serial.print(",");
-  Serial.print("m(g)");Serial.print(",");Serial.print(m,1);Serial.print(",");
-  Serial.print("F2(N)");Serial.print(",");Serial.print(f2,3);Serial.print(",");
-  Serial.print("m2(g)");Serial.print(",");Serial.println(m2,1);//Serial.print(touchValue);
+  Serial.print("m(g)");Serial.print(",");Serial.println(m,1);
+
+  if (doCal) {
+    doCal = false;
+    if (calLoad > 0 && incDat > 0) {
+      calFactor = calFactor * (incDat / calLoad);   // beides in g
+      prefs.putFloat("calFactor", calFactor);
+      LoadCell.setCalFactor(calFactor);
+      Serial.println("Kalibriert");
+    }
+  }
+
   newDataReady = false;
   }
 
