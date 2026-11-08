@@ -1,7 +1,7 @@
 /*
 zu ändern: Bei Knopfdruck wird immer der Orstoffset gesetzt;Zeitoffset wird nur dann auf 0 gesetzt, wenn in Phyphox der Mülleimer gedrückt wird
 */
-//Version 0.4
+//Version 0.5
 
 #include <Adafruit_VL53L0X.h>
 #include <phyphoxBle.h>
@@ -10,7 +10,7 @@ zu ändern: Bei Knopfdruck wird immer der Orstoffset gesetzt;Zeitoffset wird nur
 #define SDA 14 //PIN for I2C SDA
 #define SCL 12 //PIN for I2C SCL
 
-#define BLENAME "Laser-Distanz_#5"
+#define BLENAME "Laser-Distanz_#3"
 
 Adafruit_VL53L0X lox = Adafruit_VL53L0X();
 
@@ -19,8 +19,9 @@ float distance, velocity, offset, t_offset, t, readDist;
 bool stopped = 0;
 bool cleared = 0;
 bool synced = 0;
+bool s_offset = false;
 
-#define EMA_ALPHA_DIST 0.4f
+#define EMA_ALPHA_DIST 0.8f
 #define EMA_ALPHA_VEL  0.4f
 
 float emaDistance = 0.0f;
@@ -30,7 +31,6 @@ bool emaInitialized = false;
 void setup() {
   //needed to select the scl and sda port for the lolin lite board Wire.begin(I2C_SDA, I2C_SCL)
   Wire.begin(SDA, SCL);
-  //enable internal LED c:\Users\Heinrich\Nextcloud\Physik\DIY\Physics-Arduino-Sensors\Force Sensor\Arduino\load_cell_esp_phyphox\load_cell_esp_phyphox.ino
  
   Serial.begin(115200);
    // wait until serial port opens for native USB devices
@@ -40,7 +40,7 @@ void setup() {
   delay(2000);
 
   Serial.println("-----------------------------");
-  Serial.println("Vl53l0X-Sensor Version 0.4");
+  Serial.println("Vl53l0X-Sensor Version 0.5");
   Serial.println("-----------------------------");
 
   delay(1000);
@@ -146,17 +146,24 @@ void setup() {
   exVel.setLabel("v(cm/s)");
   exVel.setDatachannel(3);
 
+  PhyphoxBleExperiment::Button zero("s = 0", 4);
+  zero.onPress([]() {s_offset = true;});
+
 
   firstView.addElement(dist);
   firstView.addElement(firstGraph);  //attach graph to view
+  firstView.addElement(zero);
+
   //firstView.addElement(myEdit);
 
   secondView.addElement(dist);
-  
+ //secondView.addElement(zero);
+
   thirdView.addElement(dist);
   thirdView.addElement(firstGraph);
   thirdView.addElement(vel);
   thirdView.addElement(secondGraph);  //attach second graph to view
+  //thirdView.addElement(zero);
 
   entfernung.addView(firstView);   //Attach view to experiment
   entfernung.addView(secondView);  //Attach view to experiment
@@ -173,27 +180,28 @@ void setup() {
 
 
 void loop() {
-int buttonState = digitalRead(BUTTON_PIN);
-if (!buttonState) {
-  Serial.println("press");
-  delay(200);
-  while (!lox.isRangeComplete()) {
-    delay(1);
+  int buttonState = digitalRead(BUTTON_PIN);
+  if (!buttonState || s_offset) {
+    Serial.println("press");
+    delay(200);
+    while (!lox.isRangeComplete()) {
+      delay(1);
+    }
+    offset = lox.readRange() * 0.1;
+    if (stopped) {
+      cleared = 1;
+    }
+    // EMA bei neuem Offset zurücksetzen
+    emaInitialized = false;
+    Serial.println(offset);
+    s_offset = false;
   }
-  offset = lox.readRange() * 0.1;
-  if (stopped) {
-    cleared = 1;
-  }
-  // EMA bei neuem Offset zurücksetzen
-  emaInitialized = false;
-  Serial.println(offset);
-}
 
     if (lox.isRangeComplete() && (!stopped || !synced)) {
-    readDist = lox.readRange() * 0.1;
-    distance = readDist - offset;
+      readDist = lox.readRange() * 0.1;
+      distance = readDist - offset;
 
-    float t = 0.001f * (float)millis() - t_offset;
+      float t = 0.001f * (float)millis() - t_offset;
 
     // Rohe Distanz per EMA filtern
     if (!emaInitialized) {
@@ -248,6 +256,7 @@ if (!buttonState) {
 
   PhyphoxBLE::write(t, distance, velocity);
   }
+  PhyphoxBLE::poll();    
 }
 void newExperimentEvent(){
   Serial.println(PhyphoxBLE::eventType);
@@ -282,9 +291,3 @@ void newExperimentEvent(){
     Serial.println("synced");
   }
 }
-
-//void receivedData() {           // get data from PhyPhox app
-//  float readInput;
-//  PhyphoxBLE::read(readInput);
-//  intervall = readInput;
-//}

@@ -25,17 +25,17 @@ LEFTPANEL = 1;
 RIGHTPANEL = 1;
 LOCKSCREW = 1;
 STANDSCREW = 1;
-NAME = "LS 4568";
+NAME = "LS 4872";
 
 led_only=1; //set  to 0 if using the aliexpress break_beam_sensor
 
-RJ45 = 0;
+RJ45 = false;
 USBC = true;
 SWITCH = true;
 
 
-OLED = false;
-
+OLED = true;
+oled_size = "0.96";
 
 z = 28;
 xi = 80;//60
@@ -217,10 +217,10 @@ module Top(oled=1,led=1){
            }
         translate([0,-0.01,cutheight])cuboid([xa+1,ya+1,z],anchor = FRONT+TOP);
         if(OLED){
-            translate([-40,20,12])rotate([0,180,90])oledCase(PART = "cutout","0.96");
+            translate([-40,20,12])rotate([0,180,90])oledCase(PART = "cutout",oled_size);
         }
         if(OLED){
-            #translate([-53,50,12])rotate([180,0,0])buttonCase2(PART = "cutout");
+            translate([-53,50,12])rotate([180,0,0])buttonCase2(PART = "cutout");
 
         }
         //status LED
@@ -240,8 +240,8 @@ module Top(oled=1,led=1){
             translate([0,wall-d1/5,cutheight+d1*0.6])xcyl(h=xa-3*wall,d=d1);
             translate([0,widthy/2-wall+d1/5,cutheight+d1*0.6])xcyl(h=xi-3*wall,d=d1);
      if(OLED){
-            translate([-40,20,12])rotate([0,180,90])oledCase(PART = "snap","0.96");
-            translate([-40,20,0])rotate([0,180,-90])oledCase(PART = "cover","0.96");
+            translate([-40,20,12])rotate([0,180,90])oledCase(PART = "snap",oled_size);
+            translate([-40,20,0])rotate([0,180,-90])oledCase(PART = "cover",oled_size);
 
         }
      if(OLED){
@@ -304,8 +304,8 @@ module Bottom(){
          Body();
          //rod shaft
           if(rod){
-         translate([0,12,0])cuboid([16,16,z],chamfer=1,except=[TOP,BOTTOM]);
-         translate([0,8,-5])cuboid([16,16,z/2],chamfer=1,except=[TOP,BOTTOM]);
+         //translate([0,12,0])cuboid([16,16,z],chamfer=1,except=[TOP,BOTTOM]);
+         translate([0,0,-5])cuboid([16,widthbase,z/2+4],chamfer=2,except=[LEFT,RIGHT],anchor=FRONT);
          }//end if
          //led mount (IRR and IRE)
          if(led_only == 1){
@@ -328,8 +328,11 @@ module Bottom(){
           if(rod){
          //hole for rod
            translate([0,12,0])cyl(d=11,h=z);
+          // cable hole
+           translate([0,28.5,-12])cuboid([20,17,15],chamfer = 6,edges=[TOP+FRONT,TOP+BACK],anchor=BOTTOM)attach(TOP)cuboid([20,5,2],anchor=BOTTOM);
+
          //screwhole
-            translate([0,-17,-3])rotate([-90,0,0])rodmount(hole=true);
+            translate([0,0,-3])rotate([-90,0,0])rodmount(hole=true,l=12);
             }//end if
         translate([0,-0.01,cutheight])cuboid([xa+1,ya+1,z],anchor = FRONT+BOTTOM);
         

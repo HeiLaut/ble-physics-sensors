@@ -3,7 +3,7 @@
 #include <phyphoxBle.h> 
 #define SDA 15
 #define SCL 13
-
+#define NAME "Multimeter A"
 Adafruit_INA219 ina219;
 
 float interval = 20;
@@ -31,7 +31,7 @@ void setup(void) {
   }
  
   
-  PhyphoxBLE::start("Multimeter C");  
+  PhyphoxBLE::start(NAME);  
   PhyphoxBLE::configHandler = &receivedData;  
   
   PhyphoxBleExperiment multimeter;
@@ -76,7 +76,7 @@ void setup(void) {
    powerGraph.setLabelX("Spannung");
    powerGraph.setLabelY("Leistung");
    powerGraph.setChannel(2,4);
-   powerGraph.setStyle("dots");
+   powerGraph.setStyle(STYLE_DOTS);
    powerGraph.setColor("00FF00"); 
 
    PhyphoxBleExperiment::Graph powerGraphTime;    
@@ -87,7 +87,7 @@ void setup(void) {
    powerGraphTime.setLabelY("Leistung");
    powerGraphTime.setChannel(1,4);
    powerGraphTime.setColor("00FF00"); 
-   powerGraphTime.setStyle("line");
+   powerGraphTime.setStyle(STYLE_LINES);
 
    PhyphoxBleExperiment::Graph characteristic;    
    characteristic.setLabel("I(U)");
@@ -96,7 +96,7 @@ void setup(void) {
    characteristic.setLabelX("Spannung");
    characteristic.setLabelY("Stromstärke");
    characteristic.setChannel(2,3);
-   characteristic.setStyle("dots");
+   characteristic.setStyle(STYLE_LINES);
 
    PhyphoxBleExperiment::Value volt;        
    volt.setLabel("U");            
@@ -209,6 +209,7 @@ void loop(void)
   Serial.println(power_mW);
   
   delay(interval);
+  PhyphoxBLE::poll();
 }
 
 

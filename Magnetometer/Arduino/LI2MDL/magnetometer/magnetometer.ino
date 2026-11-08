@@ -23,6 +23,8 @@ float xo = 0;
 float yo = 0;
 float zo = 0;
 
+volatile bool doTare = false;   // wird vom phyphox-Button gesetzt
+
 void setup() {
   pinMode(LED_BUILTIN, OUTPUT);  
   digitalWrite(LED_BUILTIN, LOW);
@@ -56,6 +58,10 @@ void setup() {
   magnet.setTitle("Magnetfeldsensor");
   magnet.setCategory("Sensor-Boxen");
   magnet.setDescription("3-Achsen Magnetfeldsensor MLX90393");
+
+  //Offset-Button (wie beim Kraftsensor)
+  PhyphoxBleExperiment::Button nullBtn("Nullen", 1);
+  nullBtn.onPress([]() { doTare = true; });
 
   //View
   PhyphoxBleExperiment::View firstView;
@@ -106,7 +112,7 @@ void setup() {
   sumGraph.setChannel(1,5);
 
   PhyphoxBleExperiment::Graph multiGraph;
-  multiGraph.setLabel("y");
+  multiGraph.setLabel("x - grün, y - blau, z - gelb");
   multiGraph.setUnitX("s");
   multiGraph.setUnitY("mT");
   multiGraph.setLabelX("Zeit");
@@ -163,6 +169,7 @@ void setup() {
   bg.setChannel(5);
   bg.setXMLAttribute("size=\"2\"");
 
+  firstView.addElement(nullBtn);           //Offset-Button im ersten View
   firstView.addElement(xGraph);            //attach graph to view
   firstView.addElement(yGraph);            //attach graph to view
   firstView.addElement(zGraph);            //attach graph to view
@@ -203,17 +210,20 @@ void loop() {
   Serial.print(",Bz(mT): ,");  Serial.print(z,3);
   Serial.print(",Bg(mT): ,");  Serial.println(g,3);
 
-  if(buttonState==0){
+  if(buttonState==0 || doTare){
+    doTare = false;
     lis2mdl.getEvent(&event);
     delay(50);
 
     xo=event.magnetic.x*0.001;
     yo=event.magnetic.y*0.001;
     zo=event.magnetic.z*0.001;
+    Serial.println("Offset gesetzt");
   }
   
   //Serial.println(buttonState);
   PhyphoxBLE::write(t, x, y, z, g);   
 
   delay(20);
+  PhyphoxBLE::poll();
 }

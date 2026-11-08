@@ -19,6 +19,7 @@ float distance, velocity, offset, t_offset, t, readDist;
 bool stopped = 0;
 bool cleared = 0;
 bool synced = 0;
+bool s_offset = false;
 
 #define EMA_ALPHA_DIST 0.4f
 #define EMA_ALPHA_VEL  0.5f
@@ -147,17 +148,23 @@ void setup() {
   exVel.setLabel("v(cm/s)");
   exVel.setDatachannel(3);
 
+  PhyphoxBleExperiment::Button zero("s = 0", 4);
+  zero.onPress([]() {s_offset = true;});
+
 
   firstView.addElement(dist);
   firstView.addElement(firstGraph);  //attach graph to view
+  firstView.addElement(zero);
   //firstView.addElement(myEdit);
 
   secondView.addElement(dist);
+  //secondView.addElement(zero);
   
   thirdView.addElement(dist);
   thirdView.addElement(firstGraph);
   thirdView.addElement(vel);
   thirdView.addElement(secondGraph);  //attach second graph to view
+  //thirdView.addElement(zero);
 
   entfernung.addView(firstView);   //Attach view to experiment
   entfernung.addView(secondView);  //Attach view to experiment
@@ -175,7 +182,7 @@ void setup() {
 
 void loop() {
 int buttonState = digitalRead(BUTTON_PIN);
-if (!buttonState) {
+if (!buttonState || s_offset) {
   Serial.println("press");
   delay(200);
   while (!vl53.dataReady()) {
@@ -188,6 +195,7 @@ if (!buttonState) {
   // EMA bei neuem Offset zurücksetzen
   emaInitialized = false;
   Serial.println(offset);
+  s_offset = false;
 }
 
   if (vl53.dataReady() && (!stopped || !synced)) {
