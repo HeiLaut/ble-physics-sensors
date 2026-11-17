@@ -22,17 +22,13 @@ include<BOSL2/threading.scad>
 
 
 $fn = 50;
-/*intersection(){
-    test();
-    translate([0,-30,-10])cuboid([30,20,20]);
-    }
-*/
+test();
 module test(){
 lolinspace = 5;
 z = 30;
 x=80;
 y=70;
-case([x,y,z],part="bottom",explode = 25,rd=2,lolinspace = lolinspace,button = 0,reset = 0, thread = 0,clearance = 0.2,embosstext = "TEST");
+*case([x,y,z],part="bottom",explode = 25,rd=2,lolinspace = lolinspace,reset = 0, thread = 0,clearance = 0.2,button  = 0,embosstext = "TEST");
 *case([x,y,z],part="top",explode = 50,rd=2,lolinspace = lolinspace,button = 1,reset = 0, thread = true,usbC = 1, wall=2,jst = 1,switch=1,charge_view = 1,
    power_view = 1);
 *color("red")translate([-11.5,16.5,lolinspace-12])rotate([180,0,-90])import("lolin32_lite.stl");
@@ -50,7 +46,7 @@ module case(
    explode = 0, //show parts seperate
    lolin32lite = true, //lolin32lite mount
    lolinspace = 7.4, //spacing of lolin32lite aboce bottom part
-   lolinsnap = 1,
+   lolinsnap = 0,
    thread = false, //add thread on bottom part for rod
    button = false,//add buttonhole on top part
    reset = false, //add reset button
@@ -167,7 +163,7 @@ module case(
                both();
                translate([0,0,cutheight])cuboid(x*y,anchor=BOTTOM);
                if(button){
-                  #translate([buttonpos[0],buttonpos[1],-z/2])rotate([0,0,90])buttonCase2("cutout",wall);
+                  translate([buttonpos[0],buttonpos[1],-z/2])rotate([0,0,90])buttonCase2("cutout",wall);
                   }
                if(thread){
                   translate([0,0,-z/2])cuboid([13,13,15],rounding=2,except=[TOP,BOTTOM]);
@@ -185,9 +181,9 @@ module case(
                }//end for
                if(button){
                translate([buttonpos[0],buttonpos[1],-z/2])rotate([0,0,90]){
-               buttonCase2("snap");
-               up(10)buttonCase2("cover");
-               down(5)buttonCase2("cap");
+                buttonCase2("snap");
+                up(10)buttonCase2("cover");
+                down(5)buttonCase2("cap");
 
                }
                }
@@ -197,8 +193,8 @@ module case(
                         translate([0,-23,-z/2])cuboid([25,7.3,lolinspace],anchor = BOTTOM+FRONT);
                         translate([0,24,-z/2])cuboid([26,5.5,lolinspace],anchor = BOTTOM+BACK);
                         if(lolinsnap){
-                            for(i=[-1,1])translate([i*13.3,-24.5,-z/2])cuboid([1.2,10,lolinspace+1.7],anchor =BOTTOM+FRONT)
-                                attach(TOP)ycyl(d=2,h=10 );
+                            for(i=[-1,1])translate([i*13.3,-24.5,-z/2])cuboid([1.2,8,lolinspace+1.7],anchor =BOTTOM+FRONT,rounding = -2, edges = [BOTTOM+LEFT,BOTTOM+RIGHT])
+                                attach(TOP)ycyl(d=2,h=8 );
                         }//end if lolinsnap
                      }//end union
                   translate([10.8,-17.6,-z/2])cyl(d=2,h=lolinspace+1,anchor = BOTTOM);
@@ -229,7 +225,7 @@ module case(
       body(explode,"upper");
       body(explode,"lower");
       fwd(explode+y/2+wall/2)frontplate();
-      back(explode)translate([0,-1*(-y/2-wall/2),0])frontaplate();
+      back(explode)translate([0,-1*(-y/2-wall/2),0])frontplate();
       }
    if(part == "top"){
       down(z/2)body(explode,"upper");
@@ -361,9 +357,9 @@ module buttonCase2(PART = "cutout",w=2){
     cuboid([disSize[0]-0.5,disSize[1]-0.5,wall],rounding = 1, except=[TOP,BOTTOM],anchor=TOP);
 
     rotate([180,0,0])for(i=[1:90:279]){
-         rotate([0,0,i])translate([-4/2-0.75/2,0,0])union(){
-            down(0.5)cuboid([0.75,2.7,2.5]);
-            translate([-0.75,0,0.25])cuboid([1.2,1,3]);
+         rotate([0,0,i])translate([-2.5,0,0])union(){
+            cuboid([0.75,2.7,1.75],chamfer = -0.75,anchor=TOP, edges = [TOP+LEFT],);
+            *translate([-0.5,0,0.25])cuboid([1.2,1,3]);
             translate([0.75/2,2.7/2,-3.5/2+0.7])rotate([90,90,0])linear_extrude(2.7)polygon([[0,0],[0.7,0.3],[0.7,0]]);
          }//end union
       }//end for
