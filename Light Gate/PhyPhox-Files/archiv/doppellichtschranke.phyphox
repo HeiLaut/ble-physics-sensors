@@ -1,0 +1,73 @@
+<phyphox xmlns="https://phyphox.org/xml" xmlns:editor="https://phyphox.org/xml/editor" version="1.20" locale="de">
+  <title>Doppellichtschranke</title>
+  <category>Sensor-Boxen</category>
+  <color>red</color>
+  <description>2x ESP32 Lichtschranke</description>
+  <data-containers>
+    <container size="0">time</container>
+    <container size="5">dt</container>
+    <container size="0">n</container>
+    <container>timeOffset</container>
+    <container size="0">timeView</container>
+    <container size="0">nOffset</container>
+    <container size="0">nView</container>
+    <container size="0">dtView</container>
+    <container size="0">dtB</container>
+    <container size="0">timeB</container>
+    <container size="0">nB</container>
+    <container>nOffsetB</container>
+    <container>timeOffsetB</container>
+    <container size="0">timeViewB</container>
+    <container size="0">nViewB</container>
+    <container size="0">t_A_B</container>
+    <container>timediff</container>
+    <container size="0">event_time</container>
+    <container size="0">event_timeB</container>
+  </data-containers>
+  <input>
+    <bluetooth uuid="12345678-1234-1234-1234-123456789abc" mtu="0" mode="notification">
+      <output char="abcdef01-1234-1234-1234-123456789abc" conversion="string">time</output>
+      <output char="abcdef03-1234-1234-1234-123456789abc" conversion="string">dt</output>
+      <output char="abcdef05-1234-1234-1234-123456789abc" conversion="string">n</output>
+      <output char="abcdef06-1234-1234-1234-123456789abc" conversion="string">event_time</output>
+    </bluetooth>
+    <bluetooth uuid="12345678-1234-1234-1234-123456789abc" mode="notification">
+      <output char="abcdef01-1234-1234-1234-123456789abc" conversion="string">timeB</output>
+      <output char="abcdef03-1234-1234-1234-123456789abc" conversion="string">dtB</output>
+      <output char="abcdef05-1234-1234-1234-123456789abc" conversion="string">nB</output>
+      <output char="abcdef06-1234-1234-1234-123456789abc" conversion="string">event_timeB</output>
+    </bluetooth>
+  </input>
+  <analysis>
+    <first>
+      <input as="value" keep="true">time</input>
+      <output as="first" append="true">timeOffset</output>
+      <input as="value" keep="true">timeB</input>
+      <output as="first" append="true">timeOffsetB</output>
+    </first>
+    <subtract>
+      <input keep="true">timeOffset</input>
+      <input keep="true">timeOffsetB</input>
+      <output>timediff</output>
+    </subtract>
+    <formula formula="abs(([1]-[2])-[3])">
+      <input keep="true">event_time</input>
+      <input keep="true">event_timeB</input>
+      <input keep="true">timediff</input>
+      <output>t_A_B</output>
+    </formula>
+  </analysis>
+  <views>
+    <view label="Laufzeiten">
+      <value label="Laufzeit A-B t=" size="2" precision="1" unit="s">
+        <input>t_A_B</input>
+      </value>
+      <value label="dtA t=" size="2" precision="4" unit="s">
+        <input>dt</input>
+      </value>
+      <value label="dtB t=" size="2" precision="4" unit="s">
+        <input>dtB</input>
+      </value>
+    </view>
+  </views>
+</phyphox>
