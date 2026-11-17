@@ -35,7 +35,7 @@
   </data-containers>
   <input>
     <bluetooth uuid="12345678-1234-1234-1234-123456789abc" mtu="0" mode="notification">
-      <output char="abcdef01-1234-1234-1234-123456789abc" conversion="string">time</output>
+      <output char="abcdef06-1234-1234-1234-123456789abc" conversion="string">time</output>
       <output char="abcdef02-1234-1234-1234-123456789abc" conversion="string">lt</output>
       <output char="abcdef03-1234-1234-1234-123456789abc" conversion="string">dt</output>
       <output char="abcdef03-1234-1234-1234-123456789abc" conversion="string">dtView</output>
