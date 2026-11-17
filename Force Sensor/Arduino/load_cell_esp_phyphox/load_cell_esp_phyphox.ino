@@ -3,7 +3,7 @@
 #include <Preferences.h>
 
 #define BUTTON_PIN 2 
-#define SENSOR_NAME "Kraftsensor 1N"
+#define SENSOR_NAME "Kraftsensor B"
 HX711_ADC LoadCell(4, 5); //LoadCell(DT,SCK)
 HX711_ADC LoadCell2(33,14);
 
@@ -18,7 +18,9 @@ volatile bool  doTare  = false;
 //const float calFactor = 1071.03;
 
 //calibration factor for secondary load cell (connected via rj45)
-const float calFactor2 = 1019.34;
+float calFactor2 = 1019.34;
+volatile float calLoad2 = 0;
+volatile bool  doCal2   = false;
 
 int tara = 0;
 int reset = 0;
@@ -28,7 +30,8 @@ void setup() {
   Serial.begin(115200); 
 
   prefs.begin("kraftsensor", false);
-  calFactor = prefs.getFloat("calFactor", calFactor);
+  calFactor  = prefs.getFloat("calFactor", calFactor);
+  calFactor2 = prefs.getFloat("calFactor2", calFactor2);
   //Turn on the internal LED on lolin 32
   
 
@@ -45,15 +48,21 @@ void setup() {
   kraft.setTitle("Kraftsensor");
   kraft.setCategory("Sensor-Boxen");
   
-  PhyphoxBleExperiment::Button calBtn("Kalibrieren", 5);
-  PhyphoxBleExperiment::Edit   calEdit("Referenzkraft", 6);
+  PhyphoxBleExperiment::Button calBtn("Kalibrieren 1", 5);
+  PhyphoxBleExperiment::Edit   calEdit("Referenzmasse 1", 6);
+  PhyphoxBleExperiment::Button calBtn2("Kalibrieren 2", 7);
+  PhyphoxBleExperiment::Edit   calEdit2("Referenzmasse 2", 8);
   PhyphoxBleExperiment::Button tareBtn("Tarieren", 4);
 
-  calEdit.setUnit("g");           // statt "N"
-  calEdit.setLabel("Referenzmasse");   // optional
+  calEdit.setUnit("g");
   calEdit.setDecimal(true);
   calEdit.submitWith(calBtn);   // Button-Kanal ist durch den Konstruktor schon gesetzt
   calEdit.onChange([](float v) { calLoad = v; doCal = true; });
+
+  calEdit2.setUnit("g");
+  calEdit2.setDecimal(true);
+  calEdit2.submitWith(calBtn2);
+  calEdit2.onChange([](float v) { calLoad2 = v; doCal2 = true; });
   
   tareBtn.onPress([]() { doTare = true; });
  //View
@@ -136,6 +145,8 @@ void setup() {
 
   calib.addElement(calEdit);
   calib.addElement(calBtn);
+  calib.addElement(calEdit2);
+  calib.addElement(calBtn2);
 
   kraft.addView(firstView);
   kraft.addView(secondView);
@@ -202,15 +213,24 @@ void loop() {
   Serial.print("m2(g)");Serial.print(",");Serial.println(m2,1);//Serial.print(touchValue);
 
   if (doCal) {
-  doCal = false;
-  float incDat = LoadCell.getData();
-  if (calLoad > 0 && incDat > 5) {
-  calFactor = calFactor * (incDat / calLoad);   // beides in g
-  prefs.putFloat("calFactor", calFactor);
-  LoadCell.setCalFactor(calFactor);
-  Serial.println("Kalibriert");
+    doCal = false;
+    if (calLoad > 0 && incDat > 5) {
+      calFactor = calFactor * (incDat / calLoad);   // beides in g
+      prefs.putFloat("calFactor", calFactor);
+      LoadCell.setCalFactor(calFactor);
+      Serial.println("Kalibriert (Sensor 1)");
+    }
   }
-}
+
+  if (doCal2) {
+    doCal2 = false;
+    if (calLoad2 > 0 && m2 > 5) {                   // m2 = abs(incDat2), Vorzeichen egal
+      calFactor2 = calFactor2 * (m2 / calLoad2);    // beides in g
+      prefs.putFloat("calFactor2", calFactor2);
+      LoadCell2.setCalFactor(calFactor2);
+      Serial.println("Kalibriert (Sensor 2)");
+    }
+  }
   
   newDataReady = false;
   }
@@ -227,4 +247,3 @@ void newExperimentEvent(){
     reset = true;
   }
 }
-
