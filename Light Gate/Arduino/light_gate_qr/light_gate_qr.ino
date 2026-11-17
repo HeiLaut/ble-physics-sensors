@@ -10,15 +10,15 @@
 
 // ---- Pin-Configuration ----
 // LS4568 SIGNAL: 22, LED: 33 /LED Output must be disabled (Signal PIN22)
-#define SIGNAL_PIN 26
+#define SIGNAL_PIN 26//22//5//26
 #define BUTTON_PIN 27
 #define SDA_PIN 16   
 #define SCL_PIN 17
-#define LED_PIN 32
+#define LED_PIN 32//33//32
 
 // ---- OLED ----
 #define SCREEN_WIDTH 128
-#define SCREEN_HEIGHT 32//32
+#define SCREEN_HEIGHT 32
 #define NAME "LS 1"//"Einzel-Lichtschranke A"
 
 Adafruit_SSD1306 oled(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
@@ -40,7 +40,6 @@ bool cleared = 0;
 bool synced = 0;
 
 volatile float t = 0;
-volatile float t_offset = 0;
 // ---- Mode/Taster ----
 // 0 = Laufzeit, 1 = Verdunklung, 2 = Pendel
 
@@ -49,13 +48,14 @@ bool lastButtonState = HIGH;
 
 
 #define SERVICE_UUID   "12345678-1234-1234-1234-123456789abc"
-#define CHAR_UUID_T    "abcdef01-1234-1234-1234-123456789abc"  // time
+#define CHAR_UUID_T    "abcdef01-1234-1234-1234-123456789abc"  // runtime
 #define CHAR_UUID_LT   "abcdef02-1234-1234-1234-123456789abc"  // signal time
 #define CHAR_UUID_DT   "abcdef03-1234-1234-1234-123456789abc"  // shadowing time
 #define CHAR_UUID_SD   "abcdef04-1234-1234-1234-123456789abc"  // period
 #define CHAR_UUID_N    "abcdef05-1234-1234-1234-123456789abc"  // count
+#define CHAR_UUID_ET   "abcdef06-1234-1234-1234-123456789abc" //event time 
 
-BLECharacteristic *pCharT, *pCharLT, *pCharDT, *pCharSD, *pCharN;
+BLECharacteristic *pCharT, *pCharLT, *pCharDT, *pCharSD, *pCharN, *pCharET;
 bool deviceConnected = false;
 
 class MyServerCallbacks : public BLEServerCallbacks {
@@ -102,6 +102,8 @@ void setup() {
   pCharDT = createChar(pService, CHAR_UUID_DT);
   pCharSD = createChar(pService, CHAR_UUID_SD);
   pCharN = createChar(pService, CHAR_UUID_N);
+  pCharET = createChar(pService, CHAR_UUID_ET);
+
 
 
   pService->start();
@@ -122,10 +124,11 @@ void setup() {
 
   attachInterrupt(digitalPinToInterrupt(SIGNAL_PIN), isr1, CHANGE);
 
-  t_offset = 0;
-
-  pinMode(LED_BUILTIN, OUTPUT);
-  digitalWrite(LED_BUILTIN, LOW);
+  //if signal pin is connected to 22 (internal LED-PIN) then disable internal LED
+  if(SIGNAL_PIN != 22){
+   pinMode(LED_BUILTIN, OUTPUT);
+   digitalWrite(LED_BUILTIN, LOW);
+  }
 }
 
 void loop() {
@@ -150,27 +153,38 @@ void loop() {
    if(digitalRead(SIGNAL_PIN)){
     verdT = abs((float)t1 - (float)t2) * 0.000001f;
   }
+      t  = 0.000001f * (float)micros();
+   if (deviceConnected) {
+
+      String sT       = String(t,4);
+      pCharT->setValue(sT.c_str());       pCharT->notify();
+      delay(20);
+   }
 
 
+  
   if (newEvent) {
     newEvent = false;
-    t  = 0.000001f * (float)t1 - t_offset;
+    float eT  = 0.000001f * (float)t1;
     laufT   = (timeArray[2] - timeArray[1]) * 0.000001f;
     pendelT = (timeArray[2] - timeArray[0]) * 0.000001f;
     pendelF = 1.0f / pendelT;
-    Serial.println(String(t) + " | " + String(laufT) + " | " + String(verdT) + " | " +String(pendelT) + "|" + String(n));
+    Serial.println(String(t) + " | " + String(laufT,3) + " | " + String(verdT,4) + " | " +String(pendelT,3) + "|" + String(n));
      if (deviceConnected) {
-    String sT       = String(t,4);
+   // String sT       = String(t,4);
     String sLaufT   = String(laufT,4);
     String sVerdT   = String(verdT,4);
     String sPendelT = String(pendelT,4);//pendelT
     String sN = String(n);
+    String sET = String(eT,4);
+
 
     pCharN->setValue(sN.c_str()); pCharN->notify();
-    pCharT->setValue(sT.c_str());       pCharT->notify();
+   // pCharT->setValue(sT.c_str());       pCharT->notify();
     pCharLT->setValue(sLaufT.c_str());  pCharLT->notify();
     pCharDT->setValue(sVerdT.c_str());  pCharDT->notify();
     pCharSD->setValue(sPendelT.c_str()); pCharSD->notify();
+    pCharET->setValue(sET.c_str()); pCharET->notify();
 
 
     //delay(500);
