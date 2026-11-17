@@ -28,11 +28,11 @@
       <input keep="true">timeOffset</input>
       <output>timeView</output>
     </subtract>
-    <add>
+    <multiply>
       <input keep="true">current</input>
       <input keep="true">voltage</input>
       <output>power</output>
-    </add>
+    </multiply>
   </analysis>
   <views>
     <view label="Einfach">
