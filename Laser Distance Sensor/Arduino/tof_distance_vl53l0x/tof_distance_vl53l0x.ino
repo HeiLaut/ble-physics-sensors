@@ -1,6 +1,3 @@
-/*
-zu ändern: Bei Knopfdruck wird immer der Orstoffset gesetzt;Zeitoffset wird nur dann auf 0 gesetzt, wenn in Phyphox der Mülleimer gedrückt wird
-*/
 //Version 0.5
 
 #include <Adafruit_VL53L0X.h>
@@ -9,8 +6,7 @@ zu ändern: Bei Knopfdruck wird immer der Orstoffset gesetzt;Zeitoffset wird nur
 #define BUTTON_PIN 27 //PIN for Offset-Button
 #define SDA 14 //PIN for I2C SDA
 #define SCL 12 //PIN for I2C SCL
-
-#define BLENAME "Laser-Distanz_#3"
+#define BLENAME "Laser-Distanz_#5"
 
 Adafruit_VL53L0X lox = Adafruit_VL53L0X();
 

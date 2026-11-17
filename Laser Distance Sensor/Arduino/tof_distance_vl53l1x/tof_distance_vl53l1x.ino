@@ -7,9 +7,9 @@ zu ändern: Bei Knopfdruck wird immer der Orstoffset gesetzt;Zeitoffset wird nur
 #include <phyphoxBle.h>
 
 #define BUTTON_PIN 27 //PIN for Offset-Button
-#define SDA 16 //PIN for I2C SDA
-#define SCL 17 //PIN for I2C SCL
-
+#define SDA 16//15 //PIN for I2C SDA
+#define SCL 17//3 //PIN for I2C SCL
+#define LED_BUILTIN 22
 #define BLENAME "Laser-Distanz 0-400cm"
 
 Adafruit_VL53L1X vl53 = Adafruit_VL53L1X();
@@ -31,17 +31,15 @@ bool emaInitialized = false;
 void setup() {
   //needed to select the scl and sda port for the lolin lite board Wire.begin(I2C_SDA, I2C_SCL)
   Wire.begin(SDA, SCL);
-  //enable internal LED c:\Users\Heinrich\Nextcloud\Physik\DIY\Physics-Arduino-Sensors\Force Sensor\Arduino\load_cell_esp_phyphox\load_cell_esp_phyphox.ino
  
   Serial.begin(115200);
-   // wait until serial port opens for native USB devices
   while (!Serial) {
     delay(1);
   }
   delay(2000);
 
   Serial.println("-----------------------------");
-  Serial.println("Vl53l1X-Sensor Version 0.4");
+  Serial.println("Vl53l1X-Sensor Version 0.5");
   Serial.println("-----------------------------");
 
   delay(1000);
@@ -50,7 +48,6 @@ void setup() {
   digitalWrite(LED_BUILTIN, LOW);
 
 
-  //Serial.println("Adafruit VL53L0X test");
   if (!vl53.begin(0x29, &Wire)) {
     Serial.println(F("Failed to boot VL53L1X"));
     while (1){
