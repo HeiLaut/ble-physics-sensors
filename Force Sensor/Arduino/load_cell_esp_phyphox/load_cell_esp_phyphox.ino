@@ -3,7 +3,7 @@
 #include <Preferences.h>
 
 #define BUTTON_PIN 2 
-#define SENSOR_NAME "Kraftsensor B"
+#define SENSOR_NAME "Kraftsensor 1N"
 HX711_ADC LoadCell(4, 5); //LoadCell(DT,SCK)
 HX711_ADC LoadCell2(33,14);
 
@@ -158,10 +158,14 @@ void setup() {
   PhyphoxBLE::addExperiment(kraft);
    
   LoadCell.begin(); // start connection to HX711
+  LoadCell.setSamplesInUse(1);   // schnellste Reaktion, kein Mitteln
+
   LoadCell.start(2000); // load cells gets 2000ms of time to stabilize
   LoadCell.setCalFactor(calFactor); 
 
   LoadCell2.begin(); // start connection to HX711
+  LoadCell2.setSamplesInUse(1);   // schnellste Reaktion, kein Mitteln
+
   LoadCell2.start(2000); // load cells gets 2000ms of time to stabilize
   LoadCell2.setCalFactor(calFactor2); 
   

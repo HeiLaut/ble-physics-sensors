@@ -116,8 +116,9 @@ void setup() {
   
   PhyphoxBLE::addExperiment(kraft);
    
-  LoadCell.begin(); // start connection to HX711
-  LoadCell.start(2000); // load cells gets 2000ms of time to stabilize
+  LoadCell.begin(); 
+  LoadCell.setSamplesInUse(2);  
+  LoadCell.start(2000);
   LoadCell.setCalFactor(calFactor); 
   
   pinMode(BUTTON_PIN, INPUT_PULLUP);
