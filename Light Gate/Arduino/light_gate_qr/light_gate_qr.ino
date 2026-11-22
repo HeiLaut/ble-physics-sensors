@@ -15,6 +15,7 @@
 #define SDA_PIN 16   
 #define SCL_PIN 17
 #define LED_PIN 32//33//32
+#define LED_BUILTIN 22
 
 // ---- OLED ----
 #define SCREEN_WIDTH 128
