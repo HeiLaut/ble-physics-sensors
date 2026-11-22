@@ -33,7 +33,21 @@ void setup() {
   calFactor  = prefs.getFloat("calFactor", calFactor);
   calFactor2 = prefs.getFloat("calFactor2", calFactor2);
   //Turn on the internal LED on lolin 32
+     
+  LoadCell.begin(); // start connection to HX711
+  LoadCell.setSamplesInUse(2);   // schnellste Reaktion, kein Mitteln
+
+  LoadCell.start(2000); // load cells gets 2000ms of time to stabilize
+  LoadCell.setCalFactor(calFactor); 
+
+  LoadCell2.begin(); // start connection to HX711
+  LoadCell2.setSamplesInUse(2);   // schnellste Reaktion, kein Mitteln
+
+  LoadCell2.start(2000); // load cells gets 2000ms of time to stabilize
+  LoadCell2.setCalFactor(calFactor2); 
   
+  
+  pinMode(BUTTON_PIN, INPUT_PULLUP);
 
   pinMode(LED_BUILTIN, OUTPUT);  
   digitalWrite(LED_BUILTIN, LOW);
@@ -156,22 +170,6 @@ void setup() {
 
   
   PhyphoxBLE::addExperiment(kraft);
-   
-  LoadCell.begin(); // start connection to HX711
-  LoadCell.setSamplesInUse(1);   // schnellste Reaktion, kein Mitteln
-
-  LoadCell.start(2000); // load cells gets 2000ms of time to stabilize
-  LoadCell.setCalFactor(calFactor); 
-
-  LoadCell2.begin(); // start connection to HX711
-  LoadCell2.setSamplesInUse(1);   // schnellste Reaktion, kein Mitteln
-
-  LoadCell2.start(2000); // load cells gets 2000ms of time to stabilize
-  LoadCell2.setCalFactor(calFactor2); 
-  
-  
-  pinMode(BUTTON_PIN, INPUT_PULLUP);
-
 }
 
 
