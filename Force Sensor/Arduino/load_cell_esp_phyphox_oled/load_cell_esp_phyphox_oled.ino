@@ -8,12 +8,13 @@
 #define SENSOR_NAME "Kraftsensor OLED"
 #define SCREEN_WIDTH 128 // OLED display width, in pixels
 #define SCREEN_HEIGHT 32 // OLED display height, in pixels
-
+#define SDA 32
+#define SCL 33
 #define OLED_RESET     -1 // Reset pin # (or -1 if sharing Arduino reset pin)
 #define SCREEN_ADDRESS 0x3C ///< See datasheet for Address; 0x3D for 128x64, 0x3C for 128x32
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
-HX711_ADC LoadCell(4, 5); //LoadCell(DT,SCK)
+HX711_ADC LoadCell(4, 5); 
 
 Preferences prefs;
 
@@ -34,7 +35,8 @@ void setup() {
   prefs.begin("kraftsensor", false);
   calFactor = prefs.getFloat("calFactor", calFactor);
 
-  Wire.begin(33,32);//SDA SCL
+  Wire.begin(SDA,SCL);//SDA SCL
+  Wire.setClock(400000); 
   //Turn on the internal LED on lolin 32
   pinMode(LED_BUILTIN, OUTPUT);  
   digitalWrite(LED_BUILTIN, LOW);
@@ -117,7 +119,7 @@ void setup() {
   PhyphoxBLE::addExperiment(kraft);
    
   LoadCell.begin(); 
-  LoadCell.setSamplesInUse(2);  
+  LoadCell.setSamplesInUse(4);  
   LoadCell.start(2000);
   LoadCell.setCalFactor(calFactor); 
   
@@ -168,17 +170,19 @@ void loop() {
   float f = incDat *9.81/1000;
   PhyphoxBLE::write(t,f,m);
 
-  display.clearDisplay();
-  display.setTextSize(2);
-  display.setCursor(10,0);
-  display.print(f,3);
-  display.setCursor(85,0);
-  display.print('N');
-  display.setCursor(10,15);
-  display.print(m,1);
-  display.setCursor(85,15);
-  display.print('g');
-  display.display();
+   static uint8_t cnt = 0;
+  if (++cnt >= 8) {
+    cnt = 0;
+
+    display.clearDisplay();
+    display.setTextSize(2);
+    display.setCursor(10,0);  display.print(f,3);
+    display.setCursor(85,0);  display.print('N');
+    display.setCursor(10,15); display.print(m,1);
+    display.setCursor(85,15); display.print('g');
+    display.display();
+  }
+
 
   Serial.print("t(s)");Serial.print(",");Serial.print(t);Serial.print(",");
   Serial.print("F(N)");Serial.print(",");Serial.print(f,3);Serial.print(",");
